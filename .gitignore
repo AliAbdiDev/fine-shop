@@ -1,0 +1,10 @@
+# Frontend
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/.env.local
+
+# Backend (بعداً اضافه می‌شود)
+backend/venv/
+backend/__pycache__/
+backend/.env
