@@ -1,5 +1,7 @@
+import Link from "next/link";
+
 function Home() {
-  return <main>welcome to Home</main>;
+  return <main><Link href={'/admin'}>admin panel</Link></main>;
 }
 
 export default Home;
