@@ -1,0 +1,8 @@
+{
+  "installCommand": "pnpm install",
+  "buildCommand": "pnpm run build",
+  "regions": ["fra1"],
+  "git": {
+    "ignoredBuildStep": "git diff --quiet HEAD^ HEAD -- ."
+  }
+}
