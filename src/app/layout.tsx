@@ -5,6 +5,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { TooltipProvider } from "@/core/components/ui/tooltip";
 import { cn } from "@/core/utils/helpers";
+import { ReactNode } from "react";
 
 const vazirRegular = localFont({
   variable: "--vazir-regular",
@@ -62,7 +63,7 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: ReactNode;
 }>) {
   return (
     <html

@@ -5,8 +5,6 @@ import * as React from "react";
 import { StoreIcon } from "lucide-react";
 
 import { NavMain } from "@/core/components/nav-main";
-import { NavProjects } from "@/core/components/nav-projects";
-import { NavSecondary } from "@/core/components/nav-secondary";
 import { NavUser } from "@/core/components/nav-user";
 import {
   Sidebar,
@@ -34,20 +32,6 @@ export type AppSidebarData = {
       url: string;
     }[];
   }[];
-  navSecondary: {
-    title: string;
-    url: string;
-    icon: React.ReactNode;
-  }[];
-  projects: {
-    name: string;
-    url: string;
-    icon: React.ReactNode;
-  }[];
-  brand: {
-    title: string;
-    subtitle: string;
-  };
 };
 
 export function AppSidebar({
@@ -62,12 +46,8 @@ export function AppSidebar({
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" render={<a href="#" />}>
-              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+              <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                 <StoreIcon className="size-4" />
-              </div>
-              <div className="grid flex-1 text-start text-sm leading-tight">
-                <span className="truncate font-medium">{data.brand.title}</span>
-                <span className="truncate text-xs">{data.brand.subtitle}</span>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -75,8 +55,6 @@ export function AppSidebar({
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />

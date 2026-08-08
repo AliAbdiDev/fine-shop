@@ -27,7 +27,7 @@ export function LoginForm({
         <CardHeader>
           <CardTitle>ورود به حساب کاربری</CardTitle>
           <CardDescription>
-            ایمیل و رمز عبور خود را برای ورود وارد کنید.
+            ایمیل و رمز عبور خود را برای ورود وارد کنید
           </CardDescription>
         </CardHeader>
         <CardContent>
