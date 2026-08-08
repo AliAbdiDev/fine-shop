@@ -9,5 +9,12 @@
         "javascriptreact",
         "typescript",
         "typescriptreact"
+    ],
+    "eslint.useFlatConfig": true,
+    "eslint.workingDirectories": [
+        {
+            "directory": "./frontend",
+            "changeProcessCWD": true
+        }
     ]
 }

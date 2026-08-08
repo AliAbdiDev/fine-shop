@@ -1,35 +1,24 @@
-import { defineConfig, globalIgnores } from "eslint/config";
-import nextVitals from "eslint-config-next/core-web-vitals";
-import nextTs from "eslint-config-next/typescript";
+import js from "@eslint/js";
 import prettierConfig from "eslint-config-prettier";
 import eslintPluginImport from "eslint-plugin-import";
 import unusedImports from "eslint-plugin-unused-imports";
+import nextVitals from "eslint-config-next/core-web-vitals";
+import nextTs from "eslint-config-next/typescript";
 
-const eslintConfig = defineConfig([
+export default [
+  { ignores: [".next/**", "out/**", "build/**", "next-env.d.ts"] },
+  js.configs.recommended,
   ...nextVitals,
   ...nextTs,
-  prettierConfig,
-
-  globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts"]),
-
-  // Plugins and global settings
   {
     plugins: {
       import: eslintPluginImport,
       "unused-imports": unusedImports,
     },
     settings: {
-      "import/resolver": {
-        typescript: true,
-        node: true,
-      },
+      "import/resolver": { typescript: true, node: true },
     },
-  },
-
-  // Base rules
-  {
     rules: {
-      // ── Remove unused imports ──
       "no-unused-vars": "off",
       "@typescript-eslint/no-unused-vars": "off",
       "unused-imports/no-unused-imports": "error",
@@ -42,17 +31,10 @@ const eslintConfig = defineConfig([
           argsIgnorePattern: "^_",
         },
       ],
-
-      // ── Automatic type imports ──
       "@typescript-eslint/consistent-type-imports": [
         "error",
-        {
-          prefer: "type-imports",
-          fixStyle: "inline-type-imports",
-        },
+        { prefer: "type-imports", fixStyle: "inline-type-imports" },
       ],
-
-      // ── Import sorting order ──
       "import/order": [
         "warn",
         {
@@ -80,49 +62,34 @@ const eslintConfig = defineConfig([
           alphabetize: { order: "asc", caseInsensitive: true },
         },
       ],
-    },
-  },
-
-  // Clarity architecture
-  {
-    name: "clarity-architecture",
-    rules: {
       "import/no-restricted-paths": [
         "error",
         {
           zones: [
-            // 1. Core (excluding features) cannot import from features
             {
               target: "./src/core/**",
               from: "./src/core/features/**",
               message: "Core layer cannot import from features.",
             },
-            // 2. Feature isolation (Features cannot import directly from each other)
             {
               target: "./src/core/features/*/",
               from: "./src/core/features/*/",
-              message:
-                "Features must be isolated. Communication must go through the core adapter.",
+              message: "Features must be isolated.",
             },
-            // 3. Pure (utils) - only within core/features
             {
               target: "./src/core/features/*/utils/**",
               from: ["./src/core/**/state/**", "./src/core/**/components/**"],
-              message:
-                "Utils must be pure, no dependencies on state or components.",
+              message: "Utils must be pure.",
             },
-            // 4. Core UI Components only from core tools
             {
               target: "./src/core/components/ui/**",
               from: ["./src/core/features/**", "./src/core/**/state/**"],
-              message:
-                "Core UI components cannot import from features or state.",
+              message: "Core UI cannot import from features or state.",
             },
           ],
         },
       ],
     },
   },
-]);
-
-export default eslintConfig;
+  prettierConfig,
+];
