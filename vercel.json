@@ -1,0 +1,6 @@
+{
+  "rootDirectory": "frontend",
+  "git": {
+    "ignoredBuildStep": "git diff --quiet HEAD^ HEAD -- frontend/"
+  }
+}
