@@ -1,8 +1,0 @@
-{
-  "git": {
-    "ignoredBuildStep": "git diff --quiet HEAD^ HEAD -- frontend/"
-  },
-  "installCommand": "pnpm install",
-  "buildCommand": "pnpm run build",
-  "regions": ["fra1"]
-}
