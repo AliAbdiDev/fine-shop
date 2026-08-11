@@ -1,15 +1,16 @@
 import js from "@eslint/js";
+import nextVitals from "eslint-config-next/core-web-vitals";
+import nextTs from "eslint-config-next/typescript";
 import prettierConfig from "eslint-config-prettier";
 import eslintPluginImport from "eslint-plugin-import";
 import unusedImports from "eslint-plugin-unused-imports";
-import nextVitals from "eslint-config-next/core-web-vitals";
-import nextTs from "eslint-config-next/typescript";
 
-export default [
+const config = [
   { ignores: [".next/**", "out/**", "build/**", "next-env.d.ts"] },
   js.configs.recommended,
   ...nextVitals,
   ...nextTs,
+
   {
     plugins: {
       import: eslintPluginImport,
@@ -18,6 +19,7 @@ export default [
     settings: {
       "import/resolver": { typescript: true, node: true },
     },
+
     rules: {
       "no-unused-vars": "off",
       "@typescript-eslint/no-unused-vars": "off",
@@ -91,5 +93,8 @@ export default [
       ],
     },
   },
+
   prettierConfig,
 ];
+
+export default config;

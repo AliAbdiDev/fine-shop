@@ -1,11 +1,13 @@
+import { type ReactNode } from "react";
+
 import type { Metadata } from "next";
 
 import localFont from "next/font/local";
 
 import "./globals.css";
 import { TooltipProvider } from "@/core/components/ui/tooltip";
+import QueryProvider from "@/core/services/configs/query/QueryProvider";
 import { cn } from "@/core/utils/helpers";
-import { ReactNode } from "react";
 
 const vazirRegular = localFont({
   variable: "--vazir-regular",
@@ -78,7 +80,9 @@ export default function RootLayout({
       )}
     >
       <body className="flex min-h-full flex-col">
-        <TooltipProvider>{children}</TooltipProvider>
+        <TooltipProvider>
+          <QueryProvider>{children}</QueryProvider>
+        </TooltipProvider>
       </body>
     </html>
   );
