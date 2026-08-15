@@ -28,5 +28,5 @@ export async function startMocking() {
         serviceWorker: { url: '/mockServiceWorker.js' },
     })
 
-    banner('browser', handlers.length, BASE)
+    banner('browser', BASE)
 }

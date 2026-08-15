@@ -10,5 +10,5 @@ export async function initServer() {
     attachLogger(server, 'node')
     server.listen({ onUnhandledRequest })
 
-    banner('node', handlers.length, BASE)
+    banner('node', BASE)
 }

@@ -1,5 +1,7 @@
 import type { SetupWorker } from 'msw/browser'
 
+import schema from '../schema.json'
+
 type Side = 'browser' | 'node'
 
 /**
@@ -65,9 +67,15 @@ export function attachLogger({ events }: MswInstance, side: Side) {
     })
 }
 
-export function banner(side: Side, count: number, base: string) {
+/**
+ * Handlers are now a single catch-all, so their count says nothing useful.
+ * Report the documented paths the engine can serve instead.
+ */
+export function banner(side: Side, base: string) {
+    const paths = Object.keys(schema.paths).length
+
     console.log(
-        `${TAG(side)} enabled | ${count} handlers | base=${base}\n` +
+        `${TAG(side)} enabled | ${paths} documented paths | base=${base}\n` +
         `${TAG(side)} legend: MOCK = fake data · REAL API = live backend · UNHANDLED = missing handler`,
     )
 }

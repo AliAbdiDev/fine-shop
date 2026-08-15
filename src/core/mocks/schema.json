@@ -10,9 +10,7 @@
       "post": {
         "operationId": "account_login_create",
         "description": "Send an OTP code to the specified email address.\n\nResponses:\n    200: OTP code sent successfully.\n    400: Invalid email.",
-        "tags": [
-          "account"
-        ],
+        "tags": ["account"],
         "requestBody": {
           "content": {
             "application/json": {
@@ -53,9 +51,7 @@
       "post": {
         "operationId": "account_otp_create",
         "description": "Verify an OTP code and return an authentication token.\n\nReturns:\n    200: OTP verified successfully.\n    201: New user created and authenticated.\n    400: Invalid email or OTP.",
-        "tags": [
-          "account"
-        ],
+        "tags": ["account"],
         "requestBody": {
           "content": {
             "application/json": {
@@ -113,9 +109,7 @@
       "post": {
         "operationId": "account_login_create",
         "description": "Send an OTP code to the specified email address.\n\nResponses:\n    200: OTP code sent successfully.\n    400: Invalid email.",
-        "tags": [
-          "account"
-        ],
+        "tags": ["account"],
         "requestBody": {
           "content": {
             "application/json": {
@@ -156,9 +150,7 @@
       "post": {
         "operationId": "account_otp_create",
         "description": "Verify an OTP code and return an authentication token.\n\nReturns:\n    200: OTP verified successfully.\n    201: New user created and authenticated.\n    400: Invalid email or OTP.",
-        "tags": [
-          "account"
-        ],
+        "tags": ["account"],
         "requestBody": {
           "content": {
             "application/json": {
@@ -229,10 +221,7 @@
             "maxLength": 6
           }
         },
-        "required": [
-          "email",
-          "otp"
-        ]
+        "required": ["email", "otp"]
       },
       "EmailOTPResponse": {
         "type": "object",
@@ -242,9 +231,7 @@
             "readOnly": true
           }
         },
-        "required": [
-          "token"
-        ]
+        "required": ["token"]
       },
       "EmailRequest": {
         "type": "object",
@@ -255,9 +242,7 @@
             "minLength": 1
           }
         },
-        "required": [
-          "email"
-        ]
+        "required": ["email"]
       }
     },
     "securitySchemes": {
