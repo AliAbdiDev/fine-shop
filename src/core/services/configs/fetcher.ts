@@ -1,4 +1,4 @@
-import { ofetch, type FetchError, type FetchOptions } from 'ofetch';
+import { createFetch, type FetchError, type FetchOptions } from 'ofetch';
 
 import { transformKeys } from '@/core/utils/helpers';
 
@@ -17,7 +17,6 @@ export interface ApiSuccess<T> {
     status: number;
     statusText: string;
     data: T;
-    headers: Headers;
     error: null;
 }
 
@@ -26,7 +25,6 @@ export interface ApiFailure {
     status: number;
     statusText: string;
     data: ApiErrorResponse | null;
-    headers: Headers | null;
     error: FetchError<ApiErrorResponse> | Error;
 }
 
@@ -50,14 +48,19 @@ const isFetchError = (e: unknown): e is FetchError<ApiErrorResponse> =>
 const shouldTransform = (options: object): boolean =>
     !('skipTransform' in options && options.skipTransform === true);
 
+const $fetch = createFetch({
+    fetch: (input: RequestInfo | URL, init?: RequestInit) =>
+        globalThis.fetch(input, init),
+});
 
 export const createFetcher = () =>
-    ofetch.create({
-        baseURL: process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000/api',
+    $fetch.create({
+        baseURL: process.env.NEXT_PUBLIC_API_BASE_URL + '/api',
         retryDelay: 500,
         timeout: 25_000,
 
         onRequest({ options }) {
+            console.log('base url', process.env.NEXT_PUBLIC_API_BASE_URL);
             // DECISION: retry is opted-in per method instead of globally in `create`.
             // A global `retry: 1` would also retry non-idempotent calls (POST/PUT/PATCH/DELETE).
             // If the server already applied the change but the response was lost (timeout /
@@ -100,8 +103,7 @@ async function request<T>(
             ok: true,
             status: response.status,
             statusText: response.statusText,
-            data: response._data as T,
-            headers: response.headers,
+            data: response._data ?? (null as T),
             error: null,
         };
     } catch (error) {
@@ -111,7 +113,6 @@ async function request<T>(
                 status: error.status ?? error.response?.status ?? 0,
                 statusText: error.statusText ?? error.response?.statusText ?? '',
                 data: isPlainData(error.data) ? (error.data as ApiErrorResponse) : null,
-                headers: error.response?.headers ?? null,
                 error,
             };
         }
@@ -121,7 +122,6 @@ async function request<T>(
             status: 0,
             statusText: '',
             data: null,
-            headers: null,
             error: error instanceof Error ? error : new Error(String(error)),
         };
     }

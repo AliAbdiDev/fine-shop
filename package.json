@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "r": "bash script/git-report.sh"
+    "mock-sync": "node src/core/mocks/configs/script-sync-schema.mjs",
+    "mock-init": "pnpm exec msw init public/ --save",
+    "r": "bash scripts/git-report.sh"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
@@ -37,6 +39,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.6",
     "@eslint/js": "^10.0.1",
+    "@mswjs/source": "^0.5.0",
     "@tailwindcss/postcss": "^4",
     "@tanstack/react-query-devtools": "^5.101.4",
     "@types/node": "^20",
@@ -48,9 +51,14 @@
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-prettier": "^5.5.6",
     "eslint-plugin-unused-imports": "^4.4.1",
+    "msw": "^2.15.0",
     "prettier": "^3.9.6",
     "prettier-plugin-tailwindcss": "^0.8.1",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "yaml": "^2.9.0"
+  },
+  "msw": {
+    "workerDirectory": ["public"]
   }
 }

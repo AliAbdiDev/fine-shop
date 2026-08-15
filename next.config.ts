@@ -2,6 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
+  serverExternalPackages: ['msw', '@mswjs/interceptors'],
+
   images: {
     formats: ['image/avif', 'image/webp'],
   },

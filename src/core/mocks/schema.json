@@ -1,0 +1,276 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Store API",
+    "version": "1.0.0",
+    "description": "API Documentation"
+  },
+  "paths": {
+    "/api/account/login/": {
+      "post": {
+        "operationId": "account_login_create",
+        "description": "Send an OTP code to the specified email address.\n\nResponses:\n    200: OTP code sent successfully.\n    400: Invalid email.",
+        "tags": [
+          "account"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailRequest"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailRequest"
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "jwtAuth": []
+          },
+          {}
+        ],
+        "responses": {
+          "200": {
+            "description": "OTP code is sent."
+          },
+          "400": {
+            "description": "Invalid credentials"
+          }
+        }
+      }
+    },
+    "/api/account/otp/": {
+      "post": {
+        "operationId": "account_otp_create",
+        "description": "Verify an OTP code and return an authentication token.\n\nReturns:\n    200: OTP verified successfully.\n    201: New user created and authenticated.\n    400: Invalid email or OTP.",
+        "tags": [
+          "account"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailOTPRequest"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailOTPRequest"
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailOTPRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "jwtAuth": []
+          },
+          {}
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailOTPResponse"
+                }
+              }
+            },
+            "description": "OTP code is sent."
+          },
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailOTPResponse"
+                }
+              }
+            },
+            "description": "OTP code is sent."
+          },
+          "400": {
+            "description": "Invalid credentials"
+          }
+        }
+      }
+    },
+    "/api/account/login": {
+      "post": {
+        "operationId": "account_login_create",
+        "description": "Send an OTP code to the specified email address.\n\nResponses:\n    200: OTP code sent successfully.\n    400: Invalid email.",
+        "tags": [
+          "account"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailRequest"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailRequest"
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "jwtAuth": []
+          },
+          {}
+        ],
+        "responses": {
+          "200": {
+            "description": "OTP code is sent."
+          },
+          "400": {
+            "description": "Invalid credentials"
+          }
+        }
+      }
+    },
+    "/api/account/otp": {
+      "post": {
+        "operationId": "account_otp_create",
+        "description": "Verify an OTP code and return an authentication token.\n\nReturns:\n    200: OTP verified successfully.\n    201: New user created and authenticated.\n    400: Invalid email or OTP.",
+        "tags": [
+          "account"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailOTPRequest"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailOTPRequest"
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailOTPRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "jwtAuth": []
+          },
+          {}
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailOTPResponse"
+                }
+              }
+            },
+            "description": "OTP code is sent."
+          },
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailOTPResponse"
+                }
+              }
+            },
+            "description": "OTP code is sent."
+          },
+          "400": {
+            "description": "Invalid credentials"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "EmailOTPRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "minLength": 1
+          },
+          "otp": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 6
+          }
+        },
+        "required": [
+          "email",
+          "otp"
+        ]
+      },
+      "EmailOTPResponse": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "readOnly": true
+          }
+        },
+        "required": [
+          "token"
+        ]
+      },
+      "EmailRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "email"
+        ]
+      }
+    },
+    "securitySchemes": {
+      "jwtAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "https://store.buildfyio.com"
+    }
+  ]
+}

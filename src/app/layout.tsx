@@ -6,6 +6,7 @@ import localFont from "next/font/local";
 
 import "./globals.css";
 import { TooltipProvider } from "@/core/components/ui/tooltip";
+import { MswProvider } from "@/core/mocks/configs/MswProvider";
 import QueryProvider from "@/core/services/configs/query/QueryProvider";
 import { cn } from "@/core/utils/helpers";
 
@@ -81,7 +82,9 @@ export default function RootLayout({
     >
       <body className="flex min-h-full flex-col">
         <TooltipProvider>
-          <QueryProvider>{children}</QueryProvider>
+          <MswProvider>
+            <QueryProvider>{children}</QueryProvider>
+          </MswProvider>
         </TooltipProvider>
       </body>
     </html>

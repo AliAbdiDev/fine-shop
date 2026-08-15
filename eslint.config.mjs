@@ -69,7 +69,7 @@ const config = [
         {
           zones: [
             {
-              target: "./src/core/**",
+              target: "./src/core/*",
               from: "./src/core/features/**",
               message: "Core layer cannot import from features.",
             },
