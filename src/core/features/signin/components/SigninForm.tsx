@@ -1,45 +1,56 @@
 "use client";
 
-import { PendingSubmitButton } from "@/core/components/custom/PendingSubmitButton";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-} from "@/core/components/ui/card";
-import { Field, FieldGroup, FieldLabel } from "@/core/components/ui/field";
-import { Input } from "@/core/components/ui/input";
+import { useRouter } from "next/navigation";
 
-export interface SendEmailResponse {
-  message: string;
-}
+import { z } from "zod";
+
+import {
+  Form,
+  FormField,
+  FormSubmit,
+  FieldGroup,
+} from "@/core/components/custom/SmartForm";
+import { Input } from "@/core/components/ui/input";
+import { emailShema } from "@/core/validation-shema";
+
+const signinSchema = z.object({
+  email: emailShema,
+});
+
+type SigninFormValues = z.infer<typeof signinSchema>;
 
 export function SigninForm() {
-  return (
-    <Card>
-      <CardHeader>
-        <h1 className="text-lg">ورود یا ثبت نام</h1>
-        <CardDescription>
-          ایمیل خود را برای ورود یا ثبت نام وارد کنید
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form>
-          <FieldGroup>
-            <Field>
-              <FieldLabel htmlFor="email">ایمیل</FieldLabel>
-              <Input
-                name="email"
-                id="email"
-                type="text"
-                placeholder="name@example.com"
-              />
-            </Field>
+  const { push } = useRouter();
+  function onSubmit(values: SigninFormValues) {
+    console.log("Email:", values.email);
+    push(`/signin/verify?email=${values.email}`);
+  }
 
-            <PendingSubmitButton>ارسال ایمیل</PendingSubmitButton>
-          </FieldGroup>
-        </form>
-      </CardContent>
-    </Card>
+  return (
+    <Form
+      schema={signinSchema}
+      defaultValues={{ email: "" }}
+      onSubmit={onSubmit}
+      className=""
+    >
+      <FieldGroup>
+        <FormField<SigninFormValues, "email">
+          name="email"
+          label="ایمیل"
+          normalize={false}
+        >
+          {({ field }) => (
+            <Input
+              autoFocus
+              {...field}
+              type="text"
+              placeholder="name@example.com"
+            />
+          )}
+        </FormField>
+
+        <FormSubmit>ارسال ایمیل</FormSubmit>
+      </FieldGroup>
+    </Form>
   );
 }

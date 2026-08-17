@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 
-import { api, type AppError } from "@/core/services/fetcher/fetcher";
+import { api } from "@/core/services/configs/api";
+import { type AppError } from "@/core/services/configs/fetcher/fetcher.type";
 
 const CASES = ["401", "403", "404", "422", "429", "500", "network"] as const;
 
