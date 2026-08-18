@@ -12,7 +12,6 @@ export default async function VerifyPage({
   searchParams: Promise<{ email: string }>;
 }) {
   const param = await searchParams;
-
   return (
     <Card>
       <CardHeader>

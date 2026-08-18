@@ -1,6 +1,6 @@
 import { createFetch } from 'ofetch';
 
-import { APP_MODE } from '@/core/constants';
+import { APP_MODE } from '@/core/constants/misc';
 import { transformKeys } from '@/core/utils/helpers';
 
 import { createApi, type RequestFailure } from './fetcher/fetcher';

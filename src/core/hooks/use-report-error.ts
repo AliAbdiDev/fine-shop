@@ -4,7 +4,7 @@ import { useCallback } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import { APP_MODE } from '../constants';
+import { APP_MODE } from '../constants/misc';
 import { type AppError } from '../services/configs/fetcher/fetcher.type';
 
 export function useReportError() {

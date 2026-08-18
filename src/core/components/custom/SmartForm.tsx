@@ -723,7 +723,6 @@ type FormSubmitState = {
 
 // (۵) به‌جای cloneElement با cast شکننده، از Slot استاندارد استفاده می‌شود.
 function FormSubmit({
-  asChild = false,
   disabled,
   requireDirty = false,
   children,

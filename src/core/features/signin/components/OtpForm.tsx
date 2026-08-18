@@ -1,18 +1,28 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
+
+import { PendingSubmitButton } from "@/core/components/custom/PendingSubmitButton";
 import {
   Form,
   FormField,
-  FormSubmit,
   FieldGroup,
 } from "@/core/components/custom/SmartForm";
 import { InputOTP, REGEXP_ANY_DIGITS } from "@/core/components/ui/input-otp";
+
+import { sendLoginOtp } from "../actions";
+
 export function OtpForm() {
+  const searchParams = useSearchParams();
+
   return (
     <Form
       defaultValues={{ otp: "" }}
-      onSubmit={(values) => {
-        console.log("OTP:", values.otp);
+      onSubmit={async (values) => {
+        sendLoginOtp({
+          otp: values.otp,
+          email: searchParams.get("email") || "",
+        });
       }}
       className="w-full max-w-sm"
     >
@@ -29,7 +39,7 @@ export function OtpForm() {
           )}
         </FormField>
 
-        <FormSubmit>تأیید کد</FormSubmit>
+        <PendingSubmitButton>تأیید کد</PendingSubmitButton>
       </FieldGroup>
     </Form>
   );
