@@ -32,7 +32,7 @@ function matchRoute(pathname: string, path: Route) {
  * اگر کوکی نبود یا نامعتبر بود، GUEST برمی‌گرداند.
  */
 export function authGetRoleFromCookie(req: NextRequest): Role {
-    const cookieValue = requestCookies(req).value('user')
+    const cookieValue = requestCookies(req).value('user-profile')
 
     if (!cookieValue) return ROLES.GUEST
 

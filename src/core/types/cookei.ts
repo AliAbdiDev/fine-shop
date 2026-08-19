@@ -1,1 +1,1 @@
-export type CookieName = "user"
+export type CookieName = "token" | "user-profile"

@@ -2,11 +2,9 @@ import 'server-only'
 
 import { cookies } from 'next/headers'
 
-
 import { type CookieName } from '@/core/types/cookei'
 
 import { type CookieInput, type TypedCookie } from './types'
-
 
 export async function getCookie(name: CookieName): Promise<TypedCookie | undefined> {
     const store = await cookies()
