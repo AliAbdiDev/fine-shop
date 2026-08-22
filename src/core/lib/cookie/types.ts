@@ -1,5 +1,4 @@
-import { type CookieName } from "@/core/types/cookei"
-
+export type CookieName = "token" | "user-profile"
 
 export interface TypedCookie {
     name: CookieName

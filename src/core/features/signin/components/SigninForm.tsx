@@ -2,6 +2,8 @@
 
 import { useRef } from "react";
 
+import { useSearchParams } from "next/navigation";
+
 import { z } from "zod";
 
 import { PendingSubmitButton } from "@/core/components/custom/PendingSubmitButton";
@@ -22,13 +24,19 @@ const signinSchema = z.object({ email: emailShema });
 
 export function SigninForm() {
   const formRef = useRef<FormApi<typeof signinSchema> | null>(null);
+  const searchParams = useSearchParams();
+
+  const from = searchParams.get("from");
 
   return (
     <Form
       schema={signinSchema}
       defaultValues={{ email: "" }}
       onSubmit={async (values) => {
-        const result = await sendLoginEmail({ email: values.email });
+        const result = await sendLoginEmail({
+          email: values.email,
+          redirectTo: from ?? "",
+        });
         if (result && formRef.current) {
           applyServerErrors(formRef.current, result);
         }

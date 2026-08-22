@@ -25,20 +25,19 @@ const otpSchema = z.object({
 
 export function OtpForm() {
   const searchParams = useSearchParams();
+  const from = searchParams.get("from");
   const formRef = useRef<FormApi<typeof otpSchema> | null>(null);
-
   return (
     <Form
       schema={otpSchema}
       defaultValues={{ otp: "" }}
       onSubmit={async (values) => {
-        // await ضروری است تا isSubmitting تا پایان اکشن true بماند.
         const result = await sendLoginOtp({
           otp: values.otp,
           email: searchParams.get("email") ?? "",
+          redirectTo: from ?? "",
         });
 
-        // موفق => redirect شده و چیزی برنمی‌گردد. اینجا فقط خطاست.
         if (result && formRef.current) {
           applyServerErrors(formRef.current, result);
         }

@@ -3,7 +3,7 @@ export const ROUTES = {
     HOME: '/',
     SIGNIN: '/signin',
     SIGNIN_VERIFY: '/signin/verify',
-    DASHBOARD: '/dashboard',
+    DASHBOARD: '/admin',
 } as const
 
 export type Route = (typeof ROUTES)[keyof typeof ROUTES]

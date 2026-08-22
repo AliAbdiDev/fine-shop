@@ -49,10 +49,6 @@ const client = createFetch({
     // reaches the call site with the backend's original keys (`retry_after`).
     onResponse({ response, options }) {
         if (response.ok && isPlainData(response._data)) {
-            const body = response._data as Record<string, unknown>;
-            if ('data' in body) {
-                response._data = body.data;
-            }
 
             if (shouldTransform(options) && isPlainData(response._data)) {
                 response._data = transformKeys(response._data, 'camel');
