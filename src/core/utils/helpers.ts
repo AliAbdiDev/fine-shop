@@ -40,3 +40,9 @@ export function transformKeys<T>(input: T, mode: Casing): T {
 
   return walk(input) as T;
 }
+
+// ---
+export const asRecord = (value: unknown): Record<string, unknown> | null =>
+  typeof value === 'object' && value !== null && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : null;

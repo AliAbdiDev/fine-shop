@@ -1,14 +1,8 @@
 import { NextResponse, type NextRequest } from 'next/server'
 
-import { type Role, ROLES } from '@/core/constants/misc'
-import { ROUTES, type Route } from '@/core/constants/routes'
+import { type Role, ROLE_HOME, ROLES, ROUTES } from '@/core/constants/misc'
 import { requestCookies } from '@/core/lib/cookie/proxyCookie'
 
-const ROLE_HOME: Record<Role, Route> = {
-    [ROLES.GUEST]: ROUTES.HOME,
-    [ROLES.BUYER]: ROUTES.HOME,
-    [ROLES.ADMIN]: ROUTES.DASHBOARD,
-}
 
 const GUEST_ONLY_ROUTES = [ROUTES.SIGNIN_VERIFY, ROUTES.SIGNIN]
 const ADMIN_ONLY_ROUTES = [ROUTES.DASHBOARD]
@@ -27,13 +21,13 @@ export function authRedirect(req: NextRequest) {
 
     let userRole: Role = ROLES.GUEST
     if (isLoggedIn) {
-        const profile = requestCookies(req).value<{ isSuperadmin: boolean }>('user-profile')
-        userRole = profile?.isSuperadmin ? ROLES.ADMIN : ROLES.BUYER
+        const profile = requestCookies(req).value<{ isSuperuser: boolean }>('user-profile')
+        userRole = profile?.isSuperuser ? ROLES.ADMIN : ROLES.BUYER
     }
 
-    const isGuestRoute = isMatch(pathname, GUEST_ONLY_ROUTES)
-    const isAdminRoute = isMatch(pathname, ADMIN_ONLY_ROUTES)
-    const isBuyerRoute = isMatch(pathname, BUYER_ONLY_ROUTES)
+    const isUserOnGuestRoute = isMatch(pathname, GUEST_ONLY_ROUTES)
+    const isUserOnAdminRoute = isMatch(pathname, ADMIN_ONLY_ROUTES)
+    const isUserOnBuyerRoute = isMatch(pathname, BUYER_ONLY_ROUTES)
 
     // -----------------------------------------------------------------
     // 2. Apply access rules based on route type (separate concerns)
@@ -41,7 +35,7 @@ export function authRedirect(req: NextRequest) {
 
     // Rule 1: Guest-only pages (like login and sign-up)
     // These pages are only for users without a token.
-    if (isGuestRoute) {
+    if (isUserOnGuestRoute) {
         if (isLoggedIn) {
             // If the user has a token, they should not be here. Redirect to their home page.
             return NextResponse.redirect(new URL(ROLE_HOME[userRole], req.url))
@@ -51,17 +45,15 @@ export function authRedirect(req: NextRequest) {
     }
 
     // Rule 2: Protected pages (admin or buyer only)
-    if (isAdminRoute || isBuyerRoute) {
+    if (isUserOnAdminRoute || isUserOnBuyerRoute) {
         if (!isLoggedIn) {
             // If the user has no token, redirect to the login page.
             const redirectUrl = new URL(ROUTES.SIGNIN, req.url)
-            const { pathname, search } = req.nextUrl;
-            redirectUrl.searchParams.set('from', `${pathname}${search}`) // remember the current path
             return NextResponse.redirect(redirectUrl)
         }
 
         // If the user has a token, check their role.
-        if ((isAdminRoute && userRole !== ROLES.ADMIN) || (isBuyerRoute && userRole !== ROLES.BUYER)) {
+        if ((isUserOnAdminRoute && userRole !== ROLES.ADMIN) || (isUserOnBuyerRoute && userRole !== ROLES.BUYER)) {
             // If the role does not match the route, redirect to their home page.
             return NextResponse.redirect(new URL(ROLE_HOME[userRole], req.url))
         }

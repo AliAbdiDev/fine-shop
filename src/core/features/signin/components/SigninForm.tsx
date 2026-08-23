@@ -35,7 +35,6 @@ export function SigninForm() {
       onSubmit={async (values) => {
         const result = await sendLoginEmail({
           email: values.email,
-          redirectTo: from ?? "",
         });
         if (result && formRef.current) {
           applyServerErrors(formRef.current, result);
