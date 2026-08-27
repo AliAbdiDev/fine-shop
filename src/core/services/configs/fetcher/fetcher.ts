@@ -1,16 +1,12 @@
+
 import { type $Fetch } from 'ofetch';
 
-import { ERROR_MESSAGES } from './constant';
-import {
-    type BackendErrorCode,
-    type ApiError,
-    type ApiResult,
-    type ErrorEnvelope,
-    type FetcherOptions,
-    type RequestBody,
-    type RequestOptions,
-} from './fetcher.type';
+import { type BackendErrorCode, ERROR_MESSAGES } from '@/core/constants/status-messages';
+
+import { type FetcherOptions, type RequestBody, type RequestOptions } from './fetcher.types';
 import { isFetchError, isPlainData } from './helper';
+import { type ApiError, type ApiResult } from './types/client.types';
+import { type ErrorEnvelope } from './types/contract.types';
 
 
 const isErrorEnvelope = (v: unknown): v is ErrorEnvelope =>

@@ -5,7 +5,8 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 
 import "./globals.css";
-import { ToastProvider } from "@/core/components/ui/toast";
+import { Toaster } from "sonner";
+
 import { TooltipProvider } from "@/core/components/ui/tooltip";
 import { MswProvider } from "@/core/mocks/configs/MswProvider";
 import QueryProvider from "@/core/services/configs/query/QueryProvider";
@@ -82,13 +83,14 @@ export default function RootLayout({
       )}
     >
       <body>
-        <ToastProvider>
-          <TooltipProvider>
-            <MswProvider>
-              <QueryProvider>{children}</QueryProvider>
-            </MswProvider>
-          </TooltipProvider>
-        </ToastProvider>
+        <TooltipProvider>
+          <MswProvider>
+            <QueryProvider>
+              {children}
+              <Toaster richColors />
+            </QueryProvider>
+          </MswProvider>
+        </TooltipProvider>
       </body>
     </html>
   );

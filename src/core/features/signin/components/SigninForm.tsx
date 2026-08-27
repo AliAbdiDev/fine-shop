@@ -2,10 +2,9 @@
 
 import { useRef } from "react";
 
-import { useSearchParams } from "next/navigation";
-
 import { z } from "zod";
 
+import { notify } from "@/core/components/custom/notify";
 import { PendingSubmitButton } from "@/core/components/custom/PendingSubmitButton";
 import {
   Form,
@@ -16,34 +15,35 @@ import {
   type FormApi,
 } from "@/core/components/custom/SmartForm";
 import { Input } from "@/core/components/ui/input";
+import { sendLoginEmail } from "@/core/services/actions/auth";
+// اضافه شد
 import { emailShema } from "@/core/validation-shema";
-
-import { sendLoginEmail } from "../actions";
 
 const signinSchema = z.object({ email: emailShema });
 
 export function SigninForm() {
   const formRef = useRef<FormApi<typeof signinSchema> | null>(null);
-  const searchParams = useSearchParams();
-
-  const from = searchParams.get("from");
 
   return (
     <Form
       schema={signinSchema}
       defaultValues={{ email: "" }}
       onSubmit={async (values) => {
-        const result = await sendLoginEmail({
-          email: values.email,
-        });
-        if (result && formRef.current) {
-          applyServerErrors(formRef.current, result);
+        const result = await sendLoginEmail({ email: values.email });
+
+        if (result && !result.ok) {
+          notify.error(result.error);
+
+          if (formRef.current) {
+            applyServerErrors(formRef.current, {
+              message: "ایمیل پذیرفته نشد",
+            });
+          }
         }
       }}
     >
       {(form) => {
         formRef.current = form;
-
         return (
           <FieldGroup>
             <FormField<z.infer<typeof signinSchema>, "email">
@@ -54,13 +54,12 @@ export function SigninForm() {
               {({ field }) => (
                 <Input
                   autoFocus
-                  {...field}
                   type="text"
                   placeholder="name@example.com"
+                  {...field}
                 />
               )}
             </FormField>
-
             <FormError />
             <PendingSubmitButton>ارسال ایمیل</PendingSubmitButton>
           </FieldGroup>

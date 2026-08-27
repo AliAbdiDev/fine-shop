@@ -1,23 +1,19 @@
 "use client";
 
-import { useRef } from "react";
-
 import { useSearchParams } from "next/navigation";
 
 import { z } from "zod";
 
+import { notify } from "@/core/components/custom/notify";
 import { PendingSubmitButton } from "@/core/components/custom/PendingSubmitButton";
 import {
   Form,
   FormError,
   FormField,
   FieldGroup,
-  applyServerErrors,
-  type FormApi,
 } from "@/core/components/custom/SmartForm";
 import { InputOTP, REGEXP_ANY_DIGITS } from "@/core/components/ui/input-otp";
-
-import { sendLoginOtp } from "../actions";
+import { sendLoginOtp } from "@/core/services/actions/auth";
 
 const otpSchema = z.object({
   otp: z.string().length(6, "کد باید ۶ رقم باشد."),
@@ -25,8 +21,7 @@ const otpSchema = z.object({
 
 export function OtpForm() {
   const searchParams = useSearchParams();
-  const from = searchParams.get("from");
-  const formRef = useRef<FormApi<typeof otpSchema> | null>(null);
+
   return (
     <Form
       schema={otpSchema}
@@ -35,18 +30,15 @@ export function OtpForm() {
         const result = await sendLoginOtp({
           otp: values.otp,
           email: searchParams.get("email") ?? "",
-          redirectTo: from ?? "",
         });
 
-        if (result && formRef.current) {
-          applyServerErrors(formRef.current, result);
+        if (result && !result.ok) {
+          notify.error(result.error);
         }
       }}
       className="w-full max-w-sm"
     >
       {(form) => {
-        formRef.current = form;
-
         return (
           <FieldGroup>
             <FormField name="otp" normalize={false}>
@@ -60,7 +52,6 @@ export function OtpForm() {
                 />
               )}
             </FormField>
-
             <FormError />
             <PendingSubmitButton>تأیید کد</PendingSubmitButton>
           </FieldGroup>

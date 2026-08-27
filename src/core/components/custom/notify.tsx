@@ -1,11 +1,12 @@
-import { toast } from "@/core/components/ui/toast";
+import { toast } from "sonner";
+
 import { APP_MODE } from "@/core/constants/misc";
 import {
   ERROR_MESSAGES,
   GENERIC_ERROR,
   GENERIC_SUCCESS,
-} from "@/core/services/configs/fetcher/constant";
-import { type ApiError } from "@/core/services/configs/fetcher/fetcher.type";
+} from "@/core/constants/status-messages";
+import { type ApiError } from "@/core/services/configs/fetcher/types/client.types";
 
 export function resolveErrorMessage(error: unknown): string {
   if (!error) return GENERIC_ERROR;
@@ -25,10 +26,6 @@ export function resolveErrorMessage(error: unknown): string {
       return ERROR_MESSAGES.NETWORK_ERROR;
     }
 
-    if (apiError.status >= 500) {
-      return ERROR_MESSAGES.SERVER_ERROR;
-    }
-
     if (apiError.message) {
       return apiError.message;
     }
@@ -42,19 +39,22 @@ export function resolveErrorMessage(error: unknown): string {
 export const notify = {
   success: (title: string = GENERIC_SUCCESS, description?: string) => {
     if (!APP_MODE.isClient()) return;
-    toast.add({ type: "success", title, description });
+    toast.success(title, { description });
   },
-  error: (error: unknown) => {
+
+  error: (error?: unknown) => {
     if (!APP_MODE.isClient()) return;
     const title = resolveErrorMessage(error);
-    toast.add({ type: "error", title });
+    toast.error(title);
   },
+
   info: (title: string, description?: string) => {
     if (!APP_MODE.isClient()) return;
-    toast.add({ type: "info", title, description });
+    toast.info(title, { description });
   },
+
   warning: (title: string, description?: string) => {
     if (!APP_MODE.isClient()) return;
-    toast.add({ type: "warning", title, description });
+    toast.warning(title, { description });
   },
 };

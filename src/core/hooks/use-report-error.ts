@@ -5,7 +5,7 @@ import { useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { APP_MODE } from '../constants/misc';
-import { type AppError } from '../services/configs/fetcher/fetcher.type';
+import { type AppError } from '../services/configs/fetcher/fetcher.types';
 
 export function useReportError() {
     const router = useRouter();

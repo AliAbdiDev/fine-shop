@@ -2,37 +2,56 @@
 
 import { redirect } from "next/navigation";
 
-import type { ServerErrorPayload } from "@/core/components/custom/SmartForm";
 import { APP_MODE, ROLE_HOME, ROUTES } from "@/core/constants/misc";
 import { setCookie } from "@/core/lib/cookie/serverCookie";
 import { type CookieOptions } from "@/core/lib/cookie/types";
 import { api } from "@/core/services/configs/api";
-import { type SuccessEnvelope } from "@/core/services/configs/fetcher/fetcher.type";
 
-type LoginEmailValues = { email: string; };
-type LoginOtpValues = { otp: string; email: string; };
-type ActionError = ServerErrorPayload<Record<string, unknown>>;
+import { type ApiResult } from "../configs/fetcher/types/client.types";
+import { type SuccessEnvelope } from "../configs/fetcher/types/contract.types";
+
+// ---------- Type Aliases ----------
+type UserProfile = {
+    email: string;
+    phoneNumber: string;
+    isSuperuser: boolean;
+};
+
+type LoginSuccessEnvelope = SuccessEnvelope<{ user: UserProfile }>;
+// ----------------------------------
+
+type LoginEmailValues = { email: string };
+type LoginOtpValues = { otp: string; email: string };
 
 export async function sendLoginEmail({
     email,
-}: LoginEmailValues): Promise<ActionError | void> {
-    const r = await api.post("/account/login/", { email });
-    if (!r.ok) return { fields: { email: "ایمیل پذیرفته نشد" } };
+}: LoginEmailValues): Promise<ApiResult<SuccessEnvelope<undefined>>> {
+    const r = await api.post<SuccessEnvelope<undefined>>(
+        "/account/login/",
+        { email },
+    );
+
+    if (!r.ok) {
+        return r;
+    }
+
     const params = new URLSearchParams({ email });
     redirect(`${ROUTES.SIGNIN_VERIFY}?${params.toString()}`);
+
+    // این خط به‌خاطر redirect اجرا نمی‌شود ولی برای تایپ لازم است
+    return r;
 }
 
 export async function sendLoginOtp({
     otp,
     email,
-}: LoginOtpValues): Promise<ActionError | void> {
-    const r = await api.post<SuccessEnvelope<{ user: { email: string; phoneNumber: string; isSuperuser: boolean } }>>("/account/otp/", { otp, email });
+}: LoginOtpValues): Promise<ApiResult<LoginSuccessEnvelope>> {
+    const r = await api.post<LoginSuccessEnvelope>(
+        "/account/otp/",
+        { otp, email },
+    );
 
-    if (!r.ok)
-        return {
-            message: "کد وارد‌شده نامعتبر است یا منقضی شده.",
-            fields: { otp: "کد را دوباره بررسی کنید." },
-        };
+    if (!r.ok) return r;
 
     const cookieOptions: CookieOptions = {
         httpOnly: true,
@@ -62,8 +81,10 @@ export async function sendLoginOtp({
             options: cookieOptions,
         });
 
-        const finalRedirectPath = ROLE_HOME[user?.isSuperuser ? 'admin' : 'buyer']
-
-        redirect(finalRedirectPath, 'replace');
+        const finalRedirectPath =
+            ROLE_HOME[user?.isSuperuser ? "admin" : "buyer"];
+        redirect(finalRedirectPath, "replace");
     }
+
+    return r;
 }
