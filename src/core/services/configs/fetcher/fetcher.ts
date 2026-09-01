@@ -5,7 +5,7 @@ import { type BackendErrorCode, ERROR_MESSAGES } from '@/core/constants/status-m
 
 import { type FetcherOptions, type RequestBody, type RequestOptions } from './fetcher.types';
 import { isFetchError, isPlainData } from './helper';
-import { type ApiError, type ApiResult } from './types/client.types';
+import { type ApiFailure, type ApiError, type ApiResult, type ApiSuccess } from './types/client.types';
 import { type ErrorEnvelope } from './types/contract.types';
 
 
@@ -39,25 +39,38 @@ export function createApi({
         try {
             const response = await client.raw<T>(url, options);
 
-            return {
+            const res: ApiSuccess<T> = {
                 ok: true,
                 status: response.status,
                 statusText: response.statusText,
                 data: response._data ?? (null as T),
-                error: null,
             };
+
+
+            if (process.env.NODE_ENV === 'development') {
+                console.warn('[api:success]', res);
+            }
+
+            return res
         } catch (error) {
             const failure = isFetchError(error) ? error : null;
             const status = failure?.status ?? failure?.response?.status ?? 0;
             const statusText =
                 failure?.statusText ?? failure?.response?.statusText ?? '';
 
-            return {
+
+            const res: ApiFailure = {
                 ok: false,
                 status,
                 statusText,
                 error: toError(status, failure?.data, error),
-            };
+            }
+
+            if (process.env.NODE_ENV === 'development') {
+                console.error('[api:error]', { ...res, raw: res.error.raw });
+            }
+
+            return res;
         }
     }
 

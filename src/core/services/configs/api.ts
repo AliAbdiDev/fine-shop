@@ -5,7 +5,7 @@ import { transformKeys } from '@/core/utils/helpers';
 import { createApi } from './fetcher/fetcher';
 import { shouldTransform, isPlainData } from './fetcher/helper';
 // ---------- Transport config: baseURL, key transform, retry policy, revalidate ----------
-const client = createFetch({
+const clientConfig = createFetch({
     fetch: (input: RequestInfo | URL, init?: RequestInit) =>
         globalThis.fetch(input, init),
 }).create({
@@ -41,6 +41,7 @@ const client = createFetch({
             response._data = transformKeys(response._data, 'camel');
         }
     },
+
 });
 
-export const api = createApi({ client });
+export const api = createApi({ client: clientConfig });

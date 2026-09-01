@@ -5,7 +5,7 @@ import { requestCookies } from '@/core/lib/cookie/proxyCookie'
 
 
 const GUEST_ONLY_ROUTES = [ROUTES.SIGNIN_VERIFY, ROUTES.SIGNIN]
-const ADMIN_ONLY_ROUTES = [ROUTES.DASHBOARD]
+const ADMIN_ONLY_ROUTES = [ROUTES.ADMIN]
 const BUYER_ONLY_ROUTES = ['/temp']
 
 function isMatch(pathname: string, routes: string[]) {

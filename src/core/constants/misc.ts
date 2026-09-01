@@ -18,15 +18,17 @@ export const ROUTES = {
     HOME: '/',
     SIGNIN: '/signin',
     SIGNIN_VERIFY: '/signin/verify',
-    DASHBOARD: '/admin',
+    ADMIN: '/admin',
+    Products: "/products"
 } as const
 
+export type Routekeys = keyof typeof ROUTES
 export type Route = (typeof ROUTES)[keyof typeof ROUTES]
 
 export const ROLE_HOME: Record<Role, Route> = {
     [ROLES.GUEST]: ROUTES.HOME,
     [ROLES.BUYER]: ROUTES.HOME,
-    [ROLES.ADMIN]: ROUTES.DASHBOARD,
+    [ROLES.ADMIN]: ROUTES.ADMIN,
 }
 
 // dynamic route examp

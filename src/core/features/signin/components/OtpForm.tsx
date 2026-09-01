@@ -38,7 +38,7 @@ export function OtpForm() {
       }}
       className="w-full max-w-sm"
     >
-      {(form) => {
+      {() => {
         return (
           <FieldGroup>
             <FormField name="otp" normalize={false}>

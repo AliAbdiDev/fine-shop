@@ -1,4 +1,4 @@
-import { type AppErrorCode } from '../constant';
+import { type AppErrorCode } from "@/core/constants/status-messages";
 
 export interface ApiError {
     code: AppErrorCode | null;
@@ -13,7 +13,6 @@ export interface ApiSuccess<T> {
     status: number;
     statusText: string;
     data: T;
-    error: null;
 }
 
 export interface ApiFailure {
