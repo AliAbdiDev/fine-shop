@@ -62,7 +62,7 @@ function PageTitle({ className, ...props }: PageTitleProps) {
     <h1
       data-slot="page-title"
       className={cn(
-        "font-vazir-bold text-foreground text-xl font-bold tracking-tight",
+        "font-vazir-bold text-foreground text-lg font-bold tracking-tight md:text-xl",
         className,
       )}
       {...props}
@@ -79,7 +79,7 @@ function PageDescription({ className, ...props }: PageDescriptionProps) {
   return (
     <p
       data-slot="page-description"
-      className={cn("text-muted-foreground text-sm", className)}
+      className={cn("text-muted-foreground text-xs md:text-sm", className)}
       {...props}
     />
   );

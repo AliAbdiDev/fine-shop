@@ -1,7 +1,8 @@
 import { NextResponse, type NextRequest } from 'next/server'
 
 import { type Role, ROLE_HOME, ROLES, ROUTES } from '@/core/constants/misc'
-import { requestCookies } from '@/core/lib/cookie/proxyCookie'
+import { type User } from '@/core/types/entities.types'
+import { requestCookies } from '@/core/utils/cookie/proxyCookie'
 
 
 const GUEST_ONLY_ROUTES = [ROUTES.SIGNIN_VERIFY, ROUTES.SIGNIN]
@@ -21,7 +22,7 @@ export function authRedirect(req: NextRequest) {
 
     let userRole: Role = ROLES.GUEST
     if (isLoggedIn) {
-        const profile = requestCookies(req).value<{ isSuperuser: boolean }>('user-profile')
+        const profile = requestCookies(req).value<User>('user-profile')
         userRole = profile?.isSuperuser ? ROLES.ADMIN : ROLES.BUYER
     }
 

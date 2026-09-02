@@ -19,7 +19,6 @@ import {
 } from "@/core/components/custom/table/DataTable";
 import { Button } from "@/core/components/ui/button";
 
-// ۱. تعریف ساختار دیتای نمونه
 interface User {
   id: number;
   name: string;
@@ -28,19 +27,17 @@ interface User {
   status: "فعال" | "غیرفعال";
 }
 
-// ۲. ساخت دیتای ماک (۴۵ سطر برای شبیه‌سازی ۵ صفحه)
 const MOCK_USERS: User[] = Array.from({ length: 45 }, (_, index) => {
   const id = index + 1;
   return {
     id,
-    name: `کاربر شماره ${id}`,
+    name: `${id}`,
     email: `user${id}@example.com`,
     role: id % 3 === 0 ? "مدیر" : id % 2 === 0 ? "ویرایشگر" : "کاربر عادی",
     status: id % 4 === 0 ? "غیرفعال" : "فعال",
   };
 });
 
-// ۳. تعریف ستون‌های جدول با استفاده از columnHelper
 const helper = columnHelper<User>();
 
 const columns = [
@@ -63,7 +60,7 @@ const columns = [
       const isStatusActive = info.getValue() === "فعال";
       return (
         <span
-          className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${
+          className={`inline-block rounded-full px-2.5 py-0.5 text-xs ${
             isStatusActive
               ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
               : "bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300"
@@ -101,7 +98,7 @@ export default function UsersTableDemo() {
     setIsLoading(true);
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 150); // ۳۰۰ میلی‌ثانیه لودینگ مصنوعی
+    }, 66); // ۳۰۰ میلی‌ثانیه لودینگ مصنوعی
 
     return () => clearTimeout(timer);
   }, [pagination.pageIndex, pagination.pageSize]);

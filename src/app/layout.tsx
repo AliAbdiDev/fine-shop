@@ -15,11 +15,9 @@ import { cn } from "@/core/utils/helpers";
 const vazirRegular = localFont({
   variable: "--vazir-regular",
   display: "swap",
-  fallback: ["Tahoma", "sans-serif"],
-  adjustFontFallback: "Arial",
   src: [
     {
-      path: "../../public/fonts/vazir-normal/Vazir.woff2",
+      path: "../../public/fonts/vazir-normal/Vazir-Regular-FD-UI.woff2",
       weight: "400",
       style: "normal",
     },

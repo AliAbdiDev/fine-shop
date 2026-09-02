@@ -1,6 +1,6 @@
 import { NextResponse, type NextProxy, type ProxyConfig } from 'next/server'
 
-import { authRedirect } from '@/core/lib/proxy-modules/auth'
+import { authRedirect } from '@/core/utils/proxy-modules/auth'
 
 export const proxy: NextProxy = (req) => {
     const redirectResponse = authRedirect(req);

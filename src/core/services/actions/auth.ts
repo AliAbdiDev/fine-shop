@@ -3,9 +3,9 @@
 import { redirect } from "next/navigation";
 
 import { APP_MODE, ROLE_HOME, ROUTES } from "@/core/constants/misc";
-import { setCookie } from "@/core/lib/cookie/serverCookie";
-import { type CookieOptions } from "@/core/lib/cookie/types";
 import { api } from "@/core/services/configs/api";
+import { setCookie } from "@/core/utils/cookie/serverCookie";
+import { type CookieOptions } from "@/core/utils/cookie/types";
 
 import { type ApiResult } from "../configs/fetcher/types/client.types";
 import { type SuccessEnvelope } from "../configs/fetcher/types/contract.types";

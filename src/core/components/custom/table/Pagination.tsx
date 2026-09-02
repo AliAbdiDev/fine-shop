@@ -39,8 +39,6 @@ export function Pagination<TData extends RowData>({
   // بررسی امن تعداد ردیف‌های انتخاب شده (بدون نیاز به Row Model اضافه‌تر)
   const totalSelectedRows = Object.keys(table.state.rowSelection || {}).length;
 
-  if (pageCount <= 1 && totalSelectedRows === 0) return null;
-
   const getVisiblePages = () => {
     const currentPage = pageIndex + 1;
 

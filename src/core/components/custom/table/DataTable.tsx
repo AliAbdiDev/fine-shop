@@ -86,11 +86,11 @@ export function DataTable<TData extends RowData>({
   return (
     <div
       className={cn(
-        "border-border bg-background flex w-full flex-col overflow-hidden rounded-md border",
+        "border-border flex size-full flex-col overflow-hidden rounded-md border",
         containerClassName,
       )}
     >
-      <div className="relative min-h-50 w-full overflow-auto">
+      <div className="bg-background min-h-[73vh] w-full overflow-auto">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -116,7 +116,7 @@ export function DataTable<TData extends RowData>({
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody>
+          <TableBody className="">
             {isLoading ? (
               <TableRow>
                 <TableCell

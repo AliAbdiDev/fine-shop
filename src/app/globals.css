@@ -7,7 +7,7 @@
 @theme inline {
   /* ── typography ── */
   --font-mono: var(--font-mono-stack);
-  --font-vazir: var(--vazir);
+  --font-vazir: var(--vazir-regular);
   --font-vazir-bold: var(--vazir-bold);
 
   /* مقیاس با line-height مناسب فارسی */
