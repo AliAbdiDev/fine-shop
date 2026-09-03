@@ -116,6 +116,21 @@ function PageContent({ className, ...props }: PageContentProps) {
 }
 
 /* =====================================================
+   PageFooter
+   ===================================================== */
+type PageFooterProps = React.ComponentProps<"footer">;
+
+function PageFooter({ className, ...props }: PageFooterProps) {
+  return (
+    <footer
+      data-slot="page-footer"
+      className={cn("text-muted-foreground pt-12 text-sm", className)}
+      {...props}
+    />
+  );
+}
+
+/* =====================================================
    Export all components
    ===================================================== */
 export {
@@ -126,4 +141,5 @@ export {
   PageDescription,
   PageActions,
   PageContent,
+  PageFooter,
 };

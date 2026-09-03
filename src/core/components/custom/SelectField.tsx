@@ -16,9 +16,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-// کامپوننت پایه شما
 
-// --- تعریف دقیق تایپ‌ها ---
+// --- تایپ‌ها ---
 export type SelectValueType = string | number;
 
 export interface SelectOption<T extends SelectValueType = string> {
@@ -38,41 +37,26 @@ export type SelectOptions<T extends SelectValueType = string> =
   SelectOption<T>[] | SelectGroupOption<T>[];
 
 export interface SelectFieldProps<T extends SelectValueType = string> {
-  /** گزینه های انتخابی */
   options: SelectOptions<T>;
-  /** مقدار کنترل شده */
   value?: T;
-  /** مقدار اولیه */
   defaultValue?: T;
-  /** کال بک تغییر مقدار */
+  onChange?: (value: T) => void;
   onValueChange?: (value: T) => void;
-  /** متن جایگزین */
+  onBlur?: () => void;
   placeholder?: string;
-  /** متن حالت خالی (وقتی گزینه‌ای وجود ندارد) */
   emptyText?: string;
-  /** لیبل بالای کامپوننت */
-  label?: string;
-  /** پیام خطا */
-  error?: string;
-  /** متن راهنما */
-  helperText?: string;
-  /** وضعیت بارگذاری */
   isLoading?: boolean;
-  /** غیرفعال سازی */
   disabled?: boolean;
-  /** ضروری بودن */
   required?: boolean;
-  /** شناسه یکتا برای accessibility */
   id?: string;
-  /** اندازه */
-  size?: "sm" | "default";
-  /** کلاس های سفارشی */
+  name?: string;
+  "aria-invalid"?: boolean;
+  "aria-describedby"?: string;
   className?: string;
   triggerClassName?: string;
   contentClassName?: string;
 }
 
-// Type Guard برای تشخیص گروه‌بندی
 function isGroupedOptions<T extends SelectValueType>(
   options: SelectOptions<T>,
 ): options is SelectGroupOption<T>[] {
@@ -83,55 +67,46 @@ export function SelectField<T extends SelectValueType = string>({
   options,
   value,
   defaultValue,
+  onChange,
   onValueChange,
+  onBlur,
   placeholder = "انتخاب کنید...",
   emptyText = "گزینه‌ای یافت نشد",
-  label,
-  error,
-  helperText,
   isLoading = false,
   disabled = false,
-  required = false,
+  required,
   id,
-  size = "default",
+  name,
+  "aria-invalid": ariaInvalid,
+  "aria-describedby": ariaDescribedBy,
   className,
   triggerClassName,
   contentClassName,
 }: SelectFieldProps<T>) {
-  // تولید شناسه یکتا برای دسترسی‌پذیری (Accessibility)
-  const generatedId = React.useId();
-  const selectId = id || generatedId;
-  const helperId = `${selectId}-helper`;
-  const errorId = `${selectId}-error`;
-
-  const isInvalid = Boolean(error);
   const isDisabled = disabled || isLoading;
 
-  // مدیریت امن تبدیل متغیرهای String/Number
   const stringifiedValue = value !== undefined ? String(value) : undefined;
   const stringifiedDefaultValue =
     defaultValue !== undefined ? String(defaultValue) : undefined;
 
-  // اصلاح تابع handleValueChange
   const handleValueChange = (val: string | null) => {
-    if (!onValueChange) return;
-
-    // اگر مقدار null بود (مثلاً پاک شدن انتخاب)
+    let convertedValue: T;
     if (val === null) {
-      onValueChange(val as unknown as T);
-      return;
+      convertedValue = val as unknown as T;
+    } else if (typeof value === "number" || typeof defaultValue === "number") {
+      const numVal = Number(val);
+      convertedValue = (isNaN(numVal) ? val : numVal) as T;
+    } else {
+      convertedValue = val as unknown as T;
     }
 
-    // اگر جنس ورودی اصلی Number بوده، آن را دوباره به Number تبدیل می‌کنیم
-    if (typeof value === "number" || typeof defaultValue === "number") {
-      const numVal = Number(val);
-      onValueChange((isNaN(numVal) ? val : numVal) as T);
-    } else {
-      onValueChange(val as unknown as T);
+    if (onChange) {
+      onChange(convertedValue);
+    } else if (onValueChange) {
+      onValueChange(convertedValue);
     }
   };
 
-  // رندر هر آیتم به صورت ایمن
   const renderItem = (item: SelectOption<T>) => (
     <SelectItem
       key={String(item.value)}
@@ -153,25 +128,12 @@ export function SelectField<T extends SelectValueType = string>({
     </SelectItem>
   );
 
-  // بررسی خالی بودن گزینه‌ها
   const isEmpty =
     options.length === 0 ||
     (isGroupedOptions(options) && options.every((g) => g.items.length === 0));
 
   return (
     <div className={cn("flex w-full flex-col gap-1.5", className)}>
-      {/* Label معتبر با اتصال id */}
-      {label && (
-        <label
-          htmlFor={selectId}
-          className="text-foreground flex cursor-pointer items-center gap-1 text-xs font-medium select-none"
-        >
-          {label}
-          {required && <span className="text-destructive">*</span>}
-        </label>
-      )}
-
-      {/* Select الاصلی */}
       <Select
         value={stringifiedValue}
         defaultValue={stringifiedDefaultValue}
@@ -179,16 +141,14 @@ export function SelectField<T extends SelectValueType = string>({
         disabled={isDisabled}
       >
         <SelectTrigger
-          id={selectId}
-          size={size}
-          aria-invalid={isInvalid}
-          aria-describedby={
-            isInvalid ? errorId : helperText ? helperId : undefined
-          }
+          id={id}
+          name={name}
+          aria-invalid={ariaInvalid}
+          aria-describedby={ariaDescribedBy}
+          onBlur={onBlur}
+          aria-required={required}
           className={cn(
             "w-full justify-between transition-all duration-200",
-            isInvalid &&
-              "border-destructive focus-visible:ring-destructive/20 text-destructive",
             triggerClassName,
           )}
         >
@@ -196,7 +156,17 @@ export function SelectField<T extends SelectValueType = string>({
             {isLoading && (
               <Loader2Icon className="text-muted-foreground size-4 shrink-0 animate-spin" />
             )}
-            <SelectValue placeholder={placeholder} />
+            <SelectValue placeholder={placeholder}>
+              {(selectedValue) => {
+                const flatOptions = isGroupedOptions(options)
+                  ? options.flatMap((group) => group.items)
+                  : options;
+                const selectedOption = flatOptions.find(
+                  (opt) => String(opt.value) === selectedValue,
+                );
+                return selectedOption ? selectedOption.label : selectedValue;
+              }}
+            </SelectValue>{" "}
           </div>
         </SelectTrigger>
 
@@ -220,17 +190,6 @@ export function SelectField<T extends SelectValueType = string>({
           )}
         </SelectContent>
       </Select>
-
-      {/* Helper text / Error Message با شناسه دسترسی‌پذیری */}
-      {error ? (
-        <p id={errorId} className="text-destructive text-xs font-medium">
-          {error}
-        </p>
-      ) : helperText ? (
-        <p id={helperId} className="text-muted-foreground text-xs">
-          {helperText}
-        </p>
-      ) : null}
     </div>
   );
 }

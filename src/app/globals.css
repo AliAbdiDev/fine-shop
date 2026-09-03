@@ -92,7 +92,7 @@
 }
 
 :root {
-  --radius: 1.6rem;
+  --radius: 1.3rem;
   --font-size-base: 1.1rem; /* default 16px  */
 
   --font-mono-stack: ui-monospace, "SF Mono", Menlo, Consolas, monospace;

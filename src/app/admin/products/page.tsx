@@ -17,6 +17,7 @@ import {
   columnHelper,
   DataTable,
 } from "@/core/components/custom/table/DataTable";
+import { Badge } from "@/core/components/ui/badge";
 import { Button } from "@/core/components/ui/button";
 
 interface User {
@@ -59,21 +60,15 @@ const columns = [
     cell: (info) => {
       const isStatusActive = info.getValue() === "فعال";
       return (
-        <span
-          className={`inline-block rounded-full px-2.5 py-0.5 text-xs ${
-            isStatusActive
-              ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
-              : "bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300"
-          }`}
-        >
+        <Badge variant={isStatusActive ? "secondary" : "outline"}>
           {info.getValue()}
-        </span>
+        </Badge>
       );
     },
   }),
 ];
 
-export default function UsersTableDemo() {
+export default function ProductsPage() {
   // مدیریت استیت پیجینیشن (شامل pageIndex و pageSize)
   const [pagination, setPagination] = React.useState<PaginationState>({
     pageIndex: 0,

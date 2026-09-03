@@ -721,7 +721,6 @@ type FormSubmitState = {
   isValid: boolean;
 };
 
-// (۵) به‌جای cloneElement با cast شکننده، از Slot استاندارد استفاده می‌شود.
 function FormSubmit({
   disabled,
   requireDirty = false,
