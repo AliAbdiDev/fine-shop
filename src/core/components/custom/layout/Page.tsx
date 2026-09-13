@@ -62,7 +62,7 @@ function PageTitle({ className, ...props }: PageTitleProps) {
     <h1
       data-slot="page-title"
       className={cn(
-        "font-vazir-bold text-foreground text-lg font-bold tracking-tight md:text-xl",
+        "font-vazir-bold text-foreground text-lg tracking-tight md:text-xl",
         className,
       )}
       {...props}
@@ -124,7 +124,7 @@ function PageFooter({ className, ...props }: PageFooterProps) {
   return (
     <footer
       data-slot="page-footer"
-      className={cn("text-muted-foreground pt-12 text-sm", className)}
+      className={cn("text-muted-foreground pt-12 pb-5 text-sm", className)}
       {...props}
     />
   );

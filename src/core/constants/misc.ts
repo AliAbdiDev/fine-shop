@@ -19,7 +19,8 @@ export const ROUTES = {
     SIGNIN: '/signin',
     SIGNIN_VERIFY: '/signin/verify',
     ADMIN: '/admin',
-    PRODUCTS: "/products"
+    PRODUCTS: "/products",
+    PRODUCTS_CREATE_UPDATE: '/create-update'
 } as const
 
 export type Routekeys = keyof typeof ROUTES

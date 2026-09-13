@@ -1,8 +1,8 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useState } from "react";
 
-import { z } from "zod";
+import { type z } from "zod";
 
 import { FormGrid } from "@/core/components/custom/layout/FormGrid";
 import {
@@ -21,7 +21,10 @@ import {
   FormSubmit,
   FormWatch,
 } from "@/core/components/custom/SmartForm";
+import { ImageUpload } from "@/core/components/custom/UploadFields";
 import { Input } from "@/core/components/ui/input";
+import { Label } from "@/core/components/ui/label";
+import { productSchema } from "@/core/validation-shema";
 
 const CATEGORIES = [
   { value: "electronics", label: "الکترونیک" },
@@ -29,22 +32,10 @@ const CATEGORIES = [
   { value: "books", label: "کتاب" },
 ];
 
-const productFormSchema = z.object({
-  name: z.string().min(1, "نام محصول الزامی است"),
-  price: z.coerce.number().positive("قیمت باید عددی مثبت باشد"),
-  stock: z.coerce
-    .number()
-    .int("تعداد باید عدد صحیح باشد")
-    .nonnegative("تعداد نمی‌تواند منفی باشد"),
-  image: z.any(),
-  category: z.string().min(1, "دسته‌بندی را انتخاب کنید"),
-});
-
-type ProductFormValues = z.infer<typeof productFormSchema>;
+type ProductFormValues = z.infer<typeof productSchema>;
 
 export default function ProductPage() {
-  const params = useParams<{ id: string }>();
-  const id = params.id;
+  const [images, setImages] = useState<Partial<unknown[]>>();
 
   async function handleSubmit(values: ProductFormValues) {
     console.log("Form submitted:", values);
@@ -55,14 +46,12 @@ export default function ProductPage() {
       <PageHeader>
         <PageHeading>
           <PageTitle>ویرایش محصول</PageTitle>
-          <PageDescription>
-            اطلاعات محصول با شناسه {id} را ویرایش کنید.
-          </PageDescription>
+          <PageDescription>اطلاعات محصول را ویرایش کنید.</PageDescription>
         </PageHeading>
       </PageHeader>
 
       <PageContent>
-        <Form schema={productFormSchema} onSubmit={handleSubmit}>
+        <Form schema={productSchema} onSubmit={handleSubmit}>
           <FormGrid>
             {/* نام محصول */}
             <FormField name="name" label="نام محصول">
@@ -79,10 +68,7 @@ export default function ProductPage() {
                   قیمت :
                   <FormWatch name="price">
                     {(value) => (
-                      <>
-                        {value ? Number(value).toLocaleString("fa-IR") : "۰"}{" "}
-                        تومان
-                      </>
+                      <>{Number(value ?? 0).toLocaleString("fa-IR")} تومان</>
                     )}
                   </FormWatch>
                 </span>
@@ -105,21 +91,33 @@ export default function ProductPage() {
               )}
             </FormField>
 
-            {/* تصویر */}
-            <FormField name="image" label="آدرس تصویر">
-              {({ field }) => <Input type="file" {...field} />}
-            </FormField>
-
-            {/* دسته‌بندی */}
             <FormField name="category" label="دسته‌بندی">
               {({ field }) => <SelectField {...field} options={CATEGORIES} />}
             </FormField>
           </FormGrid>
 
+          <div className="space-y-4 pt-9">
+            <Label>آپلود تصویر</Label>
+            <div className="flex max-w-100 items-center justify-start gap-5 overflow-x-auto p-4">
+              {Array.from({ length: 5 }).map((_, i) => {
+                return (
+                  <ImageUpload
+                    key={i}
+                    className="shrink-0"
+                    onChange={(v) => {
+                      setImages((prev) => {
+                        if (prev !== undefined) return [...prev, v];
+                      });
+                    }}
+                  />
+                );
+              })}
+            </div>
+          </div>
+
           <PageFooter>
             <FormSubmit>ذخیره محصول</FormSubmit>
           </PageFooter>
-          {/* دکمه ارسال */}
         </Form>
       </PageContent>
     </Page>

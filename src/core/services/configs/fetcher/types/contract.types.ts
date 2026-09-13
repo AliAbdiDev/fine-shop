@@ -1,4 +1,4 @@
-import { type AppErrorCode } from "../constant";
+import { type AppErrorCode } from "@/core/constants/status-messages";
 
 export interface PaginationMeta {
     page: number;

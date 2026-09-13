@@ -1,6 +1,13 @@
 import { PackageIcon, Settings2Icon, ShoppingCartIcon } from "lucide-react";
 
 import { type AppSidebarData } from "@/core/components/app-sidebar";
+import { type Route, ROUTES } from "@/core/constants/misc";
+import { type BuildRouteOptions, createRoute } from "@/core/utils/routeBuilder";
+
+export const createAdminRoute = (
+  segments: Route | Route[],
+  options?: BuildRouteOptions,
+): string => createRoute<Route>(ROUTES.ADMIN, segments, options);
 
 export const sidebarData: AppSidebarData = {
   user: {
@@ -9,6 +16,11 @@ export const sidebarData: AppSidebarData = {
     avatar: "/avatars/shadcn.jpg",
   },
   navMain: [
+    {
+      title: "محصولات",
+      url: createAdminRoute("/products"),
+      icon: <PackageIcon />,
+    },
     {
       title: "سفارش‌ها",
       url: "#",
@@ -24,21 +36,7 @@ export const sidebarData: AppSidebarData = {
         },
       ],
     },
-    {
-      title: "محصولات",
-      url: "#",
-      icon: <PackageIcon />,
-      items: [
-        {
-          title: "فهرست محصولات",
-          url: "#",
-        },
-        {
-          title: "دسته‌بندی‌ها",
-          url: "#",
-        },
-      ],
-    },
+
     {
       title: "تنظیمات",
       url: "#",

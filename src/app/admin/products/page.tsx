@@ -2,6 +2,8 @@
 
 import * as React from "react";
 
+import { useRouter } from "next/navigation";
+
 import { type PaginationState } from "@tanstack/react-table";
 
 import {
@@ -19,6 +21,7 @@ import {
 } from "@/core/components/custom/table/DataTable";
 import { Badge } from "@/core/components/ui/badge";
 import { Button } from "@/core/components/ui/button";
+import { createAdminRoute } from "@/core/features/admin/sidebarData";
 
 interface User {
   id: number;
@@ -98,6 +101,7 @@ export default function ProductsPage() {
     return () => clearTimeout(timer);
   }, [pagination.pageIndex, pagination.pageSize]);
 
+  const router = useRouter();
   return (
     <Page>
       <PageHeader>
@@ -109,7 +113,13 @@ export default function ProductsPage() {
         </PageHeading>
         <PageActions>
           <Button variant="outline">خروجی اکسل</Button>
-          <Button>افزودن کاربر جدید</Button>
+          <Button
+            onClick={() => {
+              router.push(createAdminRoute(["/products", "/create-update"]));
+            }}
+          >
+            افزودن کالا جدید
+          </Button>
         </PageActions>
       </PageHeader>
 

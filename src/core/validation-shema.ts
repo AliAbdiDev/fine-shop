@@ -10,8 +10,8 @@ export const emailShema = z.email({
 
 export const productSchema = z.object({
     name: z.string(),
-    basePrice: z.number(),
-    stock: z.number(),
+    basePrice: z.coerce.number(),
+    stock: z.coerce.number(),
     category: z.string(),
     categoryLabel: z.string(),
     images: z.array(
