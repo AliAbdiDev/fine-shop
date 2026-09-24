@@ -2,8 +2,10 @@ import { createFetch } from 'ofetch';
 
 import { transformKeys } from '@/core/utils/helpers';
 
+import { paginatedAdapter } from './fetcher/adapters';
 import { createApi } from './fetcher/fetcher';
 import { shouldTransform, isPlainData } from './fetcher/helper';
+import { type DrfPaginated } from './fetcher/types/contract.types';
 // ---------- Transport config: baseURL, key transform, retry policy, revalidate ----------
 const clientConfig = createFetch({
     fetch: (input: RequestInfo | URL, init?: RequestInit) =>
@@ -45,3 +47,15 @@ const clientConfig = createFetch({
 });
 
 export const api = createApi({ client: clientConfig });
+
+/**
+ * ساخت Adapter برای پاسخ‌های صفحه‌بندی‌شده‌ی DRF.
+ *
+ * @example
+ *   api.get<DrfPaginated<Product>, Product[]>('/product/', {
+ *     query: { page, page_size: pageSize },
+ *     adapter: drfPaginated<Product>(page, pageSize),
+ *   })
+ */
+export const drfPaginated = <T>(page: number, pageSize = 10) =>
+    paginatedAdapter<DrfPaginated<T>, T>(page, pageSize);

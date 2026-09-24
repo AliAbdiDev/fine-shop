@@ -7,7 +7,20 @@ import { ChevronDownIcon, CheckIcon, ChevronUpIcon } from "lucide-react";
 
 import { cn } from "@/core/utils/helpers";
 
-const Select = SelectPrimitive.Root;
+function Select({
+  value,
+  defaultValue,
+  ...props
+}: React.ComponentProps<typeof SelectPrimitive.Root>) {
+  const hasValue = "value" in props && value !== undefined;
+  return (
+    <SelectPrimitive.Root
+      {...props}
+      defaultValue={defaultValue}
+      {...(hasValue ? { value: value ?? "" } : {})}
+    />
+  );
+}
 
 function SelectGroup({ className, ...props }: SelectPrimitive.Group.Props) {
   return (
@@ -117,6 +130,9 @@ function SelectItem({
   children,
   ...props
 }: SelectPrimitive.Item.Props) {
+  const controlledValue = "value" in props ? (props.value ?? "") : undefined;
+  console.log("🚀 ~ SelectItem ~ props.value:", props.value);
+
   return (
     <SelectPrimitive.Item
       data-slot="select-item"
@@ -125,6 +141,7 @@ function SelectItem({
         className,
       )}
       {...props}
+      {...(controlledValue !== undefined ? { value: controlledValue } : {})}
     >
       <SelectPrimitive.ItemText className="flex flex-1 shrink-0 gap-2 whitespace-nowrap">
         {children}

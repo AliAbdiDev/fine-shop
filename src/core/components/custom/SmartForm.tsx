@@ -47,15 +47,13 @@ import { Button } from "../ui/button";
 /*                                   types                                    */
 /* -------------------------------------------------------------------------- */
 
-// (۱) Zod 4: امضای ZodType به <Output, Input> تغییر کرده و ZodTypeDef حذف شده.
-// پارامتر سوم در Zod 4 «Internals» است، نه Input.
 type FormSchema = z.ZodType<FieldValues, FieldValues>;
 
-// (۲) به‌جای conditional type که union می‌سازد و TS نمی‌تواند ارضای
-// constraint را اثبات کند، از intersection استفاده می‌کنیم.
-type SchemaInput<TSchema extends FormSchema> = z.input<TSchema> & FieldValues;
+// ✅ FIX (1): بدون `& FieldValues` — این intersection باعث می‌شد
+// keyof به `string | number` پهن شود و FieldPath دیگر union واقعی نباشد.
+type SchemaInput<TSchema extends FormSchema> = z.input<TSchema>;
 
-type SchemaOutput<TSchema extends FormSchema> = z.output<TSchema> & FieldValues;
+type SchemaOutput<TSchema extends FormSchema> = z.output<TSchema>;
 
 type FormApi<TSchema extends FormSchema> = UseFormReturn<
   SchemaInput<TSchema>,
@@ -65,12 +63,15 @@ type FormApi<TSchema extends FormSchema> = UseFormReturn<
 
 type FieldMessage = { message?: string };
 
+// ✅ FIX (2): مقدار سازگار با المان‌های بومی HTML.
+// Zod 4 برای `z.coerce.number()` نوع input را `unknown` می‌کند که با
+// `<Input>` سازگار نیست. این union جلوی خطای assignability را می‌گیرد.
+type NativeInputValue = string | number | readonly string[] | undefined;
+
 /* -------------------------------------------------------------------------- */
 /*                              error collection                              */
 /* -------------------------------------------------------------------------- */
 
-// "types" همچنان در این مجموعه است تا حلقه‌ی عمومی آن را دوباره پیمایش نکند،
-// اما (۳) جداگانه و صریح پیمایشش می‌کنیم.
 const IGNORED_ERROR_KEYS = new Set(["ref", "message", "type", "types"]);
 
 function collectFieldMessages(
@@ -95,7 +96,6 @@ function collectFieldMessages(
     messages.push({ message: node.message });
   }
 
-  // (۳) پیام‌های چندگانه‌ی validate: { types: { required, custom } }
   if (
     node.types &&
     typeof node.types === "object" &&
@@ -118,7 +118,6 @@ function collectFieldMessages(
     if (IGNORED_ERROR_KEYS.has(key)) {
       continue;
     }
-
     collectFieldMessages(value, messages);
   }
 
@@ -266,9 +265,6 @@ function applyServerErrors<TFieldValues extends FieldValues>(
     form.setError("root", { type: "server", message: payload.message });
   }
 
-  // (۳) Object.entries روی Partial<Record<FieldPath, ...>> مقدار را طوری
-  // پهن می‌کند که narrowing با Array.isArray به {} می‌رسد؛ پس منبع را
-  // پیش از پیمایش به یک Record ساده cast می‌کنیم.
   const fields = (payload.fields ?? {}) as Record<
     string,
     string | string[] | undefined
@@ -368,7 +364,6 @@ type FormProps<TSchema extends FormSchema = FormSchema> =
     >;
   };
 
-// (۲) کامپوننت مشترک؛ فرم را آماده دریافت می‌کند و useForm صدا نمی‌زند.
 function FormContainer<TSchema extends FormSchema>({
   form,
   onSubmit,
@@ -413,8 +408,9 @@ function FormContainer<TSchema extends FormSchema>({
     </FormProvider>
   );
 }
+
 const noOpSchema = z.object({}).loose() as FormSchema;
-// (۲) فقط این مسیر useForm/resolver/defaultValues می‌سازد.
+
 function FormInner<TSchema extends FormSchema>({
   schema,
   defaultValues,
@@ -439,7 +435,6 @@ function FormInner<TSchema extends FormSchema>({
   return <FormContainer<TSchema> form={form} {...shared} />;
 }
 
-// (۲) اگر form بیرونی داده شد، هیچ useForm داخلی‌ای اجرا نمی‌شود.
 function Form<TSchema extends FormSchema>({
   form,
   schema,
@@ -459,6 +454,29 @@ function Form<TSchema extends FormSchema>({
       {...shared}
     />
   );
+}
+
+/* -------------------------------------------------------------------------- */
+/*                                 useFormApi                                 */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * دسترسی تایپ‌سیف به فرم از هر جای زیر <Form>.
+ *
+ * @example
+ * const form = useFormApi<typeof productSchema>();
+ * form.setValue("name", "علی"); // تایپ‌سیف
+ */
+function useFormApi<
+  TSchema extends FormSchema = FormSchema,
+>(): FormApi<TSchema> {
+  const form = useFormContext();
+
+  if (!form) {
+    throw new Error("<useFormApi> must be used inside <Form>.");
+  }
+
+  return form as unknown as FormApi<TSchema>;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -494,7 +512,8 @@ function useFormField() {
 type FormFieldControlProps<
   TFieldValues extends FieldValues,
   TName extends FieldPath<TFieldValues>,
-> = ControllerRenderProps<TFieldValues, TName> & {
+> = Omit<ControllerRenderProps<TFieldValues, TName>, "value"> & {
+  value: NativeInputValue;
   id: string;
   "aria-invalid": boolean;
   "aria-describedby": string | undefined;
@@ -508,7 +527,15 @@ type FormFieldProps<
   control?: Control<TFieldValues>;
   label?: React.ReactNode;
   description?: React.ReactNode;
+  /**
+   * تبدیل مقدار ورودی قبل از ذخیره در فرم.
+   * پیش‌فرض `false` است تا متن‌های فارسی دست‌نخورده بمانند.
+   */
   normalize?: FieldNormalizer | false;
+  /**
+   * مقداری که وقتی `field.value === undefined` استفاده می‌شود.
+   */
+  emptyValue?: NativeInputValue;
   children: (props: {
     field: FormFieldControlProps<TFieldValues, TName>;
     fieldState: ControllerFieldState;
@@ -523,7 +550,8 @@ function FormField<
   control,
   label,
   description,
-  normalize = normalizeNumerals,
+  normalize = false,
+  emptyValue,
   orientation = "vertical",
   className,
   children,
@@ -552,7 +580,8 @@ function FormField<
         const describedBy =
           [description ? descriptionId : null, errors.length ? errorId : null]
             .filter(Boolean)
-            .join(" ") || undefined;
+            .join(" ")
+            .trim() || undefined;
 
         const contextValue: FormFieldContextValue = {
           name,
@@ -564,10 +593,17 @@ function FormField<
           errors,
         };
 
-        // نام قبلی `control` بود و prop بیرونی را shadow می‌کرد.
+        const rawValue: unknown = field.value;
+        const value = (
+          rawValue === undefined && emptyValue !== undefined
+            ? emptyValue
+            : rawValue
+        ) as NativeInputValue;
+
         const controlNode = children({
           field: {
             ...field,
+            value,
             onChange: createNormalizedChangeHandler(field.onChange, normalize),
             id: controlId,
             "aria-invalid": fieldState.invalid,
@@ -622,8 +658,6 @@ function FormField<
 /*                               FormFieldError                               */
 /* -------------------------------------------------------------------------- */
 
-// (۴) base-ui برای errors تایپ ({ message?: string } | undefined)[] | undefined
-// دارد و null نمی‌پذیرد. پس در حالت children سراسر prop را پاس نمی‌دهیم.
 function FormFieldError({
   children,
   ...props
@@ -676,7 +710,6 @@ function FormFieldSet({
 /*                                 FormWatch                                  */
 /* -------------------------------------------------------------------------- */
 
-// (۶) نوع value شامل undefined است و fallback از طریق defaultValue ممکن است.
 function FormWatch<
   TFieldValues extends FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
@@ -702,11 +735,12 @@ function FormWatch<
     );
   }
 
-  const value = useWatch<TFieldValues, TName>({
+  const watched = useWatch<TFieldValues, TName>({
     control: resolvedControl,
     name,
-    defaultValue,
   });
+
+  const value = watched === undefined ? defaultValue : watched;
 
   return <>{children(value)}</>;
 }
@@ -754,6 +788,10 @@ function FormSubmit({
   );
 }
 
+/* -------------------------------------------------------------------------- */
+/*                                   exports                                  */
+/* -------------------------------------------------------------------------- */
+
 export {
   Form,
   FormError,
@@ -768,13 +806,17 @@ export {
   jalaliDate,
   normalizeNumerals,
   parseJalaliDate,
+  useFormApi,
   useFormField,
 };
+
 export type {
   FieldNormalizer,
   FormApi,
   FormFieldControlProps,
+  NativeInputValue,
   ServerErrorPayload,
 };
+export type { FormFieldProps, FormProps, FormSharedProps, FormSchema };
 
 export { FieldGroup } from "@/core/components/ui/field";

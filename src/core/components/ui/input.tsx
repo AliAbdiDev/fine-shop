@@ -5,6 +5,7 @@ import { Input as InputPrimitive } from "@base-ui/react/input";
 import { cn } from "@/core/utils/helpers";
 
 function Input({ className, type, ...props }: React.ComponentProps<"input">) {
+  const controlledValue = "value" in props ? (props.value ?? "") : undefined;
   return (
     <InputPrimitive
       type={type}
@@ -14,6 +15,7 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
         className,
       )}
       {...props}
+      {...(controlledValue !== undefined ? { value: controlledValue } : {})}
     />
   );
 }

@@ -1,10 +1,6 @@
 "use client";
 
-import * as React from "react";
-
 import { useRouter } from "next/navigation";
-
-import { type PaginationState } from "@tanstack/react-table";
 
 import {
   Page,
@@ -21,50 +17,65 @@ import {
 } from "@/core/components/custom/table/DataTable";
 import { Badge } from "@/core/components/ui/badge";
 import { Button } from "@/core/components/ui/button";
+import { TableContentTemp } from "@/core/components/ui/table";
 import { createAdminRoute } from "@/core/features/admin/sidebarData";
+import { usePaginationQuery } from "@/core/hooks/usePaginationQuery";
+import { useProducts } from "@/core/services/client/products";
+import { type Product } from "@/core/types/entities.types";
+import { getDiscountInfo, toPersianNum } from "@/core/utils/helpers";
 
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  role: string;
-  status: "فعال" | "غیرفعال";
-}
+const helper = columnHelper<Product>();
 
-const MOCK_USERS: User[] = Array.from({ length: 45 }, (_, index) => {
-  const id = index + 1;
-  return {
-    id,
-    name: `${id}`,
-    email: `user${id}@example.com`,
-    role: id % 3 === 0 ? "مدیر" : id % 2 === 0 ? "ویرایشگر" : "کاربر عادی",
-    status: id % 4 === 0 ? "غیرفعال" : "فعال",
-  };
-});
-
-const helper = columnHelper<User>();
-
-const columns = [
-  helper.accessor("id", {
-    header: "شناسه",
-    size: 80,
-  }),
+export const columns = [
   helper.accessor("name", {
-    header: "نام و نام خانوادگی",
+    header: "نام محصول",
+    cell: (info) => <span className="font-medium">{info.getValue()}</span>,
   }),
-  helper.accessor("email", {
-    header: "ایمیل",
+
+  helper.accessor("category", {
+    header: "دسته‌بندی",
+    cell: (info) => <Badge variant="outline">{info.getValue()}</Badge>,
   }),
-  helper.accessor("role", {
-    header: "نقش",
+
+  helper.accessor("stock", {
+    header: "موجودی",
+    cell: (info) => toPersianNum(info.getValue()),
   }),
-  helper.accessor("status", {
-    header: "وضعیت",
+
+  helper.accessor("basePrice", {
+    header: "قیمت پایه",
+    cell: (info) => toPersianNum(info.getValue()),
+  }),
+
+  helper.accessor("discountedPrice", {
+    header: "قیمت با تخفیف",
     cell: (info) => {
-      const isStatusActive = info.getValue() === "فعال";
+      const discounted = info.getValue();
+      const base = info.row.original.basePrice;
+
+      if (!discounted || discounted >= base) return <TableContentTemp />;
+
+      const percent = getDiscountInfo(base, discounted).percent;
+
       return (
-        <Badge variant={isStatusActive ? "secondary" : "outline"}>
-          {info.getValue()}
+        <div className="flex items-center gap-2">
+          <span className="font-medium text-emerald-600">
+            {toPersianNum(discounted)}
+          </span>
+          <Badge variant="secondary">٪{toPersianNum(percent)}</Badge>
+        </div>
+      );
+    },
+  }),
+
+  helper.accessor("isAvailable", {
+    header: "وضعیت",
+
+    cell: (info) => {
+      const isAvailable = info.getValue();
+      return (
+        <Badge variant={isAvailable ? "secondary" : "outline"}>
+          {isAvailable ? "موجود" : "ناموجود"}
         </Badge>
       );
     },
@@ -72,43 +83,19 @@ const columns = [
 ];
 
 export default function ProductsPage() {
-  // مدیریت استیت پیجینیشن (شامل pageIndex و pageSize)
-  const [pagination, setPagination] = React.useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 10,
-  });
-
-  // استیت شبیه‌سازی لودینگ
-  const [isLoading, setIsLoading] = React.useState(false);
-
-  // ۴. شبیه‌سازی برش دیتا بر اساس صفحه جاری (کار بک‌اند)
-  const data = React.useMemo(() => {
-    const start = pagination.pageIndex * pagination.pageSize;
-    const end = start + pagination.pageSize;
-    return MOCK_USERS.slice(start, end);
-  }, [pagination.pageIndex, pagination.pageSize]);
-
-  // محاسبه تعداد کل صفحات
-  const pageCount = Math.ceil(MOCK_USERS.length / pagination.pageSize);
-
-  // شبیه‌سازی تاخیر شبکه (Network Delay) هنگام تغییر صفحه
-  React.useEffect(() => {
-    setIsLoading(true);
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 66); // ۳۰۰ میلی‌ثانیه لودینگ مصنوعی
-
-    return () => clearTimeout(timer);
-  }, [pagination.pageIndex, pagination.pageSize]);
-
   const router = useRouter();
+
+  const { page, size, setPagination } = usePaginationQuery();
+
+  const { data, isPending } = useProducts({ page, size });
+
   return (
     <Page>
       <PageHeader>
         <PageHeading>
-          <PageTitle>مدیریت کاربران</PageTitle>
+          <PageTitle>مدیریت محصولات</PageTitle>
           <PageDescription>
-            لیست تمام کاربران ثبت‌نام‌شده به همراه جزئیات و امکان تغییر وضعیت.
+            لیست تمام محصولات ثبت‌شده به همراه قیمت، موجودی و وضعیت.
           </PageDescription>
         </PageHeading>
         <PageActions>
@@ -118,7 +105,7 @@ export default function ProductsPage() {
               router.push(createAdminRoute(["/products", "/create-update"]));
             }}
           >
-            افزودن کالا جدید
+            افزودن کالای جدید
           </Button>
         </PageActions>
       </PageHeader>
@@ -126,14 +113,12 @@ export default function ProductsPage() {
       <PageContent>
         <DataTable
           columns={columns}
-          data={data}
-          pageCount={pageCount}
-          rowCount={MOCK_USERS.length}
-          isLoading={isLoading}
-          options={{
-            state: { pagination },
-            onPaginationChange: setPagination,
-          }}
+          data={data?.data}
+          pageCount={data?.meta?.totalPages}
+          rowCount={data?.meta?.totalPages}
+          isLoading={isPending}
+          pagination={{ page, size }}
+          onPaginationChange={setPagination}
         />
       </PageContent>
     </Page>

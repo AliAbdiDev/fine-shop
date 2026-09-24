@@ -20,6 +20,7 @@ import { SidebarTrigger } from "../../ui/sidebar";
 
 export const ROUTE_LABELS: Partial<Record<Routekeys, string>> = {
   PRODUCTS: "محصولات",
+  PRODUCTS_CREATE_UPDATE: "ساخت / ویرایش",
 };
 
 const createBreadcrubMap = (): Map<string, Routekeys> | undefined => {

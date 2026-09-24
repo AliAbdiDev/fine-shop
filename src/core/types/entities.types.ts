@@ -5,28 +5,22 @@ export type User = {
 };
 
 // ------------- Product --------------
-
-export type ProductAttributeValue = { label: string, value: string }
-
 export type ProductAttribute = {
     key: string,
-    label: string,
-    type: string,
-    values: Array<ProductAttributeValue>
+    values: Array<string>
 }
 
 export type Product = {
-    id: string,
     name: string,
     category: string,
     categoryLabel: string,
-    description: string,
     stock: number,
     basePrice: number,
-    discountedPrice: number,
-    images: Array<{ url: string, alt: string }>,
-    isAvailable: boolean,
-    attributeList: Array<ProductAttribute>
+    discountedPrice?: number,
+    description?: string,
+    images: Array<File>,
+    isAvailable?: boolean,
+    attributeList?: Array<ProductAttribute>
 }
 
 export type Products = Array<Product>

@@ -2,7 +2,13 @@
 
 import * as React from "react";
 
+import { useRouter } from "next/navigation";
+
+import { ArrowLeft } from "lucide-react";
+
 import { cn } from "@/core/utils/helpers";
+
+import { Button } from "../../ui/button";
 
 /* =====================================================
    Page (Root)
@@ -22,21 +28,44 @@ function Page({ className, ...props }: PageProps) {
 /* =====================================================
    PageHeader
    ===================================================== */
-type PageHeaderProps = React.ComponentProps<"header">;
+type PageHeaderProps = React.ComponentProps<"header"> & {
+  forwardBack?: boolean;
+};
 
-function PageHeader({ className, ...props }: PageHeaderProps) {
+function PageHeader({
+  className,
+  children,
+  forwardBack = false,
+  ...props
+}: PageHeaderProps) {
+  const router = useRouter();
   return (
     <header
       data-slot="page-header"
       className={cn(
-        "mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between",
+        "flex w-full items-center justify-between gap-6",
         className,
       )}
       {...props}
-    />
+    >
+      <div className="mb-6 flex flex-1 flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        {children}
+      </div>
+      {forwardBack && (
+        <Button
+          size={"icon-lg"}
+          variant={"secondary"}
+          className={"mb-6 size-10"}
+          onClick={() => {
+            router.back();
+          }}
+        >
+          <ArrowLeft />
+        </Button>
+      )}
+    </header>
   );
 }
-
 /* =====================================================
    PageHeading (wrapper for title and description)
    ===================================================== */

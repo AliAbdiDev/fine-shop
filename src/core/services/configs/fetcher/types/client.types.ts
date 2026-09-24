@@ -1,11 +1,12 @@
-import { type AppErrorCode } from "@/core/constants/status-messages";
+import { type AppErrorCode } from '@/core/constants/status-messages';
 
-export interface ApiError {
-    code: AppErrorCode | null;
-    status: number;
-    message: string | null;
-    details: string | null;
-    raw: unknown;
+export interface PaginationMeta {
+    current: number | null;
+    next: number | null;
+    previous: number | null;
+    totalPages: number | null;
+    size: number | null;
+
 }
 
 export interface ApiSuccess<T> {
@@ -13,6 +14,15 @@ export interface ApiSuccess<T> {
     status: number;
     statusText: string;
     data: T;
+    meta?: PaginationMeta;
+}
+
+export interface ApiError {
+    code: AppErrorCode | null;
+    status: number;
+    message: string | null;
+    details: string | null;
+    raw: unknown;
 }
 
 export interface ApiFailure {

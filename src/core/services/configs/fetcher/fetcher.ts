@@ -1,17 +1,34 @@
-
 import { type $Fetch } from 'ofetch';
 
-import { type BackendErrorCode, ERROR_MESSAGES } from '@/core/constants/status-messages';
+import {
+    type BackendErrorCode,
+    ERROR_MESSAGES,
+} from '@/core/constants/status-messages';
 
-import { type FetcherOptions, type RequestBody, type RequestOptions } from './fetcher.types';
+import {
+    type AdapterOutput,
+    type ResponseAdapter,
+    identityAdapter,
+} from './adapters';
+import {
+    type FetcherOptions,
+    type RequestBody,
+    type RequestOptions,
+} from './fetcher.types';
 import { isFetchError, isPlainData } from './helper';
-import { type ApiFailure, type ApiError, type ApiResult, type ApiSuccess } from './types/client.types';
+import {
+    type ApiFailure,
+    type ApiError,
+    type ApiResult,
+    type ApiSuccess,
+} from './types/client.types';
 import { type ErrorEnvelope } from './types/contract.types';
 
-
 const isErrorEnvelope = (v: unknown): v is ErrorEnvelope =>
-    isPlainData(v) && !Array.isArray(v) &&
-    'error' in v && isPlainData(v.error);
+    isPlainData(v) &&
+    !Array.isArray(v) &&
+    'error' in v &&
+    isPlainData(v.error);
 
 const isBackendCode = (v: unknown): v is BackendErrorCode =>
     typeof v === 'string' && v in ERROR_MESSAGES;
@@ -28,43 +45,54 @@ function toError(status: number, body: unknown, raw: unknown): ApiError {
     };
 }
 
-export function createApi({
-    client,
-}: { client: $Fetch; }) {
+export interface AdapterOptions<TRaw, TData> {
+    adapter?: ResponseAdapter<TRaw, TData>;
+}
 
-    async function request<T>(
+export function createApi({ client }: { client: $Fetch }) {
+    async function request<
+        TRaw,
+        TData = TRaw,
+        TBody extends RequestBody = RequestBody,
+    >(
         url: string,
-        options: FetcherOptions = {},
-    ): Promise<ApiResult<T>> {
-        try {
-            const response = await client.raw<T>(url, options);
+        options: FetcherOptions<TBody> & AdapterOptions<TRaw, TData> = {},
+    ): Promise<ApiResult<TData>> {
+        const { adapter, ...fetchOptions } = options;
 
-            const res: ApiSuccess<T> = {
+        try {
+            const response = await client.raw<TRaw>(url, fetchOptions);
+            const rawData = (response._data ?? null) as TRaw;
+
+            const adapted: AdapterOutput<TData> = adapter
+                ? adapter(rawData)
+                : identityAdapter(rawData as unknown as TData);
+
+            const res: ApiSuccess<TData> = {
                 ok: true,
                 status: response.status,
                 statusText: response.statusText,
-                data: response._data ?? (null as T),
+                data: adapted.data,
+                ...(adapted.meta ? { meta: adapted.meta } : {}),
             };
-
 
             if (process.env.NODE_ENV === 'development') {
                 console.warn('[api:success]', res);
             }
 
-            return res
+            return res;
         } catch (error) {
             const failure = isFetchError(error) ? error : null;
             const status = failure?.status ?? failure?.response?.status ?? 0;
             const statusText =
                 failure?.statusText ?? failure?.response?.statusText ?? '';
 
-
             const res: ApiFailure = {
                 ok: false,
                 status,
                 statusText,
                 error: toError(status, failure?.data, error),
-            }
+            };
 
             if (process.env.NODE_ENV === 'development') {
                 console.error('[api:error]', { ...res, raw: res.error.raw });
@@ -75,19 +103,33 @@ export function createApi({
     }
 
     return {
-        get: <T>(url: string, options?: RequestOptions) =>
-            request<T>(url, { ...options, method: 'GET' }),
+        get: <TRaw, TData = TRaw>(
+            url: string,
+            options?: RequestOptions & AdapterOptions<TRaw, TData>,
+        ) => request<TRaw, TData>(url, { ...options, method: 'GET' }),
 
-        post: <T>(url: string, body?: RequestBody, options?: RequestOptions) =>
-            request<T>(url, { ...options, method: 'POST', body }),
+        post: <TRaw, TData = TRaw, TBody extends RequestBody = RequestBody>(
+            url: string,
+            body?: TBody,
+            options?: RequestOptions & AdapterOptions<TRaw, TData>,
+        ) => request<TRaw, TData, TBody>(url, { ...options, method: 'POST', body }),
 
-        put: <T>(url: string, body?: RequestBody, options?: RequestOptions) =>
-            request<T>(url, { ...options, method: 'PUT', body }),
+        put: <TRaw, TData = TRaw, TBody extends RequestBody = RequestBody>(
+            url: string,
+            body?: TBody,
+            options?: RequestOptions & AdapterOptions<TRaw, TData>,
+        ) => request<TRaw, TData, TBody>(url, { ...options, method: 'PUT', body }),
 
-        patch: <T>(url: string, body?: RequestBody, options?: RequestOptions) =>
-            request<T>(url, { ...options, method: 'PATCH', body }),
+        patch: <TRaw, TData = TRaw, TBody extends RequestBody = RequestBody>(
+            url: string,
+            body?: TBody,
+            options?: RequestOptions & AdapterOptions<TRaw, TData>,
+        ) => request<TRaw, TData, TBody>(url, { ...options, method: 'PATCH', body }),
 
-        delete: <T>(url: string, options?: RequestOptions) =>
-            request<T>(url, { ...options, method: 'DELETE' }),
+        delete: <TRaw, TData = TRaw, TBody extends RequestBody = RequestBody>(
+            url: string,
+            body?: TBody,
+            options?: RequestOptions & AdapterOptions<TRaw, TData>,
+        ) => request<TRaw, TData, TBody>(url, { ...options, method: 'DELETE', body }),
     };
 }

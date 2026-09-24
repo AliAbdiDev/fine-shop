@@ -4,6 +4,8 @@ import * as React from "react";
 
 import {
   type ColumnDef,
+  type PaginationState,
+  type OnChangeFn,
   type TableOptions,
   flexRender,
   stockFeatures,
@@ -13,6 +15,7 @@ import {
   type StockFeatures,
   createColumnHelper,
 } from "@tanstack/react-table";
+import { Loader2 } from "lucide-react";
 
 import {
   Table,
@@ -28,20 +31,36 @@ import { Pagination } from "./Pagination";
 
 export type DataTableRow<TData extends RowData> = Row<StockFeatures, TData>;
 
+export interface DataTablePagination {
+  page: number;
+  size: number;
+}
+
 interface DataTableProps<TData extends RowData> {
-  columns: ColumnDef<StockFeatures, TData, unknown>[];
-  data: TData[];
-  pageCount?: number;
-  rowCount?: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  columns: ColumnDef<StockFeatures, TData, any>[];
+  data: TData[] | undefined | null;
+  pageCount?: number | null;
+  rowCount?: number | null;
   isLoading?: boolean;
   showPagination?: boolean;
   pageSizeOptions?: number[];
   onRowClick?: (row: DataTableRow<TData>) => void;
   containerClassName?: string;
+
+  pagination?: DataTablePagination;
+
+  onPaginationChange?: (next: DataTablePagination) => void;
+
   options?: Omit<
     TableOptions<StockFeatures, TData>,
-    "data" | "columns" | "features"
-  >;
+    "data" | "columns" | "features" | "state" | "onPaginationChange"
+  > & {
+    state?: Omit<
+      NonNullable<TableOptions<StockFeatures, TData>["state"]>,
+      "pagination"
+    >;
+  };
 }
 
 export const columnHelper = <TData extends RowData>() => {
@@ -58,16 +77,64 @@ export function DataTable<TData extends RowData>({
   pageSizeOptions = [10, 20, 30, 50],
   onRowClick,
   containerClassName,
+  pagination,
+  onPaginationChange,
   options,
 }: DataTableProps<TData>) {
+  const isControlled = pagination !== undefined;
+
+  const [internalPagination, setInternalPagination] =
+    React.useState<PaginationState>({
+      pageIndex: 0,
+      pageSize: pageSizeOptions[1] ?? 20,
+    });
+
+  const tablePagination: PaginationState = React.useMemo(
+    () =>
+      pagination
+        ? {
+            pageIndex: Math.max(0, pagination.page - 1),
+            pageSize: pagination.size,
+          }
+        : internalPagination,
+    [pagination, internalPagination],
+  );
+
+  const handlePaginationChange = React.useCallback<OnChangeFn<PaginationState>>(
+    (updater) => {
+      const prev = tablePagination;
+      const next = typeof updater === "function" ? updater(prev) : updater;
+      const sizeChanged = next.pageSize !== prev.pageSize;
+
+      const normalized: PaginationState = sizeChanged
+        ? { pageIndex: 0, pageSize: next.pageSize }
+        : next;
+
+      if (isControlled) {
+        onPaginationChange?.({
+          page: normalized.pageIndex + 1,
+          size: normalized.pageSize,
+        });
+      } else {
+        setInternalPagination(normalized);
+      }
+    },
+    [tablePagination, isControlled, onPaginationChange],
+  );
+
   const table = useTable({
-    data,
+    data: data || [],
     columns,
     features: stockFeatures,
     manualPagination: true,
-    pageCount: pageCount,
-    rowCount: rowCount,
+    pageCount: pageCount ?? -1,
+    rowCount: rowCount ?? 0,
     ...options,
+    state: {
+      ...options?.state,
+      pagination: tablePagination,
+    },
+    onPaginationChange: handlePaginationChange,
   });
 
   const colSpanCount = Math.max(1, table.getAllLeafColumns().length);
@@ -90,7 +157,7 @@ export function DataTable<TData extends RowData>({
         containerClassName,
       )}
     >
-      <div className="bg-background min-h-[73vh] w-full overflow-auto">
+      <div className="bg-background min-h-[56vh] w-full overflow-auto">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -116,17 +183,13 @@ export function DataTable<TData extends RowData>({
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody className="">
+
+          <TableBody>
             {isLoading ? (
-              <TableRow>
-                <TableCell
-                  colSpan={colSpanCount}
-                  className="text-muted-foreground h-32 text-center"
-                >
-                  <div className="flex items-center justify-center gap-2">
-                    <span className="animate-pulse">
-                      در حال دریافت اطلاعات...
-                    </span>
+              <TableRow className="hover:bg-inherit">
+                <TableCell colSpan={colSpanCount} className="p-0">
+                  <div className="flex h-[49vh] items-center justify-center">
+                    <Loader2 className="text-muted-foreground size-6 animate-spin" />
                   </div>
                 </TableCell>
               </TableRow>

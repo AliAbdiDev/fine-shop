@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
-
+import { isNullOrUndefined, isNumericString } from "@sindresorhus/is";
 import { type z } from "zod";
 
+import { InfiniteSelectField } from "@/core/components/custom/InfiniteSelectField";
 import { FormGrid } from "@/core/components/custom/layout/FormGrid";
 import {
   Page,
@@ -14,112 +14,226 @@ import {
   PageHeading,
   PageTitle,
 } from "@/core/components/custom/layout/Page";
-import { SelectField } from "@/core/components/custom/SelectField";
 import {
   Form,
   FormField,
+  FormFieldError,
   FormSubmit,
   FormWatch,
+  normalizeNumerals,
+  useFormApi,
 } from "@/core/components/custom/SmartForm";
 import { ImageUpload } from "@/core/components/custom/UploadFields";
 import { Input } from "@/core/components/ui/input";
-import { Label } from "@/core/components/ui/label";
+import { Textarea } from "@/core/components/ui/textarea";
+import { useCategoriesInfiniteSelect } from "@/core/services/client/categories";
+import { useCreateProduct } from "@/core/services/client/products";
+import { toFormData, toPersianNum } from "@/core/utils/helpers";
 import { productSchema } from "@/core/validation-shema";
 
-const CATEGORIES = [
-  { value: "electronics", label: "الکترونیک" },
-  { value: "clothing", label: "پوشاک" },
-  { value: "books", label: "کتاب" },
-];
+import ModalAttribute from "./ModalAttribute";
 
 type ProductFormValues = z.infer<typeof productSchema>;
 
+const MAX_IMAGES = 10;
+
 export default function ProductPage() {
-  const [images, setImages] = useState<Partial<unknown[]>>();
+  const create = useCreateProduct();
 
   async function handleSubmit(values: ProductFormValues) {
-    console.log("Form submitted:", values);
+    const formData = toFormData(values, {
+      fileKeys: ["images"],
+      jsonKeys: ["attributeList"],
+    });
+
+    create.mutate(formData);
   }
 
   return (
     <Page>
-      <PageHeader>
+      <PageHeader forwardBack>
         <PageHeading>
-          <PageTitle>ویرایش محصول</PageTitle>
-          <PageDescription>اطلاعات محصول را ویرایش کنید.</PageDescription>
+          <PageTitle>افزودن محصول</PageTitle>
+          <PageDescription>اطلاعات محصول را وارد کنید.</PageDescription>
         </PageHeading>
       </PageHeader>
 
       <PageContent>
-        <Form schema={productSchema} onSubmit={handleSubmit}>
-          <FormGrid>
-            {/* نام محصول */}
-            <FormField name="name" label="نام محصول">
-              {({ field }) => (
-                <Input {...field} placeholder="مثلاً گوشی هوشمند" />
-              )}
-            </FormField>
-
-            {/* قیمت */}
-            <FormField
-              name="price"
-              label={
-                <span>
-                  قیمت :
-                  <FormWatch name="price">
-                    {(value) => (
-                      <>{Number(value ?? 0).toLocaleString("fa-IR")} تومان</>
-                    )}
-                  </FormWatch>
-                </span>
-              }
-            >
-              {({ field }) => (
-                <Input type="number" step={10_000} {...field} placeholder="۰" />
-              )}
-            </FormField>
-
-            {/* تعداد موجودی */}
-            <FormField name="stock" label="تعداد موجودی">
-              {({ field }) => (
-                <Input
-                  type="number"
-                  {...field}
-                  inputMode="numeric"
-                  placeholder="۰"
-                />
-              )}
-            </FormField>
-
-            <FormField name="category" label="دسته‌بندی">
-              {({ field }) => <SelectField {...field} options={CATEGORIES} />}
-            </FormField>
-          </FormGrid>
-
-          <div className="space-y-4 pt-9">
-            <Label>آپلود تصویر</Label>
-            <div className="flex max-w-100 items-center justify-start gap-5 overflow-x-auto p-4">
-              {Array.from({ length: 5 }).map((_, i) => {
-                return (
-                  <ImageUpload
-                    key={i}
-                    className="shrink-0"
-                    onChange={(v) => {
-                      setImages((prev) => {
-                        if (prev !== undefined) return [...prev, v];
-                      });
-                    }}
-                  />
-                );
-              })}
-            </div>
-          </div>
-
-          <PageFooter>
-            <FormSubmit>ذخیره محصول</FormSubmit>
-          </PageFooter>
+        <Form
+          schema={productSchema}
+          onSubmit={handleSubmit}
+          onInvalid={(errors) => console.error("❌ validation failed:", errors)}
+        >
+          <ProductFields />
         </Form>
       </PageContent>
     </Page>
+  );
+}
+
+function ProductFields() {
+  const form = useFormApi<typeof productSchema>();
+  const categoriesSelect = useCategoriesInfiniteSelect({ page_size: 10 });
+
+  return (
+    <>
+      <FormGrid>
+        <FormField name="name" label="نام محصول">
+          {({ field }) => <Input {...field} placeholder="مثلاً گوشی هوشمند" />}
+        </FormField>
+
+        <FormField
+          name="basePrice"
+          normalize={normalizeNumerals}
+          label={
+            <span>
+              قیمت :{" "}
+              <FormWatch name="basePrice">
+                {(value) => <>{toPersianNum(value)} تومان</>}
+              </FormWatch>
+            </span>
+          }
+        >
+          {({ field }) => (
+            <Input
+              type="number"
+              inputMode="numeric"
+              {...field}
+              placeholder="۰"
+            />
+          )}
+        </FormField>
+
+        <FormField
+          name="discountedPrice"
+          normalize={normalizeNumerals}
+          label={
+            <span>
+              قیمت با تخفیف :{" "}
+              <FormWatch name="discountedPrice">
+                {(value) => <>{toPersianNum(value ?? 0)} تومان</>}
+              </FormWatch>
+            </span>
+          }
+        >
+          {({ field }) => (
+            <Input
+              type="number"
+              inputMode="numeric"
+              {...field}
+              placeholder="۰"
+            />
+          )}
+        </FormField>
+
+        <FormField
+          name="stock"
+          normalize={normalizeNumerals}
+          emptyValue=""
+          label="تعداد موجودی"
+        >
+          {({ field }) => {
+            if (
+              !isNullOrUndefined(field.value) &&
+              isNumericString(field.value)
+            ) {
+              form.setValue("isAvailable", +field.value > 0, {
+                shouldDirty: true,
+                shouldValidate: true,
+              });
+            }
+
+            return (
+              <Input
+                type="number"
+                inputMode="numeric"
+                {...field}
+                placeholder="۰"
+              />
+            );
+          }}
+        </FormField>
+
+        <FormField name="category" label="دسته‌بندی">
+          {({ field }) => (
+            <InfiniteSelectField
+              {...categoriesSelect}
+              id={field.id}
+              value={field.value as string}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+            />
+          )}
+        </FormField>
+
+        <FormField name="categoryLabel" label="برچسب دسته‌بندی">
+          {({ field }) => <Input {...field} placeholder="مثلاً موبایل" />}
+        </FormField>
+
+        <FormField name="description" label="توضیحات">
+          {({ field }) => (
+            <Textarea
+              {...field}
+              className="max-h-80"
+              value={field.value ?? ""}
+              rows={4}
+              placeholder="توضیحات محصول..."
+            />
+          )}
+        </FormField>
+      </FormGrid>
+
+      {/* ---------- images ---------- */}
+      <FormField className="pt-9" name="images" label="آپلود تصویر">
+        {({ field }) => {
+          const currentImages = (field.value as unknown as File[]) ?? [];
+
+          const reachedMax = currentImages.length >= MAX_IMAGES;
+          const slotCount = reachedMax ? MAX_IMAGES : currentImages.length + 1;
+
+          return (
+            <>
+              <div className="flex max-w-100 items-center justify-start gap-5 overflow-x-auto p-1 ps-0">
+                {Array.from({ length: slotCount }).map((_, i) => (
+                  <ImageUpload
+                    key={i}
+                    value={currentImages[i] ?? null}
+                    className="shrink-0"
+                    onChange={(v) => {
+                      if (v instanceof File) {
+                        const next = [...currentImages];
+                        next[i] = v;
+                        field.onChange(next);
+                      } else if (v === null) {
+                        field.onChange(
+                          currentImages.filter((_, index) => i !== index),
+                        );
+                      }
+                    }}
+                  />
+                ))}
+              </div>
+
+              <span className="text-muted-foreground text-xs">
+                {toPersianNum(currentImages.length)} از{" "}
+                {toPersianNum(MAX_IMAGES)}
+              </span>
+
+              {reachedMax && (
+                <FormFieldError>
+                  به حداکثر تعداد تصویر ({toPersianNum(MAX_IMAGES)} عدد)
+                  رسیده‌اید.
+                </FormFieldError>
+              )}
+            </>
+          );
+        }}
+      </FormField>
+
+      <ModalAttribute />
+      <PageFooter>
+        <FormSubmit>ذخیره محصول</FormSubmit>
+      </PageFooter>
+    </>
   );
 }

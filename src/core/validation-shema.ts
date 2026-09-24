@@ -6,22 +6,22 @@ export const emailShema = z.email({
     error: "ایمیل وارد شده نامعتبر است"
 }).lowercase().trim()
 
+const stringSchema = z.string('لطفا مقداری را وارد کنید')
+const numberSchema = z.coerce.number('لطفا عدد وارد کنید')
 // ------------- Product --------------
-
 export const productSchema = z.object({
-    name: z.string(),
-    basePrice: z.coerce.number(),
-    stock: z.coerce.number(),
-    category: z.string(),
-    categoryLabel: z.string(),
-    images: z.array(
-        z.object({
-            url: z.string(),
-            alt: z.string(),
-        })
-    ),
-    description: z.string(),
-    discountedPrice: z.number(),
+    name: stringSchema.trim(),
+    basePrice: numberSchema,
+    stock: numberSchema,
+    category: stringSchema.trim(),
+    categoryLabel: stringSchema.trim(),
+    images: z.array(z.file()).min(1, 'حداقل یک تصویر آپلود کنید').default([]),
     isAvailable: z.boolean(),
+    description: stringSchema.trim().optional(),
+    discountedPrice: numberSchema.optional(),
+    attributeList: z.array(z.object({
+        key: stringSchema,
+        values: z.array(stringSchema),
+    })).optional()
 
-}) satisfies z.ZodType<Partial<Product>>;
+}) satisfies z.ZodType<Product>;

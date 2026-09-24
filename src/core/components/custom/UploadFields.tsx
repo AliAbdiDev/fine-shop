@@ -11,11 +11,13 @@ import {
 interface ImageUploadProps extends UseImageUploadProps {
   className?: string;
   isDisabled?: boolean;
+  onRemove?: () => void;
 }
 
 export const ImageUpload: React.FC<ImageUploadProps> = ({
   className,
   isDisabled,
+  onRemove,
   ...hookProps
 }) => {
   const accept = "image/*";
@@ -39,7 +41,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
       onClick={isDisabled ? undefined : handlers.triggerPicker}
       title={title}
       className={cn(
-        "group relative flex size-24 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-xl border-2 border-dashed transition-colors duration-200 ease-in-out",
+        "group relative flex size-32 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-xl border-2 border-dashed transition-colors duration-200 ease-in-out",
         "border-border hover:border-muted-foreground/50 hover:bg-accent/50",
         isDragging && !isDisabled && "border-primary bg-primary/10",
         error && "border-destructive bg-destructive/10",
@@ -85,11 +87,15 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
           {!isLoading && !isDisabled && (
             <button
               type="button"
-              onClick={handlers.handleRemove}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 absolute top-1 right-1 rounded-full p-1 opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
+              onClick={(e) => {
+                e.stopPropagation();
+                handlers.handleRemove();
+                onRemove?.();
+              }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 absolute top-1 right-1 rounded-full p-1"
               aria-label="حذف تصویر"
             >
-              <X size={12} />
+              <X size={20} />
             </button>
           )}
         </>

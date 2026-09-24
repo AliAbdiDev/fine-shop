@@ -1,15 +1,8 @@
 import { type AppErrorCode } from "@/core/constants/status-messages";
 
-export interface PaginationMeta {
-    page: number;
-    perPage: number;
-    total: number;
-}
-
 export interface SuccessEnvelope<T = undefined> {
     message: string;
     data?: T;
-    meta?: PaginationMeta;
     token?: string;
 }
 
@@ -19,4 +12,11 @@ export interface ErrorEnvelope {
         message: string | null;
         details: string | null;
     };
+}
+
+export interface DrfPaginated<T> {
+    count: number;
+    next: string | null;
+    previous: string | null;
+    results: T[];
 }

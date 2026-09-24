@@ -104,6 +104,10 @@ function TableCaption({
   );
 }
 
+export const TableContentTemp = (className: { className?: string }) => (
+  <span className={cn("text-muted-foreground", className)}>—</span>
+);
+
 export {
   Table,
   TableHeader,
