@@ -89,7 +89,7 @@ export function SelectField<T extends SelectValueType = string>({
   const stringifiedDefaultValue =
     defaultValue !== undefined ? String(defaultValue) : undefined;
 
-  const handleValueChange = (val: string | null) => {
+  const handleValueChange = (val: unknown) => {
     let convertedValue: T;
     if (val === null) {
       convertedValue = val as unknown as T;

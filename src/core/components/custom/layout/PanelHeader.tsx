@@ -13,40 +13,20 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/core/components/ui/breadcrumb";
-import { ROUTES, type Routekeys } from "@/core/constants/misc";
+import { useBreadCrumbSelector } from "@/core/states/breadcrumb";
 import { cn } from "@/core/utils/helpers";
 
 import { SidebarTrigger } from "../../ui/sidebar";
 
-export const ROUTE_LABELS: Partial<Record<Routekeys, string>> = {
-  PRODUCTS: "محصولات",
-  PRODUCTS_CREATE_UPDATE: "ساخت / ویرایش",
-};
-
-const createBreadcrubMap = (): Map<string, Routekeys> | undefined => {
-  if (typeof window === "undefined") return;
-  const map = new Map();
-  Object.entries(ROUTES).forEach(([key, path]) => map.set(path, key));
-  return map;
-};
-
-const breadcrubMap = createBreadcrubMap();
-
-export function getSegmentLabel(segment: string): string {
+function getSegmentLabel(segment: string): string {
   const decoded = decodeURIComponent(segment);
-  const fullPath = `/${decoded}`;
-
-  const routeKey = breadcrubMap?.has(fullPath)
-    ? breadcrubMap.get(fullPath)
-    : null;
-  if (routeKey) return ROUTE_LABELS[routeKey] ?? decoded;
-
   return decoded.replace(/[-_]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 export function FloatingHeader() {
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
+  const labels = useBreadCrumbSelector.useLabels();
 
   useEffect(() => {
     if (mounted) return;
@@ -65,8 +45,9 @@ export function FloatingHeader() {
 
   const breadcrumbs = segments.map((segment, index) => {
     const href = basePath + "/" + segments.slice(0, index + 1).join("/");
-    const label = getSegmentLabel(segment);
+    const label = labels[href] ?? getSegmentLabel(segment);
     const isLast = index === segments.length - 1;
+
     return { href, label, isLast };
   });
 
@@ -100,14 +81,12 @@ export function FloatingHeader() {
                   </Fragment>
                 ))
               ) : (
-                // اگر بعد از حذف admin چیزی باقی نماند (مثلاً مسیر /admin)،
-                // می‌توانیم یک placeholder خالی یا عنوان «داشبورد» نمایش دهیم
                 <BreadcrumbItem>
                   <BreadcrumbPage>داشبورد</BreadcrumbPage>
                 </BreadcrumbItem>
               )
             ) : (
-              <div className="bg-accent/20 h-6 w-20 animate-pulse rounded-sm" /> // skeleton
+              <div className="bg-accent/20 h-6 w-20 animate-pulse rounded-sm" />
             )}
           </BreadcrumbList>
         </Breadcrumb>

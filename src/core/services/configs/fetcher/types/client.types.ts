@@ -5,8 +5,8 @@ export interface PaginationMeta {
     next: number | null;
     previous: number | null;
     totalPages: number | null;
+    rowCount: number | null;
     size: number | null;
-
 }
 
 export interface ApiSuccess<T> {

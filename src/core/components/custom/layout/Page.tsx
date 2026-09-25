@@ -54,7 +54,7 @@ function PageHeader({
       {forwardBack && (
         <Button
           size={"icon-lg"}
-          variant={"secondary"}
+          variant={"outline"}
           className={"mb-6 size-10"}
           onClick={() => {
             router.back();

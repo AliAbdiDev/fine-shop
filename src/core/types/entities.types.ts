@@ -11,6 +11,7 @@ export type ProductAttribute = {
 }
 
 export type Product = {
+    id?: string;
     name: string,
     category: string,
     categoryLabel: string,

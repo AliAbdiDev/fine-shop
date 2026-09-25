@@ -18,7 +18,7 @@ type ModalDialogProps = {
   description?: React.ReactNode;
   children: React.ReactNode;
   footer?: React.ReactNode;
-  size?: "sm" | "md" | "lg" | "xl";
+  size?: "sm" | "md" | "lg" | "xl" | "2xl";
   showClose?: boolean;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -30,6 +30,7 @@ const sizeClasses: Record<NonNullable<ModalDialogProps["size"]>, string> = {
   md: "sm:max-w-md",
   lg: "sm:max-w-lg",
   xl: "sm:max-w-xl",
+  "2xl": "sm:max-w-3xl",
 };
 
 export const ModalDialog = ({

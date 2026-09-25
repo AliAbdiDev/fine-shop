@@ -1,3 +1,4 @@
+import { isNumber } from "@sindresorhus/is";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -55,7 +56,7 @@ export const asRecord = (value: unknown): Record<string, unknown> | null =>
 /* -------------------------------------------------------------------------- */
 
 export const toPersianNum = (input: string | number): string => {
-  const num = isFinite(+input) ? +input : "";
+  const num = isNumber(+input) ? +input : "";
   return num.toLocaleString("fa-IR");
 };
 

@@ -1,5 +1,10 @@
 "use client";
 
+import { useEffect } from "react";
+
+import dynamic from "next/dynamic";
+import { useSearchParams } from "next/navigation";
+
 import { isNullOrUndefined, isNumericString } from "@sindresorhus/is";
 import { type z } from "zod";
 
@@ -7,6 +12,7 @@ import { InfiniteSelectField } from "@/core/components/custom/InfiniteSelectFiel
 import { FormGrid } from "@/core/components/custom/layout/FormGrid";
 import {
   Page,
+  PageActions,
   PageContent,
   PageDescription,
   PageFooter,
@@ -28,17 +34,22 @@ import { Input } from "@/core/components/ui/input";
 import { Textarea } from "@/core/components/ui/textarea";
 import { useCategoriesInfiniteSelect } from "@/core/services/client/categories";
 import { useCreateProduct } from "@/core/services/client/products";
+import { useBreadCrumbSelector } from "@/core/states/breadcrumb";
 import { toFormData, toPersianNum } from "@/core/utils/helpers";
 import { productSchema } from "@/core/validation-shema";
 
-import ModalAttribute from "./ModalAttribute";
-
+const ModalAttribute = dynamic(() => import("./ModalAttribute"));
 type ProductFormValues = z.infer<typeof productSchema>;
 
 const MAX_IMAGES = 10;
 
 export default function ProductPage() {
   const create = useCreateProduct();
+  const setLabel = useBreadCrumbSelector.useSetLabel();
+  const searchParams = useSearchParams();
+  const editMode = searchParams.get("edit") === "true";
+
+  const title = editMode ? "ویرایش محصول" : "ایجاد محصول";
 
   async function handleSubmit(values: ProductFormValues) {
     const formData = toFormData(values, {
@@ -49,21 +60,24 @@ export default function ProductPage() {
     create.mutate(formData);
   }
 
+  useEffect(() => {
+    return setLabel("/admin/products/create-update", title);
+  }, [setLabel, title]);
+
   return (
     <Page>
       <PageHeader forwardBack>
         <PageHeading>
-          <PageTitle>افزودن محصول</PageTitle>
+          <PageTitle>{title}</PageTitle>
           <PageDescription>اطلاعات محصول را وارد کنید.</PageDescription>
         </PageHeading>
+        <PageActions>
+          <ModalAttribute />
+        </PageActions>
       </PageHeader>
 
       <PageContent>
-        <Form
-          schema={productSchema}
-          onSubmit={handleSubmit}
-          onInvalid={(errors) => console.error("❌ validation failed:", errors)}
-        >
+        <Form schema={productSchema} onSubmit={handleSubmit}>
           <ProductFields />
         </Form>
       </PageContent>
@@ -230,7 +244,6 @@ function ProductFields() {
         }}
       </FormField>
 
-      <ModalAttribute />
       <PageFooter>
         <FormSubmit>ذخیره محصول</FormSubmit>
       </PageFooter>

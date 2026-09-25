@@ -1,7 +1,13 @@
 "use client";
 
+import { useMemo } from "react";
+
+import { type AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useRouter } from "next/navigation";
 
+import { MoreHorizontal } from "lucide-react";
+
+import { Dropdown } from "@/core/components/custom/Dropdown";
 import {
   Page,
   PageActions,
@@ -18,7 +24,7 @@ import {
 import { Badge } from "@/core/components/ui/badge";
 import { Button } from "@/core/components/ui/button";
 import { TableContentTemp } from "@/core/components/ui/table";
-import { createAdminRoute } from "@/core/features/admin/sidebarData";
+import { ROUTES } from "@/core/constants/misc";
 import { usePaginationQuery } from "@/core/hooks/usePaginationQuery";
 import { useProducts } from "@/core/services/client/products";
 import { type Product } from "@/core/types/entities.types";
@@ -26,29 +32,34 @@ import { getDiscountInfo, toPersianNum } from "@/core/utils/helpers";
 
 const helper = columnHelper<Product>();
 
-export const columns = [
+export const columns = (router: AppRouterInstance) => [
   helper.accessor("name", {
     header: "نام محصول",
+    maxSize: 600,
     cell: (info) => <span className="font-medium">{info.getValue()}</span>,
   }),
 
   helper.accessor("category", {
     header: "دسته‌بندی",
+
     cell: (info) => <Badge variant="outline">{info.getValue()}</Badge>,
   }),
 
   helper.accessor("stock", {
     header: "موجودی",
+
     cell: (info) => toPersianNum(info.getValue()),
   }),
 
   helper.accessor("basePrice", {
     header: "قیمت پایه",
+
     cell: (info) => toPersianNum(info.getValue()),
   }),
 
   helper.accessor("discountedPrice", {
     header: "قیمت با تخفیف",
+
     cell: (info) => {
       const discounted = info.getValue();
       const base = info.row.original.basePrice;
@@ -70,7 +81,6 @@ export const columns = [
 
   helper.accessor("isAvailable", {
     header: "وضعیت",
-
     cell: (info) => {
       const isAvailable = info.getValue();
       return (
@@ -80,11 +90,38 @@ export const columns = [
       );
     },
   }),
+
+  helper.display({
+    id: "actions",
+    maxSize: 55,
+    cell: ({ row }) => (
+      <Dropdown
+        options={[
+          {
+            label: "ویرایش",
+            value: "edit",
+            onClick: () => {
+              router.push(
+                ROUTES.PRODUCTS_CREATE_UPDATE +
+                  `?id=${row.original.id}&edit=true`,
+              );
+            },
+          },
+        ]}
+        trigger={
+          <Button size={"icon"} variant={"secondary"}>
+            <MoreHorizontal />
+          </Button>
+        }
+      />
+    ),
+  }),
 ];
 
 export default function ProductsPage() {
   const router = useRouter();
 
+  const cols = useMemo(() => columns(router), [router]);
   const { page, size, setPagination } = usePaginationQuery();
 
   const { data, isPending } = useProducts({ page, size });
@@ -99,10 +136,9 @@ export default function ProductsPage() {
           </PageDescription>
         </PageHeading>
         <PageActions>
-          <Button variant="outline">خروجی اکسل</Button>
           <Button
             onClick={() => {
-              router.push(createAdminRoute(["/products", "/create-update"]));
+              router.push(ROUTES.PRODUCTS_CREATE_UPDATE);
             }}
           >
             افزودن کالای جدید
@@ -112,10 +148,10 @@ export default function ProductsPage() {
 
       <PageContent>
         <DataTable
-          columns={columns}
+          columns={cols}
           data={data?.data}
           pageCount={data?.meta?.totalPages}
-          rowCount={data?.meta?.totalPages}
+          rowCount={data?.meta?.rowCount}
           isLoading={isPending}
           pagination={{ page, size }}
           onPaginationChange={setPagination}

@@ -36,25 +36,48 @@ export interface DataTablePagination {
   size: number;
 }
 
+/**
+ * حالت جدول:
+ * - `"server"` (پیش‌فرض): داده از سرور صفحه‌بندی/سورت/فیلتر می‌شود.
+ *   باید `pagination` و `onPaginationChange` بدهی و `pageCount`/`rowCount` را از متادیتا پر کنی.
+ * - `"client"`: تمام داده را یک‌جا می‌دهی، TanStack خودش صفحه‌بندی/سورت/فیلتر را انجام می‌دهد.
+ *   `pagination`/`onPaginationChange` را نده.
+ */
+export type DataTableMode = "server" | "client";
+
 interface DataTableProps<TData extends RowData> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   columns: ColumnDef<StockFeatures, TData, any>[];
   data: TData[] | undefined | null;
+
+  /** "server" (پیش‌فرض) یا "client" */
+  mode?: DataTableMode;
+
+  /* ---------- server mode فقط ---------- */
   pageCount?: number | null;
   rowCount?: number | null;
+
+  /* ---------- مشترک ---------- */
   isLoading?: boolean;
   showPagination?: boolean;
   pageSizeOptions?: number[];
+  defaultPageSize?: number;
   onRowClick?: (row: DataTableRow<TData>) => void;
   containerClassName?: string;
 
+  /* ---------- کنترل‌شده (server mode) ---------- */
   pagination?: DataTablePagination;
-
   onPaginationChange?: (next: DataTablePagination) => void;
 
+  /* ---------- پاس دادن به TanStack ---------- */
   options?: Omit<
     TableOptions<StockFeatures, TData>,
-    "data" | "columns" | "features" | "state" | "onPaginationChange"
+    | "data"
+    | "columns"
+    | "features"
+    | "state"
+    | "onPaginationChange"
+    | "manualPagination"
   > & {
     state?: Omit<
       NonNullable<TableOptions<StockFeatures, TData>["state"]>,
@@ -70,25 +93,32 @@ export const columnHelper = <TData extends RowData>() => {
 export function DataTable<TData extends RowData>({
   columns,
   data,
-  pageCount = -1,
+  mode = "server",
+  pageCount,
   rowCount,
   isLoading = false,
   showPagination = true,
   pageSizeOptions = [10, 20, 30, 50],
+  defaultPageSize,
   onRowClick,
   containerClassName,
   pagination,
   onPaginationChange,
   options,
 }: DataTableProps<TData>) {
+  const isServerMode = mode === "server";
   const isControlled = pagination !== undefined;
+
+  const resolvedDefaultPageSize = defaultPageSize ?? pageSizeOptions[1] ?? 20;
 
   const [internalPagination, setInternalPagination] =
     React.useState<PaginationState>({
       pageIndex: 0,
-      pageSize: pageSizeOptions[1] ?? 20,
+      pageSize: resolvedDefaultPageSize,
     });
 
+  // در حالت server با pagination کنترل‌شده، از بیرون می‌خوانیم.
+  // در حالت client یا server غیرکنترل‌شده، از internal استفاده می‌کنیم.
   const tablePagination: PaginationState = React.useMemo(
     () =>
       pagination
@@ -126,9 +156,12 @@ export function DataTable<TData extends RowData>({
     data: data || [],
     columns,
     features: stockFeatures,
-    manualPagination: true,
-    pageCount: pageCount ?? -1,
-    rowCount: rowCount ?? 0,
+    // 👇 کلید اصلی: در server mode صفحه‌بندی دستی، در client mode خودکار
+    manualPagination: isServerMode,
+    ...(isServerMode && {
+      pageCount: pageCount ?? -1,
+      rowCount: rowCount ?? 0,
+    }),
     ...options,
     state: {
       ...options?.state,
@@ -157,7 +190,7 @@ export function DataTable<TData extends RowData>({
         containerClassName,
       )}
     >
-      <div className="bg-background min-h-[56vh] w-full overflow-auto">
+      <div className="bg-background min-h-[40vh] w-full overflow-auto md:min-h-[56vh]">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

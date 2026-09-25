@@ -18,9 +18,10 @@ export const ROUTES = {
     HOME: '/',
     SIGNIN: '/signin',
     SIGNIN_VERIFY: '/signin/verify',
+    // admin
     ADMIN: '/admin',
-    PRODUCTS: "/products",
-    PRODUCTS_CREATE_UPDATE: '/create-update'
+    PRODUCTS: "/admin/products",
+    PRODUCTS_CREATE_UPDATE: '/admin/products/create-update'
 } as const
 
 export type Routekeys = keyof typeof ROUTES

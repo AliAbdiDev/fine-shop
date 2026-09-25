@@ -8,7 +8,7 @@ export const proxy: NextProxy = (req) => {
     // if (redirectResponse) return redirectResponse;
 
     if (req.nextUrl.pathname === ROUTES.ADMIN) {
-        return NextResponse.redirect(new URL(ROUTES.ADMIN + '/' + ROUTES.PRODUCTS, req.url))
+        return NextResponse.redirect(new URL(ROUTES.PRODUCTS, req.url))
     }
 
     return NextResponse.next();

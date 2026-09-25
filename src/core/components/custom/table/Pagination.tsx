@@ -12,7 +12,7 @@ import {
   ChevronsLeft,
 } from "lucide-react";
 
-import { cn } from "@/core/utils/helpers";
+import { cn, toPersianNum } from "@/core/utils/helpers";
 
 import {
   Select,
@@ -90,12 +90,19 @@ export function Pagination<TData extends RowData>({
               className="h-8 w-16 px-2 text-xs"
               aria-label="تعداد در صفحه"
             >
-              <SelectValue />
+              <SelectValue>
+                {(selectedValue) => {
+                  const found = pageSizeOptions.find(
+                    (size) => String(size) === selectedValue,
+                  );
+                  return toPersianNum(found ?? selectedValue ?? pageSize);
+                }}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               {pageSizeOptions.map((size) => (
                 <SelectItem key={size} value={String(size)}>
-                  {size}
+                  {toPersianNum(size)}
                 </SelectItem>
               ))}
             </SelectContent>

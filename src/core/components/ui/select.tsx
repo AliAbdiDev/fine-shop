@@ -131,7 +131,6 @@ function SelectItem({
   ...props
 }: SelectPrimitive.Item.Props) {
   const controlledValue = "value" in props ? (props.value ?? "") : undefined;
-  console.log("🚀 ~ SelectItem ~ props.value:", props.value);
 
   return (
     <SelectPrimitive.Item

@@ -53,6 +53,7 @@ export function paginatedAdapter<TRaw, TItem>(
             next: payload.next !== null ? page + 1 : null,
             previous: payload.previous !== null ? page - 1 : null,
             totalPages,
+            rowCount: payload.count,
             size: pageSize,
         };
 
