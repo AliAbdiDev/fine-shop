@@ -10,6 +10,8 @@ export type ProductAttribute = {
     values: Array<string>
 }
 
+export type ProductAttributes = Array<ProductAttribute>
+
 export type Product = {
     id?: string;
     name: string,

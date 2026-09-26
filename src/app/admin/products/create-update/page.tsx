@@ -33,7 +33,7 @@ import { ImageUpload } from "@/core/components/custom/UploadFields";
 import { Input } from "@/core/components/ui/input";
 import { Textarea } from "@/core/components/ui/textarea";
 import { useCategoriesInfiniteSelect } from "@/core/services/client/categories";
-import { useCreateProduct } from "@/core/services/client/products";
+import { useCreateProduct, useProduct } from "@/core/services/client/products";
 import { useBreadCrumbSelector } from "@/core/states/breadcrumb";
 import { toFormData, toPersianNum } from "@/core/utils/helpers";
 import { productSchema } from "@/core/validation-shema";
@@ -49,6 +49,11 @@ export default function ProductPage() {
   const searchParams = useSearchParams();
   const editMode = searchParams.get("edit") === "true";
 
+  const getProduct = useProduct({
+    id: searchParams.get("id"),
+    enabled: editMode,
+  });
+
   const title = editMode ? "ویرایش محصول" : "ایجاد محصول";
 
   async function handleSubmit(values: ProductFormValues) {
@@ -60,9 +65,10 @@ export default function ProductPage() {
     create.mutate(formData);
   }
 
-  useEffect(() => {
-    return setLabel("/admin/products/create-update", title);
-  }, [setLabel, title]);
+  useEffect(
+    () => setLabel("/admin/products/create-update", title),
+    [setLabel, title],
+  );
 
   return (
     <Page>
@@ -72,7 +78,9 @@ export default function ProductPage() {
           <PageDescription>اطلاعات محصول را وارد کنید.</PageDescription>
         </PageHeading>
         <PageActions>
-          <ModalAttribute />
+          <ModalAttribute
+            initAttributes={getProduct.data?.data.attributeList}
+          />
         </PageActions>
       </PageHeader>
 

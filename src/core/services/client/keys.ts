@@ -6,7 +6,7 @@ type EntityId = string | number;
 export type QueryKeys<P extends Prefix> = {
     all: readonly [P];
     list: (params?: ListParams) => readonly [P, "list", ListParams];
-    detail: (id: EntityId) => readonly [P, "detail", EntityId];
+    detail: (id: EntityId | null) => readonly [P, "detail", EntityId | null];
 };
 
 const productKeys: QueryKeys<"products"> = {
