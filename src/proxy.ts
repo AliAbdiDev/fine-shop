@@ -2,10 +2,11 @@ import { NextResponse, type NextProxy, type ProxyConfig } from 'next/server'
 
 
 import { ROUTES } from './core/constants/misc';
+import { authRedirect } from './core/utils/proxy-modules/auth';
 
 export const proxy: NextProxy = (req) => {
-    // const redirectResponse = authRedirect(req);
-    // if (redirectResponse) return redirectResponse;
+    const redirectResponse = authRedirect(req);
+    if (redirectResponse) return redirectResponse;
 
     if (req.nextUrl.pathname === ROUTES.ADMIN) {
         return NextResponse.redirect(new URL(ROUTES.PRODUCTS, req.url))

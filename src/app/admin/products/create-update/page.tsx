@@ -50,7 +50,7 @@ export default function ProductPage() {
   const editMode = searchParams.get("edit") === "true";
 
   const getProduct = useProduct({
-    id: searchParams.get("id"),
+    id: Number(searchParams.get("id")),
     enabled: editMode,
   });
 
@@ -95,7 +95,7 @@ export default function ProductPage() {
 
 function ProductFields() {
   const form = useFormApi<typeof productSchema>();
-  const categoriesSelect = useCategoriesInfiniteSelect({ page_size: 10 });
+  const categoriesSelect = useCategoriesInfiniteSelect({ pageSize: 10 });
 
   return (
     <>
@@ -119,6 +119,7 @@ function ProductFields() {
           {({ field }) => (
             <Input
               type="number"
+              step={1000}
               inputMode="numeric"
               {...field}
               placeholder="۰"
@@ -140,6 +141,8 @@ function ProductFields() {
         >
           {({ field }) => (
             <Input
+              step={1000}
+
               type="number"
               inputMode="numeric"
               {...field}
@@ -181,14 +184,14 @@ function ProductFields() {
             <InfiniteSelectField
               {...categoriesSelect}
               id={field.id}
-              value={field.value as string}
+              value={field.value}
               onChange={field.onChange}
               onBlur={field.onBlur}
             />
           )}
         </FormField>
 
-        <FormField name="categoryLabel" label="برچسب دسته‌بندی">
+        <FormField name="categoryLabel" label="نام دسته‌بندی">
           {({ field }) => <Input {...field} placeholder="مثلاً موبایل" />}
         </FormField>
 

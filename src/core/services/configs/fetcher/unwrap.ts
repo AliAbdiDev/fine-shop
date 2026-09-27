@@ -1,7 +1,6 @@
 import {
     type ApiError,
     type ApiResult,
-    type ApiSuccess,
 } from './types/client.types';
 
 export function createApiError(apiError: ApiError): Error & { apiError: ApiError } {
@@ -13,7 +12,9 @@ export function createApiError(apiError: ApiError): Error & { apiError: ApiError
     return err;
 }
 
-export function unwrap<T>(res: ApiResult<T>): ApiSuccess<T> {
-    if (!res.ok) throw createApiError(res.error);
-    return res;
+export function unwrap<T>(res: ApiResult<T>): T {
+    if (!res.ok) {
+        throw createApiError(res.error);
+    }
+    return res.data;
 }

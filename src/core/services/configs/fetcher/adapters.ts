@@ -1,3 +1,5 @@
+import { isNullOrUndefined } from '@sindresorhus/is';
+
 import { isPlainData } from './helper';
 import { type PaginationMeta } from './types/client.types';
 
@@ -35,23 +37,30 @@ function isPaginatedShape<TItem>(v: unknown): v is PaginatedShape<TItem> {
  * @param pageSize اندازه‌ی صفحه (از ورودی کاربر)
  */
 export function paginatedAdapter<TRaw, TItem>(
-    page: number,
-    pageSize: number,
+    { page, pageSize }: {
+        page?: number,
+        pageSize?: number,
+    }
 ): ResponseAdapter<TRaw, TItem[]> {
     return (raw) => {
+        if (isNullOrUndefined(page) || isNullOrUndefined(pageSize)) return { data: [] };
+
+        // برخی endpointها پاسخ را داخل یک آرایه‌ی تک‌عضوی می‌پیچند.
         const payload = Array.isArray(raw) ? raw[0] : raw;
 
         if (!isPaginatedShape<TItem>(payload)) {
+            // پاسخ DRF-paginated نیست؛ فرض می‌کنیم خودِ payload لیست است.
             return { data: (payload as unknown as TItem[]) ?? [] };
         }
 
-        const totalPages =
-            pageSize > 0 ? Math.ceil(payload.count / pageSize) : null;
+        const hasNext = payload.next !== null;
+        const hasPrevious = payload.previous !== null;
+        const totalPages = pageSize > 0 ? Math.ceil(payload.count / pageSize) : null;
 
         const meta: PaginationMeta = {
             current: page,
-            next: payload.next !== null ? page + 1 : null,
-            previous: payload.previous !== null ? page - 1 : null,
+            next: hasNext ? page + 1 : null,
+            previous: hasPrevious ? page - 1 : null,
             totalPages,
             rowCount: payload.count,
             size: pageSize,

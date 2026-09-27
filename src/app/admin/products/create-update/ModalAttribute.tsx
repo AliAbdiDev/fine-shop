@@ -33,14 +33,14 @@ function ModalAttribute({
   const init = useProductAttributeSelector.useInit();
 
   const attsData = getAllAtts.data?.data || [];
-  const findValuesByKey =
+  const foundValuesByKey =
     attsData.find((item) => item.key === key)?.values || [];
 
   const isHydrat = useRef(false);
 
   useEffect(() => {
     if (isHydrat.current) return;
-    if (initAttributes) {
+    if (initAttributes?.length) {
       init(initAttributes);
       isHydrat.current = true;
     }
@@ -116,7 +116,7 @@ function ModalAttribute({
               <TableCell>
                 <SelectField
                   key={`value-select-${key ?? "empty"}`}
-                  options={findValuesByKey.map((foundAtt) => ({
+                  options={foundValuesByKey.map((foundAtt) => ({
                     value: foundAtt,
                     label: foundAtt,
                   }))}
@@ -131,7 +131,7 @@ function ModalAttribute({
                   variant="ghost"
                   onClick={() => {
                     const r = addAtt({ key, values: value ? [value] : null });
-                    if (r) notify.warning(r.message);
+                    if (r) notify.error(r.message);
                   }}
                 >
                   افزودن

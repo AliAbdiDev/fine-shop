@@ -11,7 +11,7 @@ export type ProductAttributeStore = {
     removeAtt: (key: string) => void,
 }
 
-export const useProductAttributeStore = createStore<ProductAttributeStore>((set, get) => {
+const useProductAttributeStore = createStore<ProductAttributeStore>((set, get) => {
     return {
         atts: [],
         init: (payload) => {
@@ -27,7 +27,7 @@ export const useProductAttributeStore = createStore<ProductAttributeStore>((set,
             }
 
             if (!payload.key) {
-                return { message: "ویژگی را تعیین کنید" };
+                return { message: " نام ویژگی را تعیین کنید " };
             }
 
             if (!payload.values || payload.values.length === 0) {

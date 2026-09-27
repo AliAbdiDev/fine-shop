@@ -28,6 +28,24 @@ const isPlainObject = (v: unknown): v is Record<string, unknown> =>
 export function transformKeys<T>(input: T, mode: Casing): T {
   const convert = mode === "snake" ? toSnakeCase : toCamelCase;
 
+  // FormData: فقط کلیدها تبدیل می‌شوند؛ مقادیر (File/Blob/string) دست‌نخورده.
+  if (input instanceof FormData) {
+    const out = new FormData();
+    for (const [k, v] of input.entries()) {
+      out.append(convert(k), v);
+    }
+    return out as unknown as T;
+  }
+
+  // URLSearchParams: برای body های x-www-form-urlencoded.
+  if (input instanceof URLSearchParams) {
+    const out = new URLSearchParams();
+    for (const [k, v] of input.entries()) {
+      out.append(convert(k), v);
+    }
+    return out as unknown as T;
+  }
+
   const walk = (value: unknown): unknown => {
     if (Array.isArray(value)) return value.map(walk);
     if (!isPlainObject(value)) return value;

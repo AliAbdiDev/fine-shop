@@ -1,4 +1,7 @@
+export type EntityId = number;
+
 export type User = {
+    id?: EntityId
     email: string;
     phoneNumber: string;
     isSuperuser: boolean;
@@ -6,6 +9,7 @@ export type User = {
 
 // ------------- Product --------------
 export type ProductAttribute = {
+    id?: EntityId
     key: string,
     values: Array<string>
 }
@@ -13,7 +17,7 @@ export type ProductAttribute = {
 export type ProductAttributes = Array<ProductAttribute>
 
 export type Product = {
-    id?: string;
+    id?: EntityId
     name: string,
     category: string,
     categoryLabel: string,
@@ -27,3 +31,10 @@ export type Product = {
 }
 
 export type Products = Array<Product>
+
+export type Category = {
+    id?: EntityId,
+    name: string,
+    slug: string
+}
+export type Categorys = Array<Category>

@@ -1,24 +1,24 @@
-type Prefix = "categories" | "products" | "users";
+import { type EntityId } from "@/core/types/entities.types";
 
-type ListParams = Record<string, unknown>;
-type EntityId = string | number;
+type Prefix = "categories" | "products" | "users" | "attributes";
 
-export type QueryKeys<P extends Prefix> = {
-    all: readonly [P];
-    list: (params?: ListParams) => readonly [P, "list", ListParams];
-    detail: (id: EntityId | null) => readonly [P, "detail", EntityId | null];
-};
+export type ListParams = { page?: number; pageSize?: number };
 
-const productKeys: QueryKeys<"products"> = {
-    all: ["products"],
-    list: (params) => ["products", "list", params ?? {}],
-    detail: (id) => ["products", "detail", id],
-};
+export function createKeys<P extends Prefix>(prefix: P) {
+    return {
+        all: () => [prefix] as const,
 
-const categoryKeys: QueryKeys<"categories"> = {
-    all: ["categories"],
-    list: (params) => ["categories", "list", params ?? {}],
-    detail: (id) => ["categories", "detail", id],
-};
+        lists: () => [prefix, "list"] as const,
 
-export { productKeys, categoryKeys };
+        list: (params: ListParams) => ([prefix, "list", params] as const),
+
+        details: () => [prefix, "detail"] as const,
+
+        detail: (id: EntityId) => [prefix, "detail", id] as const,
+    };
+}
+
+export const productKeys = createKeys("products");
+export const categoryKeys = createKeys("categories");
+export const userKeys = createKeys("users");
+export const attributeKeys = createKeys("attributes");

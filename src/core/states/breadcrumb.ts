@@ -22,7 +22,7 @@ export type BreadcrumbStore = {
     setLabel: (path: Route, label: string) => () => void;
 };
 
-export const useBreadcrumbStore = create<BreadcrumbStore>((set) => ({
+const useBreadcrumbStore = create<BreadcrumbStore>((set) => ({
     labels: buildInitialLabels(),
 
     setLabel: (path, label) => {

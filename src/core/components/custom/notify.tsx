@@ -3,37 +3,31 @@ import { toast } from "sonner";
 import { APP_MODE } from "@/core/constants/misc";
 import {
   ERROR_MESSAGES,
-  GENERIC_ERROR,
   GENERIC_SUCCESS,
 } from "@/core/constants/status-messages";
 import { type ApiError } from "@/core/services/configs/fetcher/types/client.types";
 
-export function resolveErrorMessage(error: unknown): string {
-  if (!error) return GENERIC_ERROR;
+interface ApiClientError extends Error {
+  apiError: ApiError;
+}
 
-  if (typeof error === "object" && "status" in error) {
-    const apiError = error as ApiError;
+function isApiClientError(e: unknown): e is ApiClientError {
+  return (
+    e instanceof Error &&
+    e.name === "ApiClientError" &&
+    "apiError" in e &&
+    typeof (e as ApiClientError).apiError === "object" &&
+    (e as ApiClientError).apiError !== null
+  );
+}
 
-    if (apiError.code && apiError.code in ERROR_MESSAGES) {
-      return ERROR_MESSAGES[apiError.code as keyof typeof ERROR_MESSAGES];
-    }
+export function resolveErrorMessage(error: unknown): string | null {
+  if (!isApiClientError(error)) return null;
 
-    if (
-      apiError.status === 0 ||
-      apiError.status === 502 ||
-      apiError.status === 504
-    ) {
-      return ERROR_MESSAGES.NETWORK_ERROR;
-    }
+  const { code } = error.apiError;
+  if (!code || !(code in ERROR_MESSAGES)) return null;
 
-    if (apiError.message) {
-      return apiError.message;
-    }
-  }
-
-  if (typeof error === "string") return error;
-
-  return GENERIC_ERROR;
+  return ERROR_MESSAGES[code as keyof typeof ERROR_MESSAGES];
 }
 
 export const notify = {
@@ -44,8 +38,9 @@ export const notify = {
 
   error: (error?: unknown) => {
     if (!APP_MODE.isClient()) return;
-    const title = resolveErrorMessage(error);
-    toast.error(title);
+    const msg = resolveErrorMessage(error);
+    if (msg === null) return; // ← کد ناشناخته → هیچ تستری
+    toast.error(msg);
   },
 
   info: (title: string, description?: string) => {

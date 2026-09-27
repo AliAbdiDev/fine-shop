@@ -49,6 +49,10 @@ export interface AdapterOptions<TRaw, TData> {
     adapter?: ResponseAdapter<TRaw, TData>;
 }
 
+export interface AuthOptions {
+    token?: string | null;
+}
+
 export function createApi({ client }: { client: $Fetch }) {
     async function request<
         TRaw,
@@ -56,9 +60,17 @@ export function createApi({ client }: { client: $Fetch }) {
         TBody extends RequestBody = RequestBody,
     >(
         url: string,
-        options: FetcherOptions<TBody> & AdapterOptions<TRaw, TData> = {},
+        options: FetcherOptions<TBody> &
+            AdapterOptions<TRaw, TData> &
+            AuthOptions = {},
     ): Promise<ApiResult<TData>> {
-        const { adapter, ...fetchOptions } = options;
+        const { adapter, token, ...fetchOptions } = options;
+
+        if (token) {
+            const headers = new Headers(fetchOptions.headers);
+            headers.set('Authorization', `Bearer ${token}`);
+            fetchOptions.headers = headers;
+        }
 
         try {
             const response = await client.raw<TRaw>(url, fetchOptions);
@@ -102,34 +114,38 @@ export function createApi({ client }: { client: $Fetch }) {
         }
     }
 
+    type Options<TRaw, TData> = RequestOptions &
+        AdapterOptions<TRaw, TData> &
+        AuthOptions;
+
     return {
         get: <TRaw, TData = TRaw>(
             url: string,
-            options?: RequestOptions & AdapterOptions<TRaw, TData>,
+            options?: Options<TRaw, TData>,
         ) => request<TRaw, TData>(url, { ...options, method: 'GET' }),
 
         post: <TRaw, TData = TRaw, TBody extends RequestBody = RequestBody>(
             url: string,
             body?: TBody,
-            options?: RequestOptions & AdapterOptions<TRaw, TData>,
+            options?: Options<TRaw, TData>,
         ) => request<TRaw, TData, TBody>(url, { ...options, method: 'POST', body }),
 
         put: <TRaw, TData = TRaw, TBody extends RequestBody = RequestBody>(
             url: string,
             body?: TBody,
-            options?: RequestOptions & AdapterOptions<TRaw, TData>,
+            options?: Options<TRaw, TData>,
         ) => request<TRaw, TData, TBody>(url, { ...options, method: 'PUT', body }),
 
         patch: <TRaw, TData = TRaw, TBody extends RequestBody = RequestBody>(
             url: string,
             body?: TBody,
-            options?: RequestOptions & AdapterOptions<TRaw, TData>,
+            options?: Options<TRaw, TData>,
         ) => request<TRaw, TData, TBody>(url, { ...options, method: 'PATCH', body }),
 
         delete: <TRaw, TData = TRaw, TBody extends RequestBody = RequestBody>(
             url: string,
             body?: TBody,
-            options?: RequestOptions & AdapterOptions<TRaw, TData>,
+            options?: Options<TRaw, TData>,
         ) => request<TRaw, TData, TBody>(url, { ...options, method: 'DELETE', body }),
     };
 }

@@ -124,7 +124,7 @@ export default function ProductsPage() {
   const cols = useMemo(() => columns(router), [router]);
   const { page, size, setPagination } = usePaginationQuery();
 
-  const { data, isPending } = useProducts({ page, size });
+  const { data, isPending } = useProducts({ page, pageSize: size });
 
   return (
     <Page>
