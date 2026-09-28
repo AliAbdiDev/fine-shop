@@ -60,10 +60,10 @@ export function useProducts(p: ListParams) {
     return useQuery({
         queryKey: productKeys.list(p),
         queryFn: async () =>
-            await api.get<DrfPaginated<Product>, Products>("/product/", {
+            unwrap(await api.get<DrfPaginated<Product>, Products>("/product/", {
                 query: p,
                 adapter: paginatedAdapter(p),
-            })
+            }))
 
     });
 }
