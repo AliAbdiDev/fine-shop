@@ -89,15 +89,14 @@ export const useAttributes = ({ enabled = true }: { enabled?: boolean }) => {
     });
 }
 
-export const useRemoveImageProduct = ({ id, enabled = true }: { id: EntityId | null; enabled?: boolean }) => {
+export const useRemoveImageProduct = () => {
     const token = useAuthSelector.useToken();
+    console.log("🚀 ~ useRemoveImageProduct ~ token:", token)
     const queryClient = useQueryClient();
 
-    const isId = isNumber(id)
     return useMutation({
-        mutationFn: async (payload: FormData) => {
-            if (isNullOrUndefined(isId)) throw new Error("id is required");
-            return unwrap(await api.patch<Product, Product>(`/product/${id}/`, payload, { token }));
+        mutationFn: async (payload: EntityId) => {
+            return unwrap(await api.delete<Product, Product>(`/product/image/${payload}/`, undefined, { token }));
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: productKeys.lists() });

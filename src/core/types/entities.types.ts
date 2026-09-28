@@ -25,7 +25,10 @@ export type Product = {
     basePrice: number,
     discountedPrice?: number,
     description?: string,
-    images: Array<{ url: string, alt: string } | File>,
+    images: Array<{
+        url: string, alt: string,
+        id?: EntityId
+    } | File>,
     isAvailable?: boolean,
     attributeList?: Array<ProductAttribute>
 }

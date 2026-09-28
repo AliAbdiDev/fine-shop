@@ -40,9 +40,11 @@ import {
   useCreateProduct,
   useEditProduct,
   useProduct,
+  useRemoveImageProduct,
 } from "@/core/services/client/products";
 import { useBreadCrumbSelector } from "@/core/states/breadcrumb";
 import { useProductAttributeSelector } from "@/core/states/productAttribute";
+import { type Product } from "@/core/types/entities.types";
 import { toFormData, toPersianNum } from "@/core/utils/helpers";
 import { productSchema } from "@/core/validation-shema";
 
@@ -131,6 +133,8 @@ function ProductFields({
   categoriesSelect: CategoriesSelectResult;
 }) {
   const form = useFormApi<typeof productSchema>();
+  const removeImage = useRemoveImageProduct();
+
   return (
     <>
       <FormGrid>
@@ -258,7 +262,8 @@ function ProductFields({
       {/* ---------- images ---------- */}
       <FormField className="pt-9" name="images" label="آپلود تصویر">
         {({ field }) => {
-          const currentImages = (field.value as unknown as File[]) ?? [];
+          const currentImages =
+            (field.value as unknown as Product["images"]) ?? [];
 
           const reachedMax = currentImages.length >= MAX_IMAGES;
           const slotCount = reachedMax ? MAX_IMAGES : currentImages.length + 1;
@@ -266,24 +271,36 @@ function ProductFields({
           return (
             <>
               <div className="flex max-w-100 items-center justify-start gap-5 overflow-x-auto p-1 ps-0">
-                {Array.from({ length: slotCount }).map((_, i) => (
-                  <ImageUpload
-                    key={i}
-                    value={currentImages[i] ?? null}
-                    className="shrink-0"
-                    onChange={(v) => {
-                      if (v instanceof File) {
-                        const next = [...currentImages];
-                        next[i] = v;
-                        field.onChange(next);
-                      } else if (v === null) {
-                        field.onChange(
-                          currentImages.filter((_, index) => i !== index),
-                        );
-                      }
-                    }}
-                  />
-                ))}
+                {Array.from({ length: slotCount }).map((_, i) => {
+                  const id = !(currentImages[i] instanceof File)
+                    ? currentImages[i]?.id
+                    : null;
+
+                  return (
+                    <ImageUpload
+                      key={i}
+                      value={currentImages[i] ?? null}
+                      className="shrink-0"
+                      onRemove={() => {
+                        console.log("🚀 ~ ProductFields ~ id:", id);
+                        if (id) {
+                          removeImage.mutate(id);
+                        }
+                      }}
+                      onChange={(v) => {
+                        if (v instanceof File) {
+                          const next = [...currentImages];
+                          next[i] = v;
+                          field.onChange(next);
+                        } else if (v === null) {
+                          field.onChange(
+                            currentImages.filter((_, index) => i !== index),
+                          );
+                        }
+                      }}
+                    />
+                  );
+                })}
               </div>
 
               <span className="text-muted-foreground text-xs">

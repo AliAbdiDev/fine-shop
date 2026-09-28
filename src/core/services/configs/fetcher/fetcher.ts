@@ -67,6 +67,7 @@ export function createApi({ client }: { client: $Fetch }) {
         const { adapter, token, ...fetchOptions } = options;
 
         if (token) {
+            console.log("🚀 ~ request ~ token:", token)
             const headers = new Headers(fetchOptions.headers);
             headers.set('Authorization', `Bearer ${token}`);
             fetchOptions.headers = headers;
