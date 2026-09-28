@@ -8,7 +8,6 @@ import { useSearchParams } from "next/navigation";
 import { isNullOrUndefined, isNumericString } from "@sindresorhus/is";
 import { type z } from "zod";
 
-import { InfiniteSelectField } from "@/core/components/custom/InfiniteSelectField";
 import { FormGrid } from "@/core/components/custom/layout/FormGrid";
 import {
   Page,
@@ -215,29 +214,6 @@ function ProductFields({
                 min={0}
                 placeholder="۰"
               />
-            );
-          }}
-        </FormField>
-
-        <FormField name="category" label="دسته‌بندی">
-          {({ field }) => {
-            return (
-              <FormWatch name="categoryLabel">
-                {(categoryLabel) => (
-                  <InfiniteSelectField
-                    {...categoriesSelect}
-                    id={field.id}
-                    value={field.value}
-                    selectedLabel={
-                      typeof categoryLabel === "string"
-                        ? categoryLabel
-                        : undefined
-                    }
-                    onChange={field.onChange}
-                    onBlur={field.onBlur}
-                  />
-                )}
-              </FormWatch>
             );
           }}
         </FormField>
