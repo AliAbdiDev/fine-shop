@@ -21,7 +21,7 @@ export interface ApiError {
     code: AppErrorCode | null;
     status: number;
     message: string | null;
-    details: string | null;
+    details: { name: string[] } | null;
     raw: unknown;
 }
 

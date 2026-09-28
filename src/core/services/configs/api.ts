@@ -11,7 +11,7 @@ const clientConfig = createFetch({
 }).create({
     baseURL: process.env.NEXT_PUBLIC_API_BASE_URL + '/api',
     retryDelay: 500,
-    timeout: 25_000,
+    timeout: 5_000,
     retryStatusCodes: [408, 425, 500, 502, 503, 504],
 
     onRequest({ options }) {

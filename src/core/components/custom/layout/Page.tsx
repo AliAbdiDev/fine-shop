@@ -11,17 +11,78 @@ import { cn } from "@/core/utils/helpers";
 import { Button } from "../../ui/button";
 
 /* =====================================================
+   Skeleton (base primitive)
+   ===================================================== */
+type SkeletonProps = React.ComponentProps<"div">;
+
+function Skeleton({ className, ...props }: SkeletonProps) {
+  return (
+    <div
+      data-slot="skeleton"
+      className={cn("bg-muted animate-pulse rounded-md", className)}
+      {...props}
+    />
+  );
+}
+
+/* =====================================================
+   PageSkeleton (full-page wireframe)
+   ===================================================== */
+type PageSkeletonProps = React.ComponentProps<"div">;
+
+function PageSkeleton({ className, ...props }: PageSkeletonProps) {
+  return (
+    <div
+      data-slot="page-skeleton"
+      className={cn("mx-auto w-full max-w-7xl", className)}
+      {...props}
+    >
+      {/* Header: title + description + actions + back button */}
+      <header className="mb-6 flex w-full items-center justify-between gap-6">
+        <div className="flex flex-1 flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-2">
+            <Skeleton className="h-6 w-48 md:h-7" />
+            <Skeleton className="h-3 w-72 md:h-4" />
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <Skeleton className="h-9 w-24" />
+            <Skeleton className="h-9 w-28" />
+          </div>
+        </div>
+        <Skeleton className="size-10 shrink-0 rounded-md" />
+      </header>
+
+      {/* Content */}
+      <div className="space-y-4">
+        <Skeleton className="h-40 w-full rounded-lg" />
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <Skeleton className="h-24 w-full rounded-lg" />
+          <Skeleton className="h-24 w-full rounded-lg" />
+        </div>
+        <Skeleton className="h-64 w-full rounded-lg" />
+      </div>
+    </div>
+  );
+}
+
+/* =====================================================
    Page (Root)
    ===================================================== */
-type PageProps = React.ComponentProps<"div">;
+type PageProps = React.ComponentProps<"div"> & {
+  isLoading?: boolean;
+};
 
-function Page({ className, ...props }: PageProps) {
+function Page({ className, isLoading = false, children, ...props }: PageProps) {
+  if (isLoading) return <PageSkeleton className={className} />;
+
   return (
     <div
       data-slot="page"
       className={cn("mx-auto w-full max-w-7xl", className)}
       {...props}
-    />
+    >
+      {children}
+    </div>
   );
 }
 
@@ -66,6 +127,7 @@ function PageHeader({
     </header>
   );
 }
+
 /* =====================================================
    PageHeading (wrapper for title and description)
    ===================================================== */
@@ -153,7 +215,7 @@ function PageFooter({ className, ...props }: PageFooterProps) {
   return (
     <footer
       data-slot="page-footer"
-      className={cn("text-muted-foreground pt-12 pb-5 text-sm", className)}
+      className={cn("text-muted-foreground pt-10 pb-5 text-sm", className)}
       {...props}
     />
   );
@@ -164,6 +226,8 @@ function PageFooter({ className, ...props }: PageFooterProps) {
    ===================================================== */
 export {
   Page,
+  PageSkeleton,
+  Skeleton,
   PageHeader,
   PageHeading,
   PageTitle,

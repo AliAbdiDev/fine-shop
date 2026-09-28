@@ -38,8 +38,12 @@ export const notify = {
 
   error: (error?: unknown) => {
     if (!APP_MODE.isClient()) return;
+    if (typeof error === "string") {
+      toast.error(error);
+      return;
+    }
     const msg = resolveErrorMessage(error);
-    if (msg === null) return; // ← کد ناشناخته → هیچ تستری
+    if (msg === null) return;
     toast.error(msg);
   },
 

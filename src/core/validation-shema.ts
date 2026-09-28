@@ -8,22 +8,33 @@ export const emailShema = z.email({
 
 const stringSchema = z.string('لطفا مقداری را وارد کنید').trim()
 const numberSchema = z.coerce.number('لطفا عدد وارد کنید')
-const stringMax100 = stringSchema.max(100, 'حداکثر 100 کاراکتر')
+const minCharacter = (number: number) => stringSchema.min(number, `حداقل باید ${number} وارد کنید `)
+const maxCharacter = (number = 100) => stringSchema.max(number, `حداکثر ${number} کاراکتر میتوانید وارد کنید`)
 
 // ------------- Product --------------
 export const productSchema = z.object({
-    name: stringMax100,
+    name: maxCharacter(),
     basePrice: numberSchema,
     stock: numberSchema,
-    category: stringMax100,
-    categoryLabel: stringMax100,
-    images: z.array(z.file()).min(1, 'حداقل یک تصویر آپلود کنید').default([]),
+    category: maxCharacter(),
+    images: z.array(z.union([z.object({ url: z.url('لطفا آدرس سایت را وارد کنید'), alt: stringSchema }), z.file('لطفا فایل تصویر را وارد کنید')])).min(1, 'حداقل یک تصویر را آپلود کنید').max(8, 'حداکثر تعداد مجاز اپلود 8 تصویر است'),
     isAvailable: z.boolean(),
-    description: stringSchema.max(5000, 'حداکثر 5000 کاراکتر').optional(),
+    description: maxCharacter(5000).optional(),
     discountedPrice: numberSchema.optional(),
     attributeList: z.array(z.object({
         key: stringSchema,
-        values: z.array(stringMax100),
+        values: z.array(maxCharacter()),
     })).optional()
 
+}).superRefine((data, ctx) => {
+    if (
+        (data.discountedPrice !== undefined && data.discountedPrice !== 0) &&
+        data.discountedPrice >= data.basePrice
+    ) {
+        ctx.addIssue({
+            code: "custom",
+            path: ["discountedPrice"],
+            message: "قیمت با تخفیف نمی‌تواند مساوی یا بیشتر از قیمت اصلی باشد",
+        });
+    }
 }) satisfies z.ZodType<Product>;

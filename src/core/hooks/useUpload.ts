@@ -1,15 +1,20 @@
+"use client";
 
 import * as React from "react";
 
 export type UploadState =
-    "idle" | "uploading" | "processing" | "error" | "done";
+    | "idle"
+    | "uploading"
+    | "processing"
+    | "error"
+    | "done";
 
 export interface UseImageUploadProps {
-    value?: File | string | null;
+    value?: File | string | null | unknown;
     onChange?: (value: File | string | null) => void;
     onUpload?: (
         file: File,
-        onProgress?: (percent: number) => void,
+        onProgress?: (percent: number) => void
     ) => Promise<string>;
     accept?: string;
     maxSize?: number;
@@ -27,7 +32,7 @@ function formatBytes(bytes: number): string {
 function validateFile(
     file: File,
     accept: string,
-    maxSize?: number,
+    maxSize?: number
 ): string | null {
     if (accept && accept !== "*/*") {
         const acceptedTypes = accept.split(",").map((t) => t.trim().toLowerCase());
@@ -62,7 +67,7 @@ export function useImageUpload({
     disabled = false,
 }: UseImageUploadProps) {
     const inputRef = React.useRef<HTMLInputElement>(null);
-    const isMounted = React.useRef(true); // برای جلوگیری از آپدیت استیت بعد از unmount
+    const isMounted = React.useRef(true);
 
     const [internalFile, setInternalFile] = React.useState<File | null>(null);
     const [uploadState, setUploadState] = React.useState<UploadState>("idle");
@@ -81,7 +86,7 @@ export function useImageUpload({
     }, []);
 
     React.useEffect(() => {
-        if (!currentValue) {
+        if (!currentValue || (Array.isArray(currentValue) && currentValue.length === 0)) {
             // eslint-disable-next-line react-hooks/set-state-in-effect
             setUploadState("idle");
             setError(null);
@@ -91,16 +96,45 @@ export function useImageUpload({
         }
     }, [currentValue, uploadState]);
 
-    // مدیریت امن Preview URL (Memory Leak Prevention)
+    // مدیریت امن Preview URL و جلوگیری از کرش Overload resolution failed
     const previewUrl = React.useMemo(() => {
         if (!currentValue) return null;
+
+        // اگر استرینگ است مستقیما برگردان
         if (typeof currentValue === "string") return currentValue;
-        return URL.createObjectURL(currentValue);
+
+        // تنها در صورتی که واقعاً فایل یا Blob باشد به createObjectURL بفرست
+        if (typeof window !== "undefined" && (currentValue instanceof File || currentValue instanceof Blob)) {
+            return URL.createObjectURL(currentValue);
+        }
+
+        // هندل کردن زمانی که مقدار از فرمت آرایه است (مثلاً مقدار پیش‌فرض hook-form)
+        if (Array.isArray(currentValue)) {
+            return typeof currentValue[0] === "string" ? currentValue[0] : null;
+        }
+
+        // هندل کردن زمانی که API یک آبجکت برمی‌گرداند (مثل { url: "..." })
+        if (typeof currentValue === "object" && currentValue !== null) {
+            if ("url" in currentValue && typeof currentValue.url === "string") {
+                return currentValue.url;
+            }
+            if ("src" in currentValue && typeof currentValue.src === "string") {
+                return currentValue.src;
+            }
+        }
+
+        return null;
     }, [currentValue]);
 
+    // Memory Leak Prevention
     React.useEffect(() => {
         return () => {
-            if (previewUrl && typeof currentValue !== "string") {
+            // فقط زمانی revoke کن که واقعاً توسط createObjectURL ساخته شده باشد
+            if (
+                previewUrl &&
+                typeof window !== "undefined" &&
+                (currentValue instanceof File || currentValue instanceof Blob)
+            ) {
                 URL.revokeObjectURL(previewUrl);
             }
         };
@@ -142,19 +176,17 @@ export function useImageUpload({
                 onChange?.(file);
             }
         },
-        [accept, maxSize, isControlled, onUpload, onChange],
+        [accept, maxSize, isControlled, onUpload, onChange]
     );
 
-    // هندلرهای رویداد
     const handleFileChange = React.useCallback(
         (event: React.ChangeEvent<HTMLInputElement>) => {
             const selectedFile = event.target.files?.[0];
-            // Reset input value so the same file can be selected again after an error
             if (event.target) event.target.value = "";
             if (!selectedFile) return;
             processFile(selectedFile);
         },
-        [processFile],
+        [processFile]
     );
 
     const handleRemove = React.useCallback(
@@ -166,7 +198,7 @@ export function useImageUpload({
             setProgress(0);
             onChange?.(null);
         },
-        [isControlled, onChange],
+        [isControlled, onChange]
     );
 
     const handleRetry = React.useCallback(
@@ -178,17 +210,18 @@ export function useImageUpload({
                 inputRef.current?.click();
             }
         },
-        [currentValue, processFile],
+        [currentValue, processFile]
     );
 
-    // محاسبه متادیتای نمایشی
+    // محاسبه متادیتای نمایشی با پایداری نوع (Type Safety)
     const title = React.useMemo(() => {
         if (!currentValue) return "انتخاب تصویر";
         if (typeof currentValue === "string") {
             const parts = currentValue.split("/");
             return parts[parts.length - 1] || "تصویر انتخاب شده";
         }
-        return currentValue.name;
+        if (currentValue instanceof File) return currentValue.name;
+        return "تصویر انتخاب شده";
     }, [currentValue]);
 
     const description = React.useMemo(() => {
@@ -196,7 +229,7 @@ export function useImageUpload({
         if (uploadState === "uploading") return `در حال آپلود... ${progress}%`;
         if (uploadState === "processing") return "در حال پردازش...";
         if (currentValue instanceof File) return formatBytes(currentValue.size);
-        if (typeof currentValue === "string") return "تصویر آپلود شده";
+        if (currentValue) return "تصویر انتخاب شده"; // Fallback برای آرایه‌ها و آبجکت‌ها
         return "برای انتخاب یا کشیدن تصویر کلیک کنید";
     }, [error, uploadState, progress, currentValue]);
 

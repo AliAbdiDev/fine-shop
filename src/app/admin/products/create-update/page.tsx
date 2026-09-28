@@ -32,9 +32,17 @@ import {
 import { ImageUpload } from "@/core/components/custom/UploadFields";
 import { Input } from "@/core/components/ui/input";
 import { Textarea } from "@/core/components/ui/textarea";
-import { useCategoriesInfiniteSelect } from "@/core/services/client/categories";
-import { useCreateProduct, useProduct } from "@/core/services/client/products";
+import {
+  type CategoriesSelectResult,
+  useCategoriesInfiniteSelect,
+} from "@/core/services/client/categories";
+import {
+  useCreateProduct,
+  useEditProduct,
+  useProduct,
+} from "@/core/services/client/products";
 import { useBreadCrumbSelector } from "@/core/states/breadcrumb";
+import { useProductAttributeSelector } from "@/core/states/productAttribute";
 import { toFormData, toPersianNum } from "@/core/utils/helpers";
 import { productSchema } from "@/core/validation-shema";
 
@@ -44,25 +52,38 @@ type ProductFormValues = z.infer<typeof productSchema>;
 const MAX_IMAGES = 10;
 
 export default function ProductPage() {
-  const create = useCreateProduct();
-  const setLabel = useBreadCrumbSelector.useSetLabel();
   const searchParams = useSearchParams();
   const editMode = searchParams.get("edit") === "true";
+  const id = Number(searchParams.get("id"));
 
+  const setLabel = useBreadCrumbSelector.useSetLabel();
+  const attributes = useProductAttributeSelector.useAtts();
+
+  const create = useCreateProduct();
+  const edit = useEditProduct({ id });
+
+  const categories = useCategoriesInfiniteSelect({
+    pageSize: 10,
+  });
+
+  const { isFetched: _r, ...categoriesSelect } = categories;
   const getProduct = useProduct({
-    id: Number(searchParams.get("id")),
-    enabled: editMode,
+    id,
+    enabled: editMode && categories.isFetched,
   });
 
   const title = editMode ? "ویرایش محصول" : "ایجاد محصول";
 
   async function handleSubmit(values: ProductFormValues) {
-    const formData = toFormData(values, {
-      fileKeys: ["images"],
-      jsonKeys: ["attributeList"],
-    });
+    const formData = toFormData(
+      { ...values, attributeList: attributes } as ProductFormValues,
+      {
+        fileKeys: ["images"],
+        jsonKeys: ["attributeList"],
+      },
+    );
 
-    create.mutate(formData);
+    (editMode ? edit : create).mutate(formData);
   }
 
   useEffect(
@@ -70,33 +91,46 @@ export default function ProductPage() {
     [setLabel, title],
   );
 
+  const productData = getProduct.data?.data;
+
   return (
-    <Page>
+    <Page isLoading={getProduct.isPending && editMode}>
       <PageHeader forwardBack>
         <PageHeading>
           <PageTitle>{title}</PageTitle>
           <PageDescription>اطلاعات محصول را وارد کنید.</PageDescription>
         </PageHeading>
         <PageActions>
-          <ModalAttribute
-            initAttributes={getProduct.data?.data.attributeList}
-          />
+          <ModalAttribute initAttributes={productData?.attributeList} />
         </PageActions>
       </PageHeader>
 
       <PageContent>
-        <Form schema={productSchema} onSubmit={handleSubmit}>
-          <ProductFields />
+        <Form
+          schema={productSchema}
+          onSubmit={handleSubmit}
+          defaultValues={{
+            ...productData,
+            images: productData?.images,
+          }}
+        >
+          <ProductFields categoriesSelect={categoriesSelect} />
+
+          <PageFooter>
+            <FormSubmit loading={create.isPending}>ذخیره محصول</FormSubmit>
+          </PageFooter>
         </Form>
       </PageContent>
     </Page>
   );
 }
 
-function ProductFields() {
+function ProductFields({
+  categoriesSelect,
+}: {
+  categoriesSelect: CategoriesSelectResult;
+}) {
   const form = useFormApi<typeof productSchema>();
-  const categoriesSelect = useCategoriesInfiniteSelect({ pageSize: 10 });
-
   return (
     <>
       <FormGrid>
@@ -122,6 +156,7 @@ function ProductFields() {
               step={1000}
               inputMode="numeric"
               {...field}
+              min={0}
               placeholder="۰"
             />
           )}
@@ -142,10 +177,10 @@ function ProductFields() {
           {({ field }) => (
             <Input
               step={1000}
-
               type="number"
               inputMode="numeric"
               {...field}
+              min={0}
               placeholder="۰"
             />
           )}
@@ -173,6 +208,7 @@ function ProductFields() {
                 type="number"
                 inputMode="numeric"
                 {...field}
+                min={0}
                 placeholder="۰"
               />
             );
@@ -180,15 +216,26 @@ function ProductFields() {
         </FormField>
 
         <FormField name="category" label="دسته‌بندی">
-          {({ field }) => (
-            <InfiniteSelectField
-              {...categoriesSelect}
-              id={field.id}
-              value={field.value}
-              onChange={field.onChange}
-              onBlur={field.onBlur}
-            />
-          )}
+          {({ field }) => {
+            return (
+              <FormWatch name="categoryLabel">
+                {(categoryLabel) => (
+                  <InfiniteSelectField
+                    {...categoriesSelect}
+                    id={field.id}
+                    value={field.value}
+                    selectedLabel={
+                      typeof categoryLabel === "string"
+                        ? categoryLabel
+                        : undefined
+                    }
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                  />
+                )}
+              </FormWatch>
+            );
+          }}
         </FormField>
 
         <FormField name="categoryLabel" label="نام دسته‌بندی">
@@ -254,10 +301,6 @@ function ProductFields() {
           );
         }}
       </FormField>
-
-      <PageFooter>
-        <FormSubmit>ذخیره محصول</FormSubmit>
-      </PageFooter>
     </>
   );
 }

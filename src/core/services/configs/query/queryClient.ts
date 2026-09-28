@@ -4,6 +4,8 @@ import { MutationCache, QueryCache, QueryClient, environmentManager } from '@tan
 
 import { notify } from '@/core/components/custom/notify';
 
+export const ERROR_HANDLED_LOCALLY = 'errorHandledLocally' as const;
+
 const makeQueryClient = () =>
     new QueryClient({
         defaultOptions: {
@@ -15,10 +17,24 @@ const makeQueryClient = () =>
             },
         },
         queryCache: new QueryCache({
-            onError: (error) => notify.error(error),
+            onError: (error, query) => {
+                const custom = query.meta?.toastMessage?.(error);
+                if (typeof custom === 'string') {
+                    notify.error(custom);
+                    return;
+                }
+                notify.error(error);
+            },
         }),
         mutationCache: new MutationCache({
-            onError: (error) => notify.error(error),
+            onError: (error, _v, _c, mutation) => {
+                const custom = mutation.meta?.toastMessage?.(error);
+                if (typeof custom === 'string') {
+                    notify.error(custom);
+                    return;
+                }
+                notify.error(error);
+            },
         }),
     });
 

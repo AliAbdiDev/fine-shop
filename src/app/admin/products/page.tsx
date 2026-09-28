@@ -70,9 +70,7 @@ export const columns = (router: AppRouterInstance) => [
 
       return (
         <div className="flex items-center gap-2">
-          <span className="font-medium text-emerald-600">
-            {toPersianNum(discounted)}
-          </span>
+          {toPersianNum(discounted)}
           <Badge variant="secondary">٪{toPersianNum(percent)}</Badge>
         </div>
       );

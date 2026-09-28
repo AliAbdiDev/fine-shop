@@ -16,6 +16,7 @@ export interface CategorySelectOption {
 }
 
 export interface CategoriesSelectResult {
+    isFetched?: boolean,
     options: CategorySelectOption[];
     isLoading: boolean;
     isFetchingNextPage: boolean;
@@ -25,7 +26,7 @@ export interface CategoriesSelectResult {
 
 /* -------------------- hook -------------------- */
 
-type CategoryListParams = Omit<ListParams, "page">;
+type CategoryListParams = & Omit<ListParams, "page">;
 
 export function useCategoriesInfiniteSelect(
     params: CategoryListParams,
@@ -39,11 +40,12 @@ export function useCategoriesInfiniteSelect(
                 "/product/category/",
                 { query: full, adapter: paginatedAdapter(full) },
             );
-            const items = unwrap(res);
+
+            const success = unwrap(res);
 
             return {
-                items,
-                nextPage: res.ok ? (res.meta?.next ?? null) : null,
+                items: success.data,
+                nextPage: success.meta?.next ?? null,
             };
         },
         getNextPageParam: (last) => last.nextPage,
@@ -51,7 +53,9 @@ export function useCategoriesInfiniteSelect(
     });
 
     return {
-        options: query.data?.map((c) => ({ label: c?.name, value: c?.slug })) ?? [],
+        isFetched: query.isFetched,
+        options:
+            query.data?.map((c) => ({ label: c.name, value: c.slug })) ?? [],
         isLoading: query.isLoading,
         isFetchingNextPage: query.isFetchingNextPage,
         hasNextPage: query.hasNextPage,

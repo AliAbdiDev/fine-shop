@@ -1,12 +1,14 @@
+"use client";
+
 import * as React from "react";
 
-import { cn } from "cn";
 import { Camera, X, RefreshCw, Loader2 } from "lucide-react";
 
 import {
   useImageUpload,
   type UseImageUploadProps,
 } from "@/core/hooks/useUpload";
+import { cn } from "@/core/utils/helpers";
 
 interface ImageUploadProps extends UseImageUploadProps {
   className?: string;
@@ -95,7 +97,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90 absolute top-1 right-1 rounded-full p-1"
               aria-label="حذف تصویر"
             >
-              <X size={20} />
+              <X size={26} />
             </button>
           )}
         </>

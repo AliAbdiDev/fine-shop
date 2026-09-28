@@ -10,7 +10,7 @@ export interface ErrorEnvelope {
     error: {
         code: AppErrorCode;
         message: string | null;
-        details: string | null;
+        details: { name: string[] } | null;
     };
 }
 

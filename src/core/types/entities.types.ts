@@ -20,12 +20,12 @@ export type Product = {
     id?: EntityId
     name: string,
     category: string,
-    categoryLabel: string,
+    categoryLabel?: string,
     stock: number,
     basePrice: number,
     discountedPrice?: number,
     description?: string,
-    images: Array<File>,
+    images: Array<{ url: string, alt: string } | File>,
     isAvailable?: boolean,
     attributeList?: Array<ProductAttribute>
 }

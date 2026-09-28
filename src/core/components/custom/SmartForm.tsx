@@ -9,6 +9,7 @@ import {
   isValid as isValidDate,
   parse as parseWithJalali,
 } from "date-fns-jalali";
+import { Loader2 } from "lucide-react";
 import {
   Controller,
   FormProvider,
@@ -760,10 +761,12 @@ function FormSubmit({
   requireDirty = false,
   children,
   className,
+  loading,
   ...props
-}: Omit<React.ComponentProps<"button">, "children"> & {
+}: Omit<React.ComponentProps<typeof Button>, "children"> & {
   asChild?: boolean;
   requireDirty?: boolean;
+  loading?: boolean;
   children: React.ReactNode | ((state: FormSubmitState) => React.ReactNode);
 }) {
   const { isSubmitting, isDirty, isValid } = useFormState();
@@ -774,16 +777,18 @@ function FormSubmit({
 
   const content = typeof children === "function" ? children(state) : children;
 
+  const isLoading = isSubmitting || loading;
   return (
     <Button
       type="submit"
       disabled={isDisabled}
       data-slot="form-submit"
       data-submitting={isSubmitting || null}
-      className={className}
+      className={cn(isLoading && "pointer-events-none opacity-50", className)}
       {...props}
     >
       {content}
+      {isLoading && <Loader2 className="animate-spin" />}
     </Button>
   );
 }

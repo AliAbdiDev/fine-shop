@@ -10,14 +10,15 @@ import { cn } from "@/core/utils/helpers";
 function Select({
   value,
   defaultValue,
+  onValueChange,
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Root>) {
-  const hasValue = "value" in props && value !== undefined;
   return (
     <SelectPrimitive.Root
       {...props}
       defaultValue={defaultValue}
-      {...(hasValue ? { value: value ?? "" } : {})}
+      value={value ?? ""}
+      onValueChange={onValueChange}
     />
   );
 }

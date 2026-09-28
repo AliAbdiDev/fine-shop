@@ -14,8 +14,6 @@ import {
   SelectValue,
 } from "../ui/select";
 
-/* -------------------- types -------------------- */
-
 export type SelectValueType = string | number;
 
 export interface SelectOption<T extends SelectValueType = string> {
@@ -39,19 +37,14 @@ export interface InfiniteSelectFieldProps<
   isFetchingNextPage?: boolean;
   hasNextPage?: boolean;
   onLoadMore?: () => void;
-
   value?: TValue;
   defaultValue?: TValue;
   onChange?: (value: TValue) => void;
-
   className?: string;
+  selectedLabel?: string; // عنوانِ پشتیبان برای زمانی که آیتم انتخاب‌شده در لیست لود نشده وجود ندارد
 }
 
-/* -------------------- constant -------------------- */
-
 const LOADING_TEXT = "در حال بارگذاری...";
-
-/* -------------------- component -------------------- */
 
 export function InfiniteSelectField<TValue extends SelectValueType = string>({
   options,
@@ -64,21 +57,39 @@ export function InfiniteSelectField<TValue extends SelectValueType = string>({
   onChange,
   className,
   disabled,
+  selectedLabel,
   ...triggerProps
 }: InfiniteSelectFieldProps<TValue>) {
   const isDisabled = disabled || isLoading;
 
-  const stringifiedValue = value !== undefined ? String(value) : undefined;
+  const stringifiedValue =
+    value !== undefined && value !== null ? String(value) : "";
   const stringifiedDefaultValue =
-    defaultValue !== undefined ? String(defaultValue) : undefined;
+    defaultValue !== undefined && defaultValue !== null
+      ? String(defaultValue)
+      : undefined;
 
-  // Base UI مقدار را `unknown` تایپ می‌کند؛ این‌جا narrow می‌کنیم.
+  // اگر آیتم اولیه در لیست options لودشده نباشد، آن را به عنوان یک option موقت اضافه می‌کنیم
+  const effectiveOptions = React.useMemo(() => {
+    if (!stringifiedValue) return options;
+
+    const exists = options.some((o) => String(o.value) === stringifiedValue);
+    if (!exists) {
+      const fallbackOption: SelectOption<TValue> = {
+        label: selectedLabel || stringifiedValue,
+        value: value as TValue,
+      };
+      return [fallbackOption, ...options];
+    }
+
+    return options;
+  }, [options, stringifiedValue, value, selectedLabel]);
+
   const handleValueChange = React.useCallback(
     (val: unknown) => {
       let converted: TValue;
-
       if (val === null || val === undefined || val === "") {
-        converted = val as TValue;
+        converted = "" as TValue;
       } else if (
         typeof value === "number" ||
         typeof defaultValue === "number"
@@ -88,21 +99,18 @@ export function InfiniteSelectField<TValue extends SelectValueType = string>({
       } else {
         converted = String(val) as TValue;
       }
-
       onChange?.(converted);
     },
     [value, defaultValue, onChange],
   );
 
   const [viewport, setViewport] = React.useState<HTMLElement | null>(null);
-
   const sentinelCallbackRef = React.useCallback(
     (node: HTMLDivElement | null) => {
       if (!node) {
         setViewport(null);
         return;
       }
-      // Base UI selector — چک کن در DevTools
       const vp = node.closest(
         "[data-base-ui-select-viewport]",
       ) as HTMLElement | null;
@@ -123,20 +131,16 @@ export function InfiniteSelectField<TValue extends SelectValueType = string>({
 
   React.useEffect(() => {
     if (!viewport) return;
-
     const handleScroll = () => {
       if (!hasNextRef.current) return;
       if (isFetchingRef.current) return;
-
       const { scrollTop, scrollHeight, clientHeight } = viewport;
       if (scrollTop + clientHeight >= scrollHeight - 48) {
         onLoadMoreRef.current?.();
       }
     };
-
     viewport.addEventListener("scroll", handleScroll, { passive: true });
     const raf = requestAnimationFrame(handleScroll);
-
     return () => {
       viewport.removeEventListener("scroll", handleScroll);
       cancelAnimationFrame(raf);
@@ -181,14 +185,8 @@ export function InfiniteSelectField<TValue extends SelectValueType = string>({
             {isLoading && (
               <Loader2Icon className="text-muted-foreground size-4 shrink-0 animate-spin" />
             )}
-            <SelectValue placeholder="انتخاب کنید...">
-              {(selectedValue) => {
-                const found = options.find(
-                  (o) => String(o.value) === selectedValue,
-                );
-                return found ? found.label : selectedValue;
-              }}
-            </SelectValue>
+
+            <SelectValue placeholder="انتخاب کنید..." />
           </div>
         </SelectTrigger>
 
@@ -198,23 +196,20 @@ export function InfiniteSelectField<TValue extends SelectValueType = string>({
               <Loader2Icon className="size-3 animate-spin" />
               {LOADING_TEXT}
             </div>
-          ) : options.length === 0 ? (
+          ) : effectiveOptions.length === 0 ? (
             <div className="text-muted-foreground p-3 text-center text-xs">
               گزینه‌ای یافت نشد
             </div>
           ) : (
             <>
-              {options.map(renderItem)}
-
+              {effectiveOptions.map(renderItem)}
               <div ref={sentinelCallbackRef} className="h-px" aria-hidden />
-
               {isFetchingNextPage && (
                 <div className="text-muted-foreground flex items-center justify-center gap-2 p-2 text-xs">
                   <Loader2Icon className="size-3 animate-spin" />
                   {LOADING_TEXT}
                 </div>
               )}
-
               {!hasNextPage && !isFetchingNextPage && (
                 <div className="text-muted-foreground p-2 text-center text-[10px]">
                   پایان لیست
