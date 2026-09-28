@@ -3,10 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "pnpm run ts && next dev --turbopack",
+    "full-check": "pnpm run ts && pnpm run lint",
+    "ts": "tsc --noEmit",
+    "lint": "eslint",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
     "mock-sync": "node src/core/mocks/configs/script-sync-schema.mjs",
     "mock-init": "pnpm exec msw init public/ --save",
     "r": "bash scripts/git-report.sh"
@@ -70,8 +72,6 @@
     "yaml": "^2.9.0"
   },
   "msw": {
-    "workerDirectory": [
-      "public"
-    ]
+    "workerDirectory": ["public"]
   }
 }

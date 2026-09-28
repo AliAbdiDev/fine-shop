@@ -1,7 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server'
 
 import { type Role, ROLE_HOME, ROLES, ROUTES } from '@/core/constants/misc'
-import { type User } from '@/core/types/entities.types'
 import { requestCookies } from '@/core/utils/cookie/proxyCookie'
 
 
@@ -17,12 +16,12 @@ export function authRedirect(req: NextRequest) {
     const { pathname } = req.nextUrl
 
     // 1. Setup: get user info and route type
-    const token = requestCookies(req).value<string>('token')
+    const token = requestCookies(req).value('token')
     const isLoggedIn = Boolean(token?.trim())
 
     let userRole: Role = ROLES.GUEST
     if (isLoggedIn) {
-        const profile = requestCookies(req).value<User>('user-profile')
+        const profile = requestCookies(req).value('user-profile')
         userRole = profile?.isSuperuser ? ROLES.ADMIN : ROLES.BUYER
     }
 

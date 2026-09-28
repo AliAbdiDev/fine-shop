@@ -1,6 +1,7 @@
+import schema from '../schema.json'
+
 import type { SetupWorker } from 'msw/browser'
 
-import schema from '../schema.json'
 
 type Side = 'browser' | 'node'
 

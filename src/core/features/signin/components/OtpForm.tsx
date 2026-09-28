@@ -49,6 +49,7 @@ export function OtpForm() {
                   pattern={REGEXP_ANY_DIGITS}
                   inputMode="numeric"
                   {...field}
+                  value={typeof field.value === "string" ? field.value : ""}
                 />
               )}
             </FormField>
