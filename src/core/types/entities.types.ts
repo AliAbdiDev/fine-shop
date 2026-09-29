@@ -1,11 +1,18 @@
 export type EntityId = number;
 
 export type User = {
-    id?: EntityId
+    id?: EntityId;
+    firstName?: string;
+    lastName?: string;
     email: string;
-    phoneNumber: string;
-    isSuperuser: boolean;
+    phoneNumber?: string;
+    avatarUrl?: string | null;
+    isActive?: boolean;
+    isSuperuser?: boolean;
+    createdAt?: string;
+    updatedAt?: string;
 };
+export type Users = Array<User>
 
 // ------------- Product --------------
 export type ProductAttribute = {

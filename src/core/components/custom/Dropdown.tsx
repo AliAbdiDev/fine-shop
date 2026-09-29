@@ -51,6 +51,16 @@ export interface DropdownFieldProps<T extends DropdownValueType = string> {
   emptyText?: string;
   isLoading?: boolean;
   disabled?: boolean;
+  /**
+   * آیا منو بعد از کلیک روی آیتم باز بماند؟
+   * @default true
+   */
+  keepOpen?: boolean;
+  /**
+   * نمایش تیک و استایل فعال برای آیتم انتخاب‌شده
+   * @default true
+   */
+  showSelected?: boolean;
   required?: boolean;
   id?: string;
   name?: string;
@@ -87,6 +97,8 @@ export function Dropdown<T extends DropdownValueType = string>({
   emptyText = "گزینه‌ای یافت نشد",
   isLoading = false,
   disabled = false,
+  keepOpen = true,
+  showSelected = true,
   required,
   id,
   name,
@@ -128,12 +140,15 @@ export function Dropdown<T extends DropdownValueType = string>({
 
   const renderItem = (item: DropdownOption<T>) => {
     const isSelected =
-      currentValue !== undefined && String(item.value) === String(currentValue);
+      showSelected &&
+      currentValue !== undefined &&
+      String(item.value) === String(currentValue);
 
     return (
       <DropdownMenuItem
         key={String(item.value)}
         disabled={item.disabled}
+        closeOnClick={!keepOpen}
         onClick={() => {
           item.onClick?.(item.value);
           handleSelect(item.value);

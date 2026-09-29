@@ -16,6 +16,8 @@ import {
   SidebarMenuItem,
 } from "@/core/components/ui/sidebar";
 
+type IconComponent = React.ComponentType<{ className?: string }>;
+
 export type AppSidebarData = {
   user: {
     name: string;
@@ -25,7 +27,8 @@ export type AppSidebarData = {
   navMain: {
     title: string;
     url: string;
-    icon: React.ReactNode;
+    icon: IconComponent;
+    activeIcon?: IconComponent;
     isActive?: boolean;
     items?: {
       title: string;
@@ -53,9 +56,11 @@ export function AppSidebar({
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
+
       <SidebarContent>
         <NavMain items={data.navMain} />
       </SidebarContent>
+
       <SidebarFooter>
         <NavUser user={data.user} />
       </SidebarFooter>

@@ -2,8 +2,11 @@ import { type EntityId } from "@/core/types/entities.types";
 
 type Prefix = "categories" | "products" | "users" | "attributes";
 
-export type ListParams = { page?: number; pageSize?: number };
-
+export type ListParams = {
+    page: number;
+    pageSize: number;
+    search?: string;
+};
 export function createKeys<P extends Prefix>(prefix: P) {
     return {
         all: () => [prefix] as const,

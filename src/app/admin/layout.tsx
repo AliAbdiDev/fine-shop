@@ -6,7 +6,7 @@ import { AppSidebar } from "@/core/components/app-sidebar";
 import { FloatingHeader } from "@/core/components/custom/layout/PanelHeader";
 import { ScrollArea } from "@/core/components/ui/scroll-area";
 import { SidebarInset, SidebarProvider } from "@/core/components/ui/sidebar";
-import { sidebarData } from "@/core/features/admin/sidebarData";
+import { dataPanel } from "@/core/features/admin/sidebarData";
 
 export default function Layout({
   children,
@@ -15,7 +15,7 @@ export default function Layout({
 }>) {
   return (
     <SidebarProvider>
-      <AppSidebar data={sidebarData} side="right" />
+      <AppSidebar data={dataPanel} side="right" />
 
       <SidebarInset className="flex h-[calc(100vh-1rem)] flex-col overflow-hidden">
         <FloatingHeader />

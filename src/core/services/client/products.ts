@@ -91,12 +91,25 @@ export const useAttributes = ({ enabled = true }: { enabled?: boolean }) => {
 
 export const useRemoveImageProduct = () => {
     const token = useAuthSelector.useToken();
-    console.log("🚀 ~ useRemoveImageProduct ~ token:", token)
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (payload: EntityId) => {
-            return unwrap(await api.delete<Product, Product>(`/product/image/${payload}/`, undefined, { token }));
+        mutationFn: async (id: EntityId) => {
+            return unwrap(await api.delete<Product, Product>(`/product/image/${id}/`, undefined, { token }));
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: productKeys.lists() });
+        },
+    });
+}
+
+export const useRemoveProduct = () => {
+    const token = useAuthSelector.useToken();
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async (id: EntityId) => {
+            return unwrap(await api.delete<Product, Product>(`/product/${id}/`, undefined, { token }));
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: productKeys.lists() });

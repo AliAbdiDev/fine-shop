@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { ModalDialog } from "@/core/components/custom/Modal";
+import { ModalDialog } from "@/core/components/custom/ModalDialog";
 import { notify } from "@/core/components/custom/notify";
 import { SelectField } from "@/core/components/custom/SelectField";
 import { Button } from "@/core/components/ui/button";

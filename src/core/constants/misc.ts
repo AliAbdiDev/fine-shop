@@ -20,6 +20,7 @@ export const ROUTES = {
     SIGNIN_VERIFY: '/signin/verify',
     // admin
     ADMIN: '/admin',
+    USERS: '/admin/users',
     PRODUCTS: "/admin/products",
     PRODUCTS_CREATE_UPDATE: '/admin/products/create-update'
 } as const
