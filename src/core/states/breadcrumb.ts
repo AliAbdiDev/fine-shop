@@ -6,6 +6,7 @@ import { type Route, ROUTES, type Routekeys } from "@/core/constants/misc";
 
 export const ROUTE_LABELS: Partial<Record<Routekeys, string>> = {
     PRODUCTS: "محصولات",
+    USERS: "کاربران"
 };
 
 const buildInitialLabels = (): Record<string, string> => {

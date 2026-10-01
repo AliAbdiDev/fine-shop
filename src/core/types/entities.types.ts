@@ -2,15 +2,16 @@ export type EntityId = number;
 
 export type User = {
     id?: EntityId;
+    email: string;
     firstName?: string;
     lastName?: string;
-    email: string;
     phoneNumber?: string;
-    avatarUrl?: string | null;
+    avatar?: string | null;
     isActive?: boolean;
     isSuperuser?: boolean;
-    createdAt?: string;
-    updatedAt?: string;
+    lastLogin?: number;
+    createdAt?: number;
+    updatedAt?: number;
 };
 export type Users = Array<User>
 

@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 
 import { isNullOrUndefined, isString } from "@sindresorhus/is";
 import { createSelectorHooks } from "auto-zustand-selectors-hook";
@@ -48,15 +48,11 @@ export const AutInitializer = ({
   const setToken = useAuthSelector.useSetToken();
   const setUserInfo = useAuthSelector.useSetUserInfo();
 
-  const isHydrated = useRef(false);
   useEffect(() => {
-    if (isNullOrUndefined(userInfo) || isNullOrUndefined(token)) return;
-
-    if (isHydrated.current) return;
-
-    setUserInfo(userInfo);
-    setToken(token);
-    isHydrated.current = true;
+    if (!isNullOrUndefined(userInfo)) setUserInfo(userInfo);
+    if (!isNullOrUndefined(token)) {
+      setToken(token);
+    }
   }, [setUserInfo, setToken, userInfo, token]);
 
   return null;

@@ -1,5 +1,3 @@
-'use client';
-
 import * as React from 'react';
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
@@ -13,16 +11,25 @@ export interface UsePaginationQueryOptions {
     defaultPage?: number;
     defaultSize?: number;
     maxSize?: number;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resetDeps?: any[]; // 👈 اضافه شدن آرایه وابستگی‌ها
 }
 
 export function usePaginationQuery(options: UsePaginationQueryOptions = {}) {
-    const { defaultPage = 1, defaultSize = 20, maxSize = 100 } = options;
+    const { defaultPage = 1, defaultSize = 10, maxSize = 100, resetDeps = [] } = options;
 
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
 
-    const page = React.useMemo(() => {
+    const prevDeps = React.useRef(resetDeps);
+    const depsChanged = React.useMemo(() => {
+        if (resetDeps.length === 0) return false;
+        // eslint-disable-next-line react-hooks/refs
+        return !resetDeps.every((dep, i) => Object.is(dep, prevDeps.current[i]));
+    }, [resetDeps]);
+
+    const urlPage = React.useMemo(() => {
         const raw = Number(searchParams.get('page'));
         return Number.isFinite(raw) && raw >= 1 ? Math.floor(raw) : defaultPage;
     }, [searchParams, defaultPage]);
@@ -32,6 +39,8 @@ export function usePaginationQuery(options: UsePaginationQueryOptions = {}) {
         if (!Number.isFinite(raw) || raw < 1) return defaultSize;
         return Math.min(Math.floor(raw), maxSize);
     }, [searchParams, defaultSize, maxSize]);
+
+    const page = depsChanged ? 1 : urlPage;
 
     const setPagination = React.useCallback(
         (next: Partial<PaginationQuery>) => {
@@ -50,6 +59,13 @@ export function usePaginationQuery(options: UsePaginationQueryOptions = {}) {
         },
         [router, pathname, searchParams, defaultPage, defaultSize],
     );
+
+    React.useEffect(() => {
+        if (depsChanged) {
+            prevDeps.current = resetDeps;
+            if (urlPage !== 1) setPagination({ page: 1 });
+        }
+    }, [depsChanged, resetDeps, urlPage, setPagination]);
 
     return { page, size, setPagination };
 }

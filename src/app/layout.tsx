@@ -78,9 +78,9 @@ export default async function RootLayout({
       lang="fa"
       dir="rtl"
       className={cn(
+        vazirRegular.className,
         "h-full",
         "antialiased",
-        vazirRegular.className,
         vazirRegular.variable,
         vazirBold.variable,
       )}

@@ -68,15 +68,11 @@ const config = [
         "error",
         {
           zones: [
+            // ====================  Core ====================
             {
               target: "./src/core/*",
               from: "./src/core/features/**",
               message: "Core layer cannot import from features.",
-            },
-            {
-              target: "./src/core/features/*/",
-              from: "./src/core/features/*/",
-              message: "Features must be isolated.",
             },
             {
               target: "./src/core/features/*/utils/**",
@@ -87,6 +83,29 @@ const config = [
               target: "./src/core/components/ui/**",
               from: ["./src/core/features/**", "./src/core/**/state/**"],
               message: "Core UI cannot import from features or state.",
+            },
+
+            // ====================  Features (same Core) ====================
+            {
+              target: "./src/features/*/utils/**",
+              from: [
+                "./src/features/*/components/**",
+                "./src/features/*/state/**",
+                "./src/features/*/hooks/**",
+              ],
+              message:
+                "Feature utils must be pure (cannot import from components, state, or hooks).",
+            },
+
+            {
+              target: "./src/features/*/state/**",
+              from: "./src/features/*/components/**",
+              message: "Feature state cannot import from components.",
+            },
+            {
+              target: "./src/features/*/components/**",
+              from: "./src/features/*/state/**",
+              message: "Do not import state from other features directly.",
             },
           ],
         },

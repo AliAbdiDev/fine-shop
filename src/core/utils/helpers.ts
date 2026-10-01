@@ -1,4 +1,3 @@
-import { isNumber } from "@sindresorhus/is";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -73,11 +72,24 @@ export const asRecord = (value: unknown): Record<string, unknown> | null =>
 /*                              toPersianNum                                  */
 /* -------------------------------------------------------------------------- */
 
-export const toPersianNum = (input: string | number): string => {
-  const num = isNumber(+input) ? +input : "";
-  return num.toLocaleString("fa-IR");
-};
+const PERSIAN_DIGITS = "۰۱۲۳۴۵۶۷۸۹";
 
+export const toPersianNum = (
+  input: string | number,
+  comma = true
+): string => {
+  const str = String(input ?? "").trim();
+  if (!str) return "";
+
+  if (/^-?0\d/.test(str)) {
+    return str.replace(/\d/g, (d) => PERSIAN_DIGITS[+d]);
+  }
+
+  const num = Number(str);
+  if (isNaN(num)) return "";
+
+  return num.toLocaleString("fa-IR", { useGrouping: comma });
+};
 /* -------------------------------------------------------------------------- */
 /*                                toFormData                                  */
 /* -------------------------------------------------------------------------- */

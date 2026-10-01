@@ -5,8 +5,8 @@ import { useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 
-import { format } from "date-fns-jalali";
-import { Ban, CheckCircle2, Search, UserRound } from "lucide-react";
+import { isNullOrUndefined } from "@sindresorhus/is";
+import { Search, UserCheck2Icon, UserRound, UserX2Icon } from "lucide-react";
 
 import {
   Page,
@@ -24,15 +24,13 @@ import {
 import { Badge } from "@/core/components/ui/badge";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
+import { TableContentTemp } from "@/core/components/ui/table";
 import { useDebounce } from "@/core/hooks/useDebounce";
 import { usePaginationQuery } from "@/core/hooks/usePaginationQuery";
-import {
-  useActivateUser,
-  useDeactivateUser,
-  useUsers,
-} from "@/core/services/client/users";
+import { useActivateUser, useUsers } from "@/core/services/client/users";
 import { type User } from "@/core/types/entities.types";
 import { toPersianNum } from "@/core/utils/helpers";
+import { formatAnyDate } from "@/core/utils/jalali";
 
 const AlertModal = dynamic(
   () => import("@/core/components/custom/AlertModal").then((m) => m.AlertModal),
@@ -41,9 +39,6 @@ const AlertModal = dynamic(
 const helper = columnHelper<User>();
 
 type ActivateMutation = ReturnType<typeof useActivateUser>;
-type DeactivateMutation = ReturnType<typeof useDeactivateUser>;
-
-/* ---------- آواتار کاربر ---------- */
 
 function UserAvatar({ user }: { user: User }) {
   const fullName = `${user.firstName} ${user.lastName}`.trim();
@@ -72,31 +67,29 @@ function UserAvatar({ user }: { user: User }) {
 export function UserActions({
   user,
   activate,
-  deactivate,
 }: {
   user: User;
   activate: ActivateMutation;
-  deactivate: DeactivateMutation;
 }) {
   const [openConfirm, setOpenConfirm] = useState(false);
   const isActive = user.isActive;
-  const isPending = activate.isPending || deactivate.isPending;
+  const isPending = activate.isPending;
 
   return (
     <>
       <Button
-        size="sm"
+        size="xs"
         variant={isActive ? "destructive" : "secondary"}
         disabled={isPending}
         onClick={() => setOpenConfirm(true)}
       >
         {isActive ? (
           <>
-            <Ban /> مسدود کردن
+            <UserX2Icon /> مسدود کردن
           </>
         ) : (
           <>
-            <CheckCircle2 /> فعال کردن
+            <UserCheck2Icon /> فعال کردن
           </>
         )}
       </Button>
@@ -122,12 +115,8 @@ export function UserActions({
         confirmVariant={isActive ? "destructive" : "default"}
         loading={isPending}
         onConfirm={() => {
-          if (!user.id) return;
-          if (isActive) {
-            deactivate.mutate(user.id);
-          } else {
-            activate.mutate(user.id);
-          }
+          if (!user.id || isNullOrUndefined(user.isActive)) return;
+          activate.mutate({ id: user.id, isActive: !user.isActive });
         }}
       />
     </>
@@ -136,10 +125,7 @@ export function UserActions({
 
 /* ---------- ستون‌های جدول ---------- */
 
-export const getColumns = (
-  activate: ActivateMutation,
-  deactivate: DeactivateMutation,
-) => [
+export const getColumns = (activate: ActivateMutation) => [
   helper.display({
     id: "avatar",
     header: "تصویر",
@@ -147,10 +133,18 @@ export const getColumns = (
     cell: ({ row }) => <UserAvatar user={row.original} />,
   }),
 
-  helper.accessor((row) => `${row.firstName} ${row.lastName}`, {
+  helper.accessor((row) => `${row.firstName ?? ""} ${row.lastName ?? ""}`, {
     id: "fullName",
     header: "نام و نام خانوادگی",
-    cell: (info) => <span className="font-medium">{info.getValue()}</span>,
+    cell: (info) => {
+      const names = info.getValue();
+
+      return names.trim() !== "" ? (
+        <span className="font-medium">{info.getValue()}</span>
+      ) : (
+        <TableContentTemp />
+      );
+    },
   }),
 
   helper.accessor("email", {
@@ -160,13 +154,18 @@ export const getColumns = (
 
   helper.accessor("phoneNumber", {
     header: "شماره تماس",
-    cell: (info) => toPersianNum(info.getValue() ?? "-"),
+    cell: (info) => {
+      const value = info.getValue();
+      return value ? toPersianNum("0" + value, false) : <TableContentTemp />;
+    },
   }),
 
   helper.accessor("createdAt", {
     header: "تاریخ ثبت‌نام",
-    cell: (info) =>
-      toPersianNum(format(new Date(info.getValue()), "yyyy/MM/dd")),
+    cell: (info) => {
+      const value = info.getValue();
+      return value ? formatAnyDate(value) : <TableContentTemp />;
+    },
   }),
 
   helper.accessor("isActive", {
@@ -181,16 +180,29 @@ export const getColumns = (
     },
   }),
 
+  helper.accessor("isSuperuser", {
+    header: "نقش",
+    cell: (info) => {
+      const isAdmin = info.getValue();
+      return (
+        <Badge variant={isAdmin ? "default" : "outline"}>
+          {isAdmin ? "مدیر" : "خریدار"}
+        </Badge>
+      );
+    },
+  }),
+  helper.accessor("lastLogin", {
+    header: "آخرین ورود",
+    cell: (info) => {
+      const value = info.getValue();
+      return value ? formatAnyDate(value) : <TableContentTemp />;
+    },
+  }),
+
   helper.display({
     id: "actions",
     maxSize: 180,
-    cell: ({ row }) => (
-      <UserActions
-        user={row.original}
-        activate={activate}
-        deactivate={deactivate}
-      />
-    ),
+    cell: ({ row }) => <UserActions user={row.original} activate={activate} />,
   }),
 ];
 
@@ -198,12 +210,12 @@ export const getColumns = (
 
 export default function UsersPage() {
   const activate = useActivateUser();
-  const deactivate = useDeactivateUser();
-
-  const { page, size, setPagination } = usePaginationQuery();
 
   const [searchInput, setSearchInput] = useState("");
-  const search = useDebounce(searchInput.trim(), 400);
+  const search = useDebounce(searchInput, 300);
+  const { page, size, setPagination } = usePaginationQuery({
+    resetDeps: [search],
+  });
 
   const { data, isPending } = useUsers({
     page,
@@ -211,10 +223,7 @@ export default function UsersPage() {
     search: search || undefined,
   });
 
-  const columns = useMemo(
-    () => getColumns(activate, deactivate),
-    [activate, deactivate],
-  );
+  const columns = useMemo(() => getColumns(activate), [activate]);
 
   return (
     <Page>
@@ -233,7 +242,10 @@ export default function UsersPage() {
             <Input
               placeholder="جستجو با ایمیل یا نام..."
               value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
+              onValueChange={(val) => {
+                if (!isNullOrUndefined(val.trim())) setSearchInput(val);
+              }}
+
               className="pr-9"
             />
           </div>
@@ -246,7 +258,7 @@ export default function UsersPage() {
           data={data?.data}
           pageCount={data?.meta?.totalPages}
           rowCount={data?.meta?.rowCount}
-          isLoading={isPending || activate.isPending || deactivate.isPending}
+          isLoading={isPending || activate.isPending}
           pagination={{ page, size }}
           onPaginationChange={setPagination}
         />
