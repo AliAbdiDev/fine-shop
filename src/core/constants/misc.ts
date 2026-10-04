@@ -1,6 +1,8 @@
+import { type LayoutRoutes, type AppRoutes } from "../../../.next/types/routes";
+
 export const APP_MODE = {
-    isDev: process.env.NODE_ENV === 'development',
-    isProd: process.env.NODE_ENV === 'production',
+    isDev: () => process.env.NODE_ENV === 'development',
+    isProd: () => process.env.NODE_ENV === 'production',
     isClient: () => typeof window !== 'undefined',
 };
 
@@ -12,21 +14,21 @@ export const ROLES = {
 } as const
 
 export type Role = (typeof ROLES)[keyof typeof ROLES]
+export type Route = AppRoutes | LayoutRoutes
 
-
-export const ROUTES = {
+export const ROUTES: Record<string, Route> = {
     HOME: '/',
     SIGNIN: '/signin',
     SIGNIN_VERIFY: '/signin/verify',
     // admin
     ADMIN: '/admin',
     USERS: '/admin/users',
+    PANEL_PROFILE: "/admin/profile",
     PRODUCTS: "/admin/products",
-    PRODUCTS_CREATE_UPDATE: '/admin/products/create-update'
+    PRODUCTS_CREATE_UPDATE: '/admin/products/create-update',
 } as const
 
 export type Routekeys = keyof typeof ROUTES
-export type Route = (typeof ROUTES)[keyof typeof ROUTES]
 
 export const ROLE_HOME: Record<Role, Route> = {
     [ROLES.GUEST]: ROUTES.HOME,

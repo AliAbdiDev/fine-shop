@@ -12,11 +12,6 @@ import { type AppSidebarData } from "@/core/components/app-sidebar";
 import { ROUTES } from "@/core/constants/misc";
 
 export const dataPanel: AppSidebarData = {
-  user: {
-    name: "علی رضایی",
-    email: "ali@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
   navMain: [
     {
       title: "محصولات",

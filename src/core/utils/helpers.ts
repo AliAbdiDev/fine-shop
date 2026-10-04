@@ -1,3 +1,5 @@
+import { digitsArToEn, digitsFaToEn } from "@persian-tools/persian-tools";
+import { isNullOrUndefined } from "@sindresorhus/is";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -202,3 +204,19 @@ export function getDiscountInfo(
     basePrice: base,
   };
 }
+
+// ----Phone---
+export function formatPhone(value: string | null | undefined): string {
+  if (isNullOrUndefined(value)) return ''
+  const en = digitsArToEn(digitsFaToEn(String(value ?? "")));
+  const digits = en.replace(/\D/g, "");
+
+  if (!digits) return "";
+  if (digits.startsWith("0")) return digits;
+  if (digits.startsWith("98")) return "0" + digits.slice(2);
+
+  return "0" + digits;
+}
+
+// ----
+export const isFile = (input: unknown): input is File => input instanceof File;

@@ -2,6 +2,8 @@
 
 import { Fragment, useEffect, useState } from "react";
 
+import { type Route } from "next";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -44,7 +46,9 @@ export function FloatingHeader() {
   }
 
   const breadcrumbs = segments.map((segment, index) => {
-    const href = basePath + "/" + segments.slice(0, index + 1).join("/");
+    const href = (basePath +
+      "/" +
+      segments.slice(0, index + 1).join("/")) as Route;
     const label = labels[href] ?? getSegmentLabel(segment);
     const isLast = index === segments.length - 1;
 

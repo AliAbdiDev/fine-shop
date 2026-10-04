@@ -3,9 +3,8 @@
 import { useMemo, useState } from "react";
 
 import dynamic from "next/dynamic";
-import Image from "next/image";
 
-import { isNullOrUndefined } from "@sindresorhus/is";
+import { isNullOrUndefined, isString } from "@sindresorhus/is";
 import { Search, UserCheck2Icon, UserRound, UserX2Icon } from "lucide-react";
 
 import {
@@ -21,6 +20,11 @@ import {
   columnHelper,
   DataTable,
 } from "@/core/components/custom/table/DataTable";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/core/components/ui/avatar";
 import { Badge } from "@/core/components/ui/badge";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
@@ -29,7 +33,7 @@ import { useDebounce } from "@/core/hooks/useDebounce";
 import { usePaginationQuery } from "@/core/hooks/usePaginationQuery";
 import { useActivateUser, useUsers } from "@/core/services/client/users";
 import { type User } from "@/core/types/entities.types";
-import { toPersianNum } from "@/core/utils/helpers";
+import { isFile, toPersianNum } from "@/core/utils/helpers";
 import { formatAnyDate } from "@/core/utils/jalali";
 
 const AlertModal = dynamic(
@@ -42,8 +46,8 @@ type ActivateMutation = ReturnType<typeof useActivateUser>;
 
 function UserAvatar({ user }: { user: User }) {
   const fullName = `${user.firstName} ${user.lastName}`.trim();
-
-  if (!user.avatarUrl) {
+  console.log("🚀 ~ UserAvatar ~ user:", user);
+  if (isFile(user.avatar) || isNullOrUndefined(user?.avatar)) {
     return (
       <div className="bg-muted text-muted-foreground flex h-10 w-10 items-center justify-center rounded-full">
         <UserRound className="h-5 w-5" />
@@ -52,13 +56,12 @@ function UserAvatar({ user }: { user: User }) {
   }
 
   return (
-    <Image
-      src={user.avatarUrl}
-      alt={fullName}
-      width={40}
-      height={40}
-      className="h-10 w-10 rounded-full object-cover"
-    />
+    <Avatar>
+      {isString(user?.avatar) && (
+        <AvatarImage src={user?.avatar} alt={fullName} />
+      )}
+      <AvatarFallback> {fullName?.slice(0, 2)}</AvatarFallback>
+    </Avatar>
   );
 }
 
@@ -80,7 +83,7 @@ export function UserActions({
       <Button
         size="xs"
         variant={isActive ? "destructive" : "secondary"}
-        disabled={isPending}
+        disabled={isPending || user.isSuperuser}
         onClick={() => setOpenConfirm(true)}
       >
         {isActive ? (
@@ -186,7 +189,7 @@ export const getColumns = (activate: ActivateMutation) => [
       const isAdmin = info.getValue();
       return (
         <Badge variant={isAdmin ? "default" : "outline"}>
-          {isAdmin ? "مدیر" : "خریدار"}
+          {isAdmin ? "مدیر" : "مشتری"}
         </Badge>
       );
     },

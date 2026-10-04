@@ -1,13 +1,7 @@
 "use client";
 
-import {
-  BadgeCheckIcon,
-  BellIcon,
-  ChevronsUpDownIcon,
-  CreditCardIcon,
-  LogOutIcon,
-  SparklesIcon,
-} from "lucide-react";
+import { isString } from "@sindresorhus/is";
+import { BadgeCheckIcon, ChevronsUpDownIcon, LogOutIcon } from "lucide-react";
 
 import {
   Avatar,
@@ -30,16 +24,11 @@ import {
   useSidebar,
 } from "@/core/components/ui/sidebar";
 
-export function NavUser({
-  user,
-}: {
-  user: {
-    name: string;
-    email: string;
-    avatar: string;
-  };
-}) {
+import { useAuthSelector } from "../states/auth";
+
+export function NavUser() {
   const { isMobile } = useSidebar();
+  const userProfile = useAuthSelector.useUserInfo();
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -50,12 +39,21 @@ export function NavUser({
             }
           >
             <Avatar>
-              <AvatarImage src={user.avatar} alt={user.name} />
-              <AvatarFallback>کار</AvatarFallback>
+              {isString(userProfile?.avatar) && (
+                <AvatarImage
+                  src={userProfile?.avatar}
+                  alt={userProfile?.firstName}
+                />
+              )}
+              <AvatarFallback>
+                {userProfile?.firstName?.slice(0, 2)}
+              </AvatarFallback>
             </Avatar>
             <div className="grid flex-1 text-start text-sm leading-tight">
-              <span className="truncate font-medium">{user.name}</span>
-              <span className="truncate text-xs">{user.email}</span>
+              <span className="truncate font-medium">
+                {userProfile?.firstName}
+              </span>
+              <span className="truncate text-xs">{userProfile?.email}</span>
             </div>
             <ChevronsUpDownIcon className="ms-auto size-4" />
           </DropdownMenuTrigger>
@@ -69,40 +67,37 @@ export function NavUser({
               <DropdownMenuLabel className="p-0 font-normal">
                 <div className="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
                   <Avatar>
-                    <AvatarImage src={user.avatar} alt={user.name} />
-                    <AvatarFallback>کار</AvatarFallback>
+                    {isString(userProfile?.avatar) && (
+                      <AvatarImage
+                        src={userProfile?.avatar}
+                        alt={userProfile?.firstName}
+                      />
+                    )}
+                    <AvatarFallback>
+                      {" "}
+                      {userProfile?.firstName?.slice(0, 2)}
+                    </AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-start text-sm leading-tight">
-                    <span className="truncate font-medium">{user.name}</span>
-                    <span className="truncate text-xs">{user.email}</span>
+                    <span className="truncate font-medium">
+                      {userProfile?.firstName}
+                    </span>
+                    <span className="truncate text-xs">
+                      {userProfile?.email}
+                    </span>
                   </div>
                 </div>
               </DropdownMenuLabel>
             </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <SparklesIcon />
-                ارتقا حساب
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
+
             <DropdownMenuGroup>
               <DropdownMenuItem>
                 <BadgeCheckIcon />
                 حساب کاربری
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCardIcon />
-                پرداخت‌ها
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <BellIcon />
-                اعلان‌ها
-              </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem className={"hover:bg-destructive/35!"}>
               <LogOutIcon />
               خروج
             </DropdownMenuItem>

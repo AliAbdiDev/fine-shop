@@ -16,7 +16,7 @@ import {
   useFormApi,
 } from "@/core/components/custom/SmartForm";
 import { InputOTP, REGEXP_ANY_DIGITS } from "@/core/components/ui/input-otp";
-import { sendLoginOtp } from "@/core/services/actions/auth";
+import { actionSendLoginOtpAction } from "@/core/services/server/auth";
 
 const otpSchema = z.object({
   otp: z.string().length(6, "کد باید ۶ رقم باشد."),
@@ -29,7 +29,7 @@ export function OtpForm() {
 
   const submit = useCallback(
     async (values: z.infer<OtpType>) => {
-      const result = await sendLoginOtp({
+      const result = await actionSendLoginOtpAction({
         otp: values.otp,
         email: searchParams.get("email") ?? "",
       });

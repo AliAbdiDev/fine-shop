@@ -2,7 +2,7 @@ import { type User } from "@/core/types/entities.types";
 
 export type CookieMap = {
     token: string;
-    'user-profile': User;
+    'user-profile': Partial<Pick<User, 'isSuperuser'>>;
 }
 
 export type CookieName = keyof CookieMap;

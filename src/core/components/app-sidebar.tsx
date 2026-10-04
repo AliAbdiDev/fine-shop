@@ -19,11 +19,6 @@ import {
 type IconComponent = React.ComponentType<{ className?: string }>;
 
 export type AppSidebarData = {
-  user: {
-    name: string;
-    email: string;
-    avatar: string;
-  };
   navMain: {
     title: string;
     url: string;
@@ -59,7 +54,7 @@ export function AppSidebar({
       </SidebarContent>
 
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser />
       </SidebarFooter>
     </Sidebar>
   );

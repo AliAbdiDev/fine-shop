@@ -1,48 +1,48 @@
 "use server";
 
+import { type Route } from "next";
+
+import { updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { APP_MODE, ROLE_HOME, ROUTES } from "@/core/constants/misc";
+import { isNullOrUndefined } from "@sindresorhus/is";
+
+import { ROLE_HOME, ROUTES } from "@/core/constants/misc";
 import { api } from "@/core/services/configs/api";
+import { type User } from "@/core/types/entities.types";
 import { setCookie } from "@/core/utils/cookie/serverCookie";
-import { type CookieOptions } from "@/core/utils/cookie/types";
+import { type CookieValue } from "@/core/utils/cookie/types";
 
+import { cookieOptions, profileKey, type Token } from "./misc";
 import { type ApiResult } from "../configs/fetcher/types/client.types";
-import { type SuccessEnvelope } from "../configs/fetcher/types/contract.types";
 
-// ---------- Type Aliases ----------
-type UserProfile = {
-    email: string;
-    phoneNumber: string;
-    isSuperuser: boolean;
-};
-
-type LoginSuccessEnvelope = SuccessEnvelope<{ user: UserProfile }>;
+type LoginSuccessEnvelope = { data: { user: User }, token: string };
 // ----------------------------------
 
 type LoginEmailValues = { email: string };
 type LoginOtpValues = { otp: string; email: string };
 
-export async function sendLoginEmail({
+export const setUserProfileCookie = async (value: CookieValue<'user-profile'>) => {
+    if (isNullOrUndefined(value.isSuperuser)) return
+    await setCookie({ name: 'user-profile', value })
+}
+
+export async function actionSendLoginEmail({
     email,
-}: LoginEmailValues): Promise<ApiResult<SuccessEnvelope<undefined>>> {
-    const r = await api.post<SuccessEnvelope<undefined>>(
+}: LoginEmailValues): Promise<ApiResult<LoginSuccessEnvelope>> {
+    const r = await api.post<LoginSuccessEnvelope>(
         "/account/login/",
         { email },
     );
 
-    if (!r.ok) {
-        return r;
-    }
+    if (!r.ok) return r;
 
     const params = new URLSearchParams({ email });
-    redirect(`${ROUTES.SIGNIN_VERIFY}?${params.toString()}`);
+    redirect(`${ROUTES.SIGNIN_VERIFY}?${params.toString()}` as Route);
 
-    // این خط به‌خاطر redirect اجرا نمی‌شود ولی برای تایپ لازم است
-    return r;
 }
 
-export async function sendLoginOtp({
+export async function actionSendLoginOtpAction({
     otp,
     email,
 }: LoginOtpValues): Promise<ApiResult<LoginSuccessEnvelope>> {
@@ -53,21 +53,11 @@ export async function sendLoginOtp({
 
     if (!r.ok) return r;
 
-    const cookieOptions: CookieOptions = {
-        httpOnly: true,
-        secure: APP_MODE.isProd,
-        sameSite: "lax",
-        path: "/",
-        maxAge: 60 * 60 * 24 * 7,
-    };
-
     const user = r.data?.data?.user;
     if (user) {
         await setCookie({
             name: "user-profile",
             value: {
-                email: user.email,
-                phoneNumber: user.phoneNumber,
                 isSuperuser: user.isSuperuser,
             },
             options: cookieOptions,
@@ -83,8 +73,13 @@ export async function sendLoginOtp({
 
         const finalRedirectPath =
             ROLE_HOME[user?.isSuperuser ? "admin" : "buyer"];
-        redirect(finalRedirectPath, "replace");
+        redirect(finalRedirectPath as Route, "replace");
     }
 
     return r;
+}
+
+export const actionLogout = async ({ token }: { token: Token }) => {
+    if (isNullOrUndefined(token)) return;
+    updateTag(profileKey(token))
 }

@@ -17,7 +17,6 @@ import {
 } from "@/core/components/custom/layout/Page";
 import { DataTable } from "@/core/components/custom/table/DataTable";
 import { Button } from "@/core/components/ui/button";
-import { ROUTES } from "@/core/constants/misc";
 import { getProductCols } from "@/core/features/admin/products/column";
 import { usePaginationQuery } from "@/core/hooks/usePaginationQuery";
 import { useProducts, useRemoveProduct } from "@/core/services/client/products";
@@ -44,7 +43,7 @@ export default function ProductsPage() {
         <PageActions>
           <Button
             onClick={() => {
-              router.push(ROUTES.PRODUCTS_CREATE_UPDATE);
+              router.push("/admin/products/create-update");
             }}
           >
             <PackagePlusIcon /> ایجاد محصول

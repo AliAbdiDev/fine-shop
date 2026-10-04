@@ -1,18 +1,12 @@
 "use client";
 
-import { type ReactNode } from "react";
-
 import { AppSidebar } from "@/core/components/app-sidebar";
 import { FloatingHeader } from "@/core/components/custom/layout/PanelHeader";
 import { ScrollArea } from "@/core/components/ui/scroll-area";
 import { SidebarInset, SidebarProvider } from "@/core/components/ui/sidebar";
 import { dataPanel } from "@/core/features/admin/sidebarData";
 
-export default function Layout({
-  children,
-}: Readonly<{
-  children: ReactNode;
-}>) {
+export default function Layout({ children }: LayoutProps<"/admin">) {
   return (
     <SidebarProvider>
       <AppSidebar data={dataPanel} side="right" />

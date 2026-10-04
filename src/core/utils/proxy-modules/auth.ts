@@ -13,7 +13,7 @@ function isMatch(pathname: string, routes: string[]) {
 }
 
 export function authRedirect(req: NextRequest) {
-    const { pathname } = req.nextUrl
+    const { pathname: currentPath } = req.nextUrl
 
     // 1. Setup: get user info and route type
     const token = requestCookies(req).value('token')
@@ -25,9 +25,9 @@ export function authRedirect(req: NextRequest) {
         userRole = profile?.isSuperuser ? ROLES.ADMIN : ROLES.BUYER
     }
 
-    const isUserOnGuestRoute = isMatch(pathname, GUEST_ONLY_ROUTES)
-    const isUserOnAdminRoute = isMatch(pathname, ADMIN_ONLY_ROUTES)
-    const isUserOnBuyerRoute = isMatch(pathname, BUYER_ONLY_ROUTES)
+    const isUserOnGuestRoute = isMatch(currentPath, GUEST_ONLY_ROUTES)
+    const isUserOnAdminRoute = isMatch(currentPath, ADMIN_ONLY_ROUTES)
+    const isUserOnBuyerRoute = isMatch(currentPath, BUYER_ONLY_ROUTES)
 
     // -----------------------------------------------------------------
     // 2. Apply access rules based on route type (separate concerns)

@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import { type Route } from "next";
+
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 
@@ -50,7 +52,7 @@ export function ProductActions({
             value: "edit",
             onClick: () => {
               router.push(
-                `${ROUTES.PRODUCTS_CREATE_UPDATE}?id=${product.id}&edit=true`,
+                `${ROUTES.PRODUCTS_CREATE_UPDATE}?id=${product.id}&edit=true` as Route,
               );
             },
           },

@@ -18,7 +18,6 @@ import {
   PageTitle,
 } from "@/core/components/custom/layout/Page";
 import { Form, FormSubmit } from "@/core/components/custom/SmartForm";
-import { ROUTES } from "@/core/constants/misc";
 import { ProductFields } from "@/core/features/admin/products/ProductFields";
 import { useCategoriesInfiniteSelect } from "@/core/services/client/categories";
 import {
@@ -75,7 +74,7 @@ export default function ProductPage() {
 
     (editMode ? edit : create).mutate(formData, {
       onSuccess: () => {
-        router.replace(ROUTES.PRODUCTS);
+        router.replace("/admin/products");
       },
     });
   }

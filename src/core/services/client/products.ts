@@ -19,7 +19,7 @@ export const useCreateProduct = () => {
 
     return useMutation({
         mutationFn: async (payload: FormData) =>
-            unwrap(await api.post<void, Product>('/product/', payload, { token })),
+            unwrap(await api.post<void, Product>('/product/', payload, { token, timeout: 30_000, })),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: productKeys.lists() });
         },
@@ -47,7 +47,7 @@ export function useEditProduct({ id }: { id: EntityId | null; }) {
     return useMutation({
         mutationFn: async (payload: FormData) => {
             if (isNullOrUndefined(isId)) throw new Error("id is required");
-            return unwrap(await api.patch<Product, Product>(`/product/${id}/`, payload, { token }));
+            return unwrap(await api.patch<Product, Product>(`/product/${id}/`, payload, { token, timeout: 30_000, }));
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: productKeys.lists() });

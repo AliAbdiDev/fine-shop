@@ -15,7 +15,7 @@ import {
   type FormApi,
 } from "@/core/components/custom/SmartForm";
 import { Input } from "@/core/components/ui/input";
-import { sendLoginEmail } from "@/core/services/actions/auth";
+import { actionSendLoginEmail } from "@/core/services/server/auth";
 // اضافه شد
 import { emailShema } from "@/core/validation-shema";
 
@@ -29,7 +29,7 @@ export function SigninForm() {
       schema={signinSchema}
       defaultValues={{ email: "" }}
       onSubmit={async (values) => {
-        const result = await sendLoginEmail({ email: values.email });
+        const result = await actionSendLoginEmail({ email: values.email });
 
         if (result && !result.ok) {
           notify.error(result.error);

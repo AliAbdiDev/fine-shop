@@ -3,11 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "pnpm run ts && next dev --turbopack",
+    "dev": "pnpm run ts && pnpm run typegen && next dev --turbopack",
+    "typegen": "next typegen && tsc --noEmit",
     "full-check": "pnpm run ts && pnpm run lint",
     "ts": "tsc --noEmit",
     "lint": "eslint",
-    "build": "next build",
+    "build": "pnpm run typegen next build",
     "start": "next start",
     "mock-sync": "node src/core/mocks/configs/script-sync-schema.mjs",
     "mock-init": "pnpm exec msw init public/ --save",
@@ -73,8 +74,6 @@
     "yaml": "^2.9.0"
   },
   "msw": {
-    "workerDirectory": [
-      "public"
-    ]
+    "workerDirectory": ["public"]
   }
 }

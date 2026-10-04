@@ -3,7 +3,12 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
   serverExternalPackages: ['msw', '@mswjs/interceptors'],
-
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '10mb',
+    },
+  },
+  cacheComponents: true,
   images: {
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [{
@@ -12,7 +17,7 @@ const nextConfig: NextConfig = {
       pathname: '/**',
     },],
   },
-
+  typedRoutes: true,
   async headers() {
     return [
       {

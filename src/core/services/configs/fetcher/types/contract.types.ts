@@ -1,11 +1,5 @@
 import { type AppErrorCode } from "@/core/constants/status-messages";
 
-export interface SuccessEnvelope<T = undefined> {
-    message: string;
-    data?: T;
-    token?: string;
-}
-
 export interface ErrorEnvelope {
     error: {
         code: AppErrorCode;

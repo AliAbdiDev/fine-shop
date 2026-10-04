@@ -1,5 +1,7 @@
 "use client";
 
+import { type Route } from "next";
+
 import Link from "next/link";
 
 import { User, ShoppingBag, LogOut, Settings, Heart } from "lucide-react";
@@ -14,11 +16,14 @@ import {
   DropdownMenuTrigger,
 } from "@/core/components/ui/dropdown-menu";
 
-const categories = [
-  { label: "کالای دیجیتال", href: "/category/digital" },
-  { label: "مد و پوشاک", href: "/category/fashion" },
-  { label: "خانه و آشپزخانه", href: "/category/home" },
-  { label: "زیبایی و سلامت", href: "/category/beauty" },
+const categories: {
+  label: string;
+  href: Route;
+}[] = [
+  { label: "کالای دیجیتال", href: "#" },
+  { label: "مد و پوشاک", href: "#" },
+  { label: "خانه و آشپزخانه", href: "#" },
+  { label: "زیبایی و سلامت", href: "#" },
 ];
 
 export function FloatingHeader() {
@@ -80,22 +85,22 @@ export function FloatingHeader() {
             <DropdownMenuLabel>حساب من</DropdownMenuLabel>
             <DropdownMenuSeparator />
 
-            <DropdownMenuItem render={<Link href="/profile" />}>
+            <DropdownMenuItem render={<Link href="#" />}>
               <User className="h-4 w-4" />
               پروفایل
             </DropdownMenuItem>
 
-            <DropdownMenuItem render={<Link href="/orders" />}>
+            <DropdownMenuItem render={<Link href="#" />}>
               <ShoppingBag className="h-4 w-4" />
               سفارش‌های من
             </DropdownMenuItem>
 
-            <DropdownMenuItem render={<Link href="/wishlist" />}>
+            <DropdownMenuItem render={<Link href="#" />}>
               <Heart className="h-4 w-4" />
               علاقه‌مندی‌ها
             </DropdownMenuItem>
 
-            <DropdownMenuItem render={<Link href="/settings" />}>
+            <DropdownMenuItem render={<Link href="#" />}>
               <Settings className="h-4 w-4" />
               تنظیمات
             </DropdownMenuItem>
