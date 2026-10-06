@@ -7,13 +7,12 @@ import { redirect } from "next/navigation";
 
 import { isNullOrUndefined } from "@sindresorhus/is";
 
-import { ROLE_HOME, ROUTES } from "@/core/constants/misc";
+import { ROLE_HOME } from "@/core/constants/misc";
 import { api } from "@/core/services/configs/api";
 import { type User } from "@/core/types/entities.types";
-import { setCookie } from "@/core/utils/cookie/serverCookie";
-import { type CookieValue } from "@/core/utils/cookie/types";
+import { deleteCookie, getCookieValue, setCookie } from "@/core/utils/cookie/serverCookie";
 
-import { cookieOptions, profileKey, type Token } from "./misc";
+import { cookieOptions, profileKey } from "./misc";
 import { type ApiResult } from "../configs/fetcher/types/client.types";
 
 type LoginSuccessEnvelope = { data: { user: User }, token: string };
@@ -22,9 +21,9 @@ type LoginSuccessEnvelope = { data: { user: User }, token: string };
 type LoginEmailValues = { email: string };
 type LoginOtpValues = { otp: string; email: string };
 
-export const setUserProfileCookie = async (value: CookieValue<'user-profile'>) => {
-    if (isNullOrUndefined(value.isSuperuser)) return
-    await setCookie({ name: 'user-profile', value })
+export const getTokenFromCookie = async () => {
+    "use cache: private";
+    return await getCookieValue('token')
 }
 
 export async function actionSendLoginEmail({
@@ -38,7 +37,7 @@ export async function actionSendLoginEmail({
     if (!r.ok) return r;
 
     const params = new URLSearchParams({ email });
-    redirect(`${ROUTES.SIGNIN_VERIFY}?${params.toString()}` as Route);
+    redirect('/signin/verify?' + params.toString() as Route);
 
 }
 
@@ -79,7 +78,17 @@ export async function actionSendLoginOtpAction({
     return r;
 }
 
-export const actionLogout = async ({ token }: { token: Token }) => {
+export const actionLogout = async () => {
+    const token = await getCookieValue('token')
     if (isNullOrUndefined(token)) return;
-    updateTag(profileKey(token))
+    const r = await api.post('/account/logout/', undefined, { token })
+
+    if (r.ok) {
+        await deleteCookie('token')
+        await deleteCookie('user-profile')
+
+        updateTag(profileKey(token))
+        redirect('/', 'replace')
+    }
+    return r
 }

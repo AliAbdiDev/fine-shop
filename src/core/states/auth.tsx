@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { isNullOrUndefined, isString } from "@sindresorhus/is";
 import { createSelectorHooks } from "auto-zustand-selectors-hook";
 import { createStore } from "zustand";
+import { shallow } from "zustand/shallow";
 
 import { type User } from "../types/entities.types";
 
@@ -36,12 +37,17 @@ const useAuthStore = createStore<AuthStore>((set, get) => {
       set({ token: payload, tokenIsHydrated: true });
     },
 
-    setUserInfo: (payload) => {
-      if (isNullOrUndefined(payload)) {
-        set({ userInfo: null, userInfoIsHydrated: true });
+    setUserInfo: (next) => {
+      const prev = get().userInfo;
+      if (isNullOrUndefined(next)) {
+        if (!get().userInfoIsHydrated) set({ userInfoIsHydrated: true });
         return;
       }
-      set({ userInfo: payload, userInfoIsHydrated: true });
+      if (shallow(prev, next)) {
+        if (!get().userInfoIsHydrated) set({ userInfoIsHydrated: true });
+        return;
+      }
+      set({ userInfo: next, userInfoIsHydrated: true });
     },
 
     reset: () => {
