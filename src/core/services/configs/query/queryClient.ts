@@ -22,6 +22,7 @@ const makeQueryClient = () =>
 
         queryCache: new QueryCache({
             onError: (error, query) => {
+                console.log("🚀 ~ makeQueryClient ~ error:", error)
                 const custom = query.meta?.toastMessage?.(error);
                 if (typeof custom === 'string') {
                     notify.error(custom);

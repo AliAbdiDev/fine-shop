@@ -100,10 +100,7 @@ export default function ProductPage() {
         <Form
           schema={productSchema}
           onSubmit={handleSubmit}
-          defaultValues={{
-            ...productData,
-            images: productData?.images,
-          }}
+          defaultValues={productData}
         >
           <ProductFields categoriesSelect={categoriesSelect} />
 

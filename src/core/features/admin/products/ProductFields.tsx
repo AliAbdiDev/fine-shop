@@ -17,7 +17,7 @@ import { Textarea } from "@/core/components/ui/textarea";
 import { type CategoriesSelectResult } from "@/core/services/client/categories";
 import { useRemoveImageProduct } from "@/core/services/client/products";
 import { type Product } from "@/core/types/entities.types";
-import { toPersianNum } from "@/core/utils/helpers";
+import { isFile, toPersianNum } from "@/core/utils/helpers";
 import { type productSchema } from "@/core/validation-shema";
 
 const MAX_IMAGES = 10;
@@ -163,7 +163,7 @@ export function ProductFields({
             <>
               <div className="flex max-w-100 items-center justify-start gap-5 overflow-x-auto">
                 {Array.from({ length: slotCount }).map((_, i) => {
-                  const id = !(currentImages[i] instanceof File)
+                  const id = !isFile(currentImages[i])
                     ? currentImages[i]?.id
                     : null;
 
@@ -173,13 +173,10 @@ export function ProductFields({
                       value={currentImages[i] ?? null}
                       className="shrink-0"
                       onRemove={() => {
-                        console.log("🚀 ~ ProductFields ~ id:", id);
-                        if (id) {
-                          removeImage.mutate(id);
-                        }
+                        if (id) removeImage.mutate(id);
                       }}
                       onChange={(v) => {
-                        if (v instanceof File) {
+                        if (isFile(v)) {
                           const next = [...currentImages];
                           next[i] = v;
                           field.onChange(next);

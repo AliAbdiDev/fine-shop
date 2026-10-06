@@ -1,8 +1,11 @@
+import { isNullOrUndefined, isString } from "@sindresorhus/is";
 import { toast } from "sonner";
 
 import { APP_MODE } from "@/core/constants/misc";
 import {
   ERROR_MESSAGES,
+  type ErrorMessagesKeys,
+  GENERIC_ERROR,
   GENERIC_SUCCESS,
 } from "@/core/constants/status-messages";
 import { type ApiError } from "@/core/services/configs/fetcher/types/client.types";
@@ -21,13 +24,18 @@ function isApiClientError(e: unknown): e is ApiClientError {
   );
 }
 
-export function resolveErrorMessage(error: unknown): string | null {
-  if (!isApiClientError(error)) return null;
+export function resolveErrorMessage(error: unknown): string {
+  if (isString(error)) {
+    if (!error || !(error in ERROR_MESSAGES)) return GENERIC_ERROR;
+    return ERROR_MESSAGES[error as ErrorMessagesKeys];
+  }
+  if (isApiClientError(error)) {
+    const { code } = error.apiError;
+    if (!code || !(code in ERROR_MESSAGES)) return GENERIC_ERROR;
 
-  const { code } = error.apiError;
-  if (!code || !(code in ERROR_MESSAGES)) return null;
-
-  return ERROR_MESSAGES[code as keyof typeof ERROR_MESSAGES];
+    return ERROR_MESSAGES[code as ErrorMessagesKeys];
+  }
+  return GENERIC_ERROR;
 }
 
 export const notify = {
@@ -38,13 +46,17 @@ export const notify = {
 
   error: (error?: unknown) => {
     if (!APP_MODE.isClient()) return;
+
+    const msg = resolveErrorMessage(error);
+    if (!isNullOrUndefined(msg)) {
+      toast.error(msg);
+      return;
+    }
+
     if (typeof error === "string") {
       toast.error(error);
       return;
     }
-    const msg = resolveErrorMessage(error);
-    if (msg === null) return;
-    toast.error(msg);
   },
 
   info: (title: string, description?: string) => {

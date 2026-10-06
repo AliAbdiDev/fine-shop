@@ -97,7 +97,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90 absolute top-1 right-1 rounded-full p-1"
               aria-label="حذف تصویر"
             >
-              <X size={26} />
+              <X className="size-7 md:size-6" />
             </button>
           )}
         </>

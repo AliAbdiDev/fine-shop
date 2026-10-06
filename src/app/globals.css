@@ -180,4 +180,8 @@
   [role="button"]:not(:disabled) {
     cursor: pointer;
   }
+
+  input[type="tel"] {
+    direction: ltr;
+  }
 }

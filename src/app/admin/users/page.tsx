@@ -46,7 +46,6 @@ type ActivateMutation = ReturnType<typeof useActivateUser>;
 
 function UserAvatar({ user }: { user: User }) {
   const fullName = `${user.firstName} ${user.lastName}`.trim();
-  console.log("🚀 ~ UserAvatar ~ user:", user);
   if (isFile(user.avatar) || isNullOrUndefined(user?.avatar)) {
     return (
       <div className="bg-muted text-muted-foreground flex h-10 w-10 items-center justify-center rounded-full">
@@ -67,13 +66,9 @@ function UserAvatar({ user }: { user: User }) {
 
 /* ---------- دکمه فعال/غیرفعال + مودال تایید ---------- */
 
-export function UserActions({
-  user,
-  activate,
-}: {
-  user: User;
-  activate: ActivateMutation;
-}) {
+export function UserActions({ user }: { user: User }) {
+  const activate = useActivateUser();
+
   const [openConfirm, setOpenConfirm] = useState(false);
   const isActive = user.isActive;
   const isPending = activate.isPending;
@@ -126,9 +121,7 @@ export function UserActions({
   );
 }
 
-/* ---------- ستون‌های جدول ---------- */
-
-export const getColumns = (activate: ActivateMutation) => [
+export const getColumns = () => [
   helper.display({
     id: "avatar",
     header: "تصویر",
@@ -205,17 +198,14 @@ export const getColumns = (activate: ActivateMutation) => [
   helper.display({
     id: "actions",
     maxSize: 180,
-    cell: ({ row }) => <UserActions user={row.original} activate={activate} />,
+    cell: ({ row }) => <UserActions user={row.original} />,
   }),
 ];
 
-/* ---------- صفحه ---------- */
-
 export default function UsersPage() {
-  const activate = useActivateUser();
-
   const [searchInput, setSearchInput] = useState("");
   const search = useDebounce(searchInput, 300);
+
   const { page, size, setPagination } = usePaginationQuery({
     resetDeps: [search],
   });
@@ -226,7 +216,7 @@ export default function UsersPage() {
     search: search || undefined,
   });
 
-  const columns = useMemo(() => getColumns(activate), [activate]);
+  const columns = useMemo(() => getColumns(), []);
 
   return (
     <Page>
@@ -248,7 +238,6 @@ export default function UsersPage() {
               onValueChange={(val) => {
                 if (!isNullOrUndefined(val.trim())) setSearchInput(val);
               }}
-
               className="pr-9"
             />
           </div>
@@ -261,7 +250,7 @@ export default function UsersPage() {
           data={data?.data}
           pageCount={data?.meta?.totalPages}
           rowCount={data?.meta?.rowCount}
-          isLoading={isPending || activate.isPending}
+          isLoading={isPending}
           pagination={{ page, size }}
           onPaginationChange={setPagination}
         />

@@ -4,6 +4,7 @@ import { FormGrid } from "@/core/components/custom/layout/FormGrid";
 import { FormField } from "@/core/components/custom/SmartForm";
 import { ImageUpload } from "@/core/components/custom/UploadFields";
 import { Input } from "@/core/components/ui/input";
+import { removeAvatar } from "@/core/services/server/profile";
 import { type User } from "@/core/types/entities.types";
 import { formatPhone } from "@/core/utils/helpers";
 
@@ -30,7 +31,6 @@ export function ProfileFields() {
         {({ field }) => (
           <Input
             {...field}
-            dir="ltr"
             value={field.value}
             placeholder="۰۹۱۲۳۴۵۶۷۸۹"
             type="tel"
@@ -43,7 +43,10 @@ export function ProfileFields() {
           <ImageUpload
             value={(field.value as User["avatar"]) ?? null}
             onChange={field.onChange}
-            onRemove={() => field.onChange(null)}
+            onRemove={() => {
+              removeAvatar();
+              field.onChange(null);
+            }}
           />
         )}
       </FormField>
