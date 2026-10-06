@@ -1,6 +1,6 @@
 export type EntityId = number;
 
-export type Image = | {
+export type Image = {
     url: string;
     alt: string;
     id?: EntityId;
@@ -14,7 +14,7 @@ export type User = {
     firstName: string;
     lastName: string;
     phoneNumber: string;
-    avatar?: Image;
+    avatar?: string | File;
     isActive?: boolean;
     isSuperuser?: boolean;
     lastLogin?: number;
