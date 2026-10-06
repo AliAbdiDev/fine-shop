@@ -1,6 +1,9 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+
 import { isString } from "@sindresorhus/is";
+import { useQuery } from "@tanstack/react-query";
 import { BadgeCheckIcon, ChevronsUpDownIcon, LogOutIcon } from "lucide-react";
 
 import {
@@ -24,11 +27,32 @@ import {
   useSidebar,
 } from "@/core/components/ui/sidebar";
 
-import { useAuthSelector } from "../states/auth";
+import { notify } from "./custom/notify";
+import { actionLogout, getTokenFromCookie } from "../services/server/auth";
+import { getProfile } from "../services/server/profile";
 
 export function NavUser() {
   const { isMobile } = useSidebar();
-  const userProfile = useAuthSelector.useUserInfo();
+
+  // const userInfo = useAuthSelector.useUserInfo();
+  // const avatar = userInfo?.avatar;
+  // const email = userInfo?.email;
+  // const firstName = userInfo?.firstName;
+  // const lastName = userInfo?.lastName;
+
+  const { data: token } = useQuery({
+    queryFn: getTokenFromCookie,
+    queryKey: ["token"],
+  });
+  const { data: userResponse } = useQuery({
+    queryFn: () => getProfile({ token }),
+    queryKey: ["user-profile", token],
+  });
+
+  const user = userResponse?.ok ? userResponse.data : null;
+
+  const router = useRouter();
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -39,21 +63,16 @@ export function NavUser() {
             }
           >
             <Avatar>
-              {isString(userProfile?.avatar) && (
-                <AvatarImage
-                  src={userProfile?.avatar}
-                  alt={userProfile?.firstName}
-                />
+              {isString(user?.avatar) && (
+                <AvatarImage src={user?.avatar} alt={user?.firstName} />
               )}
-              <AvatarFallback>
-                {userProfile?.firstName?.slice(0, 2)}
-              </AvatarFallback>
+              <AvatarFallback>{user?.firstName?.slice(0, 2)}</AvatarFallback>
             </Avatar>
             <div className="grid flex-1 text-start text-sm leading-tight">
-              <span className="truncate font-medium">
-                {userProfile?.firstName}
+              <span className="space-x-1 truncate font-medium">
+                {user?.firstName} {user?.lastName}
               </span>
-              <span className="truncate text-xs">{userProfile?.email}</span>
+              <span className="truncate text-xs">{user?.email}</span>
             </div>
             <ChevronsUpDownIcon className="ms-auto size-4" />
           </DropdownMenuTrigger>
@@ -67,37 +86,41 @@ export function NavUser() {
               <DropdownMenuLabel className="p-0 font-normal">
                 <div className="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
                   <Avatar>
-                    {isString(userProfile?.avatar) && (
-                      <AvatarImage
-                        src={userProfile?.avatar}
-                        alt={userProfile?.firstName}
-                      />
+                    {isString(user?.avatar) && (
+                      <AvatarImage src={user?.avatar} alt={user?.firstName} />
                     )}
                     <AvatarFallback>
-                      {" "}
-                      {userProfile?.firstName?.slice(0, 2)}
+                      {user?.firstName?.slice(0, 2)}
                     </AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-start text-sm leading-tight">
-                    <span className="truncate font-medium">
-                      {userProfile?.firstName}
+                    <span className="space-x-1 truncate font-medium">
+                      {user?.firstName} {user?.lastName}
                     </span>
-                    <span className="truncate text-xs">
-                      {userProfile?.email}
-                    </span>
+                    <span className="truncate text-xs">{user?.email}</span>
                   </div>
                 </div>
               </DropdownMenuLabel>
             </DropdownMenuGroup>
 
             <DropdownMenuGroup>
-              <DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  router.push("/admin/profile");
+                }}
+              >
                 <BadgeCheckIcon />
                 حساب کاربری
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className={"hover:bg-destructive/35!"}>
+            <DropdownMenuItem
+              onClick={async () => {
+                const r = await actionLogout();
+                if (!r?.ok) notify.error(r?.error.code);
+              }}
+              className={"hover:bg-destructive/35!"}
+            >
               <LogOutIcon />
               خروج
             </DropdownMenuItem>

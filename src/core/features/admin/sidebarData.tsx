@@ -9,19 +9,18 @@ import {
 } from "lucide-react";
 
 import { type AppSidebarData } from "@/core/components/app-sidebar";
-import { ROUTES } from "@/core/constants/misc";
 
 export const dataPanel: AppSidebarData = {
   navMain: [
     {
       title: "محصولات",
-      url: ROUTES.PRODUCTS,
+      url: "/admin/products",
       icon: PackageIcon,
       activeIcon: PackageOpen,
     },
     {
       title: "کاربران",
-      url: ROUTES.USERS,
+      url: "/admin/users",
       icon: Users,
       activeIcon: UsersRound,
     },

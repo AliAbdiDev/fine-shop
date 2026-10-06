@@ -2,6 +2,8 @@
 
 import * as React from "react";
 
+import { type Route } from "next";
+
 import Link from "next/link";
 
 import { StoreIcon } from "lucide-react";
@@ -21,13 +23,13 @@ type IconComponent = React.ComponentType<{ className?: string }>;
 export type AppSidebarData = {
   navMain: {
     title: string;
-    url: string;
+    url: Route;
     icon: IconComponent;
     activeIcon?: IconComponent;
     isActive?: boolean;
     items?: {
       title: string;
-      url: string;
+      url: Route;
     }[];
   }[];
 };
