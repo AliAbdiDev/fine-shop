@@ -53,7 +53,7 @@ export function ProductSlider({
   return (
     <section className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold sm:text-xl">{title}</h2>
+        <h2 className="font-vazir-bold text-lg sm:text-xl">{title}</h2>
         {shouldLoadSlider && (
           <div className="flex items-center gap-1">
             <Button

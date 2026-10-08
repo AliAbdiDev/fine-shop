@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
-import { FloatingFooter } from "@/core/features/shop/components/floating-footer";
-import { FloatingHeader } from "@/core/features/shop/components/floating-header";
+import { SiteFooter } from "@/core/features/shop/components/site-footer";
+import { SiteHeader } from "@/core/features/shop/components/site-header";
 
 export const metadata: Metadata = {
   title: "فروشگاه من",
@@ -15,11 +15,9 @@ export default function RootLayout({
 }) {
   return (
     <>
-      <FloatingHeader />
-      <main className="mx-auto w-full max-w-6xl px-3 pt-20 pb-20 sm:px-4 sm:pt-24 sm:pb-24">
-        {children}
-      </main>
-      <FloatingFooter />
+      <SiteHeader />
+      <main className="mx-auto w-full py-8">{children}</main>
+      <SiteFooter />
     </>
   );
 }

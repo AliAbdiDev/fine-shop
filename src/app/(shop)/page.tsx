@@ -1,184 +1,138 @@
 import type { Metadata } from "next";
 
+import { CategoriesSection } from "@/core/features/shop/components/categories-section";
 import { FeaturesSection } from "@/core/features/shop/components/features-section";
 import { HeroSection } from "@/core/features/shop/components/hero-section";
+import { LifestyleSection } from "@/core/features/shop/components/lifestyle-section";
+import { NewsletterSection } from "@/core/features/shop/components/newsletter-section";
 import { ProductSlider } from "@/core/features/shop/components/product-slider";
 import { type SliderProduct } from "@/core/features/shop/components/product-slider-card";
-import { PromoBanner } from "@/core/features/shop/components/promo-banner";
+import { ReviewsSection } from "@/core/features/shop/components/reviews-section";
 
 export const metadata: Metadata = {
-  title: "فروشگاه من | خرید آنلاین کالای دیجیتال",
+  title: "بارزونو | فروشگاه آنلاین",
   description:
-    "خرید آنلاین انواع کالای دیجیتال، موبایل، لپ‌تاپ و لوازم جانبی با ارسال سریع و ضمانت اصالت کالا.",
-  openGraph: {
-    title: "فروشگاه من",
-    description: "خرید آنلاین با بهترین قیمت",
-    type: "website",
-  },
-  alternates: { canonical: "https://example.com" },
+    "خرید آنلاین با ارسال سریع، ضمانت اصالت و بازگشت ۷ روزه. انتخاب‌های خوب برای روزهای بهتر.",
+  alternates: { canonical: "https://barzono.ir" },
 };
 
-const popularProducts: SliderProduct[] = [
+const dealProducts: SliderProduct[] = [
   {
     id: 1,
-    title: "هدفون بی‌سیم سونی",
-    price: 18500000,
-    originalPrice: 21000000,
+    title: "کوله‌پشتی سفر چندکاره",
+    category: "ورزش و سفر",
+    price: 1_820_000,
+    originalPrice: 2_400_000,
+    rating: 4.6,
     image:
-      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=400&fit=crop",
   },
   {
     id: 2,
-    title: "ساعت هوشمند اپل",
-    price: 24900000,
+    title: "کفش روزمره مینیمال",
+    category: "مد و پوشاک",
+    price: 3_150_000,
+    originalPrice: 3_900_000,
+    rating: 4.8,
     image:
-      "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop",
   },
   {
     id: 3,
-    title: "گوشی شیائومی",
-    price: 32000000,
+    title: "کتری برقی استیل",
+    category: "خانه و آشپزخانه",
+    price: 6_750_000,
+    rating: 4.7,
     image:
-      "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1517668808822-9ebb02f2a0e6?w=400&h=400&fit=crop",
   },
   {
     id: 4,
-    title: "لپ‌تاپ مک‌بوک",
-    price: 78000000,
+    title: "هدفون بی‌سیم نویزکنسل",
+    category: "دیجیتال",
+    price: 9_200_000,
+    originalPrice: 11_500_000,
+    rating: 4.9,
     image:
-      "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&h=400&fit=crop",
-  },
-  {
-    id: 5,
-    title: "اسپیکر بلوتوثی",
-    price: 4500000,
-    image:
-      "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=400&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop",
   },
 ];
 
-const bestSellers: SliderProduct[] = [
+const popularProducts: SliderProduct[] = [
+  {
+    id: 5,
+    title: "شمع رایحه‌دار آرامش",
+    category: "خانه و آشپزخانه",
+    price: 1_450_000,
+    rating: 4.5,
+    image:
+      "https://images.unsplash.com/photo-1602874801006-9f4d8d3b6b93?w=400&h=400&fit=crop",
+  },
   {
     id: 6,
-    title: "پاوربانک انکر",
-    price: 2800000,
-    originalPrice: 3200000,
+    title: "سرم آبرسان هالورونیک",
+    category: "زیبایی و سلامت",
+    price: 790_000,
+    originalPrice: 980_000,
+    rating: 4.7,
     image:
-      "https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?w=400&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=400&h=400&fit=crop",
   },
   {
     id: 7,
-    title: "کیبورد مکانیکال",
-    price: 8900000,
+    title: "کتاب داستان‌های کوتاه",
+    category: "کتاب و لوازم‌تحریر",
+    price: 245_000,
+    rating: 4.8,
     image:
-      "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=400&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400&h=400&fit=crop",
   },
   {
     id: 8,
-    title: "ماوس گیمینگ",
-    price: 3500000,
+    title: "بازی فکری چوبی",
+    category: "کودک و نوزاد",
+    price: 380_000,
+    originalPrice: 460_000,
+    rating: 4.6,
     image:
-      "https://images.unsplash.com/photo-1527814050087-3793815479db?w=400&h=400&fit=crop",
-  },
-  {
-    id: 9,
-    title: "هدست گیمینگ",
-    price: 12000000,
-    image:
-      "https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?w=400&h=400&fit=crop",
-  },
-  {
-    id: 10,
-    title: "مانیتور ۲۷ اینچ",
-    price: 22000000,
-    image:
-      "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=400&h=400&fit=crop",
-  },
-];
-
-const newArrivals: SliderProduct[] = [
-  {
-    id: 11,
-    title: "ایرپاد پرو",
-    price: 19500000,
-    image:
-      "https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=400&h=400&fit=crop",
-  },
-  {
-    id: 12,
-    title: "تبلت سامسونگ",
-    price: 35000000,
-    image:
-      "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=400&h=400&fit=crop",
-  },
-  {
-    id: 13,
-    title: "دوربین کانن",
-    price: 55000000,
-    originalPrice: 62000000,
-    image:
-      "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=400&h=400&fit=crop",
-  },
-  {
-    id: 14,
-    title: "کنسول بازی",
-    price: 42000000,
-    image:
-      "https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?w=400&h=400&fit=crop",
-  },
-  {
-    id: 15,
-    title: "ساعت هوشمند سامسونگ",
-    price: 18000000,
-    image:
-      "https://images.unsplash.com/photo-1579586337278-3befd40fd17a?w=400&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1611996575749-79a3a250f948?w=400&h=400&fit=crop",
   },
 ];
 
 export default function LandingPage() {
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "ItemList",
-    itemListElement: popularProducts.map((p, i) => ({
-      "@type": "ListItem",
-      position: i + 1,
-      item: {
-        "@type": "Product",
-        name: p.title,
-        image: p.image,
-        offers: {
-          "@type": "Offer",
-          price: p.price,
-          priceCurrency: "IRR",
-          availability: "https://schema.org/InStock",
-        },
-      },
-    })),
-  };
-
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div dir="rtl" className="space-y-8 sm:space-y-12">
+    <div className="space-y-8 pb-6 sm:space-y-12">
+      <section className="shop-section-space">
         <HeroSection />
-        <FeaturesSection />
+      </section>
+      <section className="shop-section-space">
+        <CategoriesSection />
+      </section>
 
+      <section className="shop-section-space bg-secondary py-5">
         <ProductSlider
-          title="محبوب‌ترین‌ها"
-          products={popularProducts}
+          title="پیشنهادهای خوش‌قیمت"
+          products={dealProducts}
           priority
         />
+      </section>
 
-        <PromoBanner />
+      <section className="shop-section-space bg-card py-5">
+        <ProductSlider title="محبوب‌های این روزها" products={popularProducts} />
+      </section>
+      <section className="shop-section-space">
+        <LifestyleSection />
+      </section>
 
-        <ProductSlider title="پرفروش‌ترین‌ها" products={bestSellers} />
-
-        <ProductSlider title="جدیدترین‌ها" products={newArrivals} />
-      </div>
-    </>
+      <section className="shop-section-space">
+        <FeaturesSection />
+      </section>
+      <section className="shop-section-space">
+        <ReviewsSection />
+      </section>
+      <section className="shop-section-space">
+        <NewsletterSection />
+      </section>
+    </div>
   );
 }

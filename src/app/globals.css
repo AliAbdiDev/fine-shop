@@ -45,6 +45,8 @@
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
+  --color-tertiary: var(--tertiary);
+  --color-tertiary-foreground: var(--tertiary-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-muted: var(--muted);
@@ -99,52 +101,58 @@
   --font-mono-stack: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
   /* L1 — کانواس صفحه‌ی شاپ */
-  --background: oklch(0.945 0.016 95);
-  --foreground: oklch(0.215 0.032 230);
+  --background: oklch(99.05% 0.007 85.51); /* #FCFAF7 */
+  --foreground: oklch(22.63% 0.016 145.19); /* #262B26 */
 
   /* L3 — کارت و پاپ‌اور */
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.215 0.032 230);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.215 0.032 230);
+  --card: oklch(100% 0 0); /* #FFFFFF */
+  --card-foreground: oklch(22.63% 0.016 145.19); /* #262B26 */
+  --popover: oklch(100% 0 0); /* #FFFFFF */
+  --popover-foreground: oklch(22.63% 0.016 145.19); /* #262B26 */
 
-  --primary: oklch(0.52 0.115 190);
-  --primary-foreground: oklch(0.99 0.005 190);
+  --primary: oklch(62.12% 0.143 40.07); /* #D45135 */
+  --primary-foreground: oklch(100% 0 0); /* #FFFFFF */
 
-  /* L2 — سطوح میانی */
-  --secondary: oklch(0.888 0.032 95);
-  --secondary-foreground: oklch(0.245 0.032 230);
-  --muted: oklch(0.915 0.024 95);
-  --muted-foreground: oklch(0.485 0.032 230);
+  /* L2 — سطح ثانویه (مکمل سفید: سکشن‌ها، کارت‌ها، خبرنامه) */
+  --secondary: oklch(94.25% 0.018 125.48); /* #E9EDE3 */
+  --secondary-foreground: oklch(22.63% 0.016 145.19); /* #262B26 */
+
+  /* سطح سوم — فوتر و نوار بالایی هدر */
+  --tertiary: oklch(33.05% 0.049 156.3); /* #1F3D2B */
+  --tertiary-foreground: oklch(90.15% 0.018 125.48); /* #D9E2D7 */
+
+  --muted: oklch(96.55% 0.012 85.51); /* #F5F4EF */
+  --muted-foreground: oklch(51.52% 0.016 145.19); /* #74776E */
 
   /* سطح hover و آیتم انتخاب‌شده در منو و select */
-  --accent: oklch(0.885 0.072 80);
-  --accent-foreground: oklch(0.255 0.048 80);
+  --accent: oklch(95.55% 0.038 30.48); /* #FBECE6 */
+  --accent-foreground: oklch(62.12% 0.143 40.07); /* #D45135 */
 
-  --success: oklch(0.53 0.13 155);
-  --success-foreground: oklch(0.99 0.005 155);
-  --warning: oklch(0.8 0.155 78);
-  --warning-foreground: oklch(0.27 0.05 78);
-  --info: oklch(0.55 0.14 245);
-  --info-foreground: oklch(0.99 0.005 245);
-  --destructive: oklch(0.57 0.19 30);
-  --destructive-foreground: oklch(0.99 0.005 30);
+  /* Status — مقادیر معنایی واقعی */
+  --success: oklch(69.6% 0.17 162.48); /* سبز موفقیت */
+  --success-foreground: oklch(98.5% 0 0); /* #FAFAFA */
+  --warning: oklch(82.8% 0.189 84.43); /* نارنجی هشدار */
+  --warning-foreground: oklch(27.9% 0.077 45.64); /* #451A03 */
+  --info: oklch(62.3% 0.214 259.82); /* آبی اطلاع */
+  --info-foreground: oklch(98.5% 0 0); /* #FAFAFA */
+  --destructive: oklch(62.12% 0.143 40.07); /* #D45135 */
+  --destructive-foreground: oklch(100% 0 0); /* #FFFFFF */
 
-  --border: oklch(0.855 0.03 95);
-  --input: oklch(0.815 0.036 95);
-  --ring: oklch(0.52 0.115 190);
+  --border: oklch(91.55% 0.012 85.51); /* #E7E6DF */
+  --input: oklch(91.55% 0.012 85.51); /* #E7E6DF */
+  --ring: oklch(62.12% 0.143 40.07); /* #D45135 */
 
-  --chart-1: oklch(0.52 0.115 190);
-  --chart-2: oklch(0.78 0.145 80);
-  --chart-3: oklch(0.42 0.045 230);
-  --chart-4: oklch(0.68 0.115 190);
-  --chart-5: oklch(0.66 0.12 45);
-  --chart-6: oklch(0.53 0.13 155);
-  --chart-7: oklch(0.57 0.19 30);
-  --chart-8: oklch(0.55 0.15 300);
+  --chart-1: oklch(62.12% 0.143 40.07); /* #D45135 */
+  --chart-2: oklch(33.05% 0.049 156.3); /* #1F3D2B */
+  --chart-3: oklch(94.25% 0.018 125.48); /* #E9EDE3 */
+  --chart-4: oklch(96.55% 0.012 85.51); /* #F5F4EF */
+  --chart-5: oklch(95.55% 0.038 30.48); /* #FBECE6 */
+  --chart-6: oklch(51.52% 0.016 145.19); /* #74776E */
+  --chart-7: oklch(90.15% 0.018 125.48); /* #D9E2D7 */
+  --chart-8: oklch(22.63% 0.016 145.19); /* #262B26 */
 
   /* L0 — پوسته‌ی داشبورد: تیره‌ترین لایه، قابِ دور محتوا */
-  --sidebar: oklch(93.277% 0.03448 74.363);
+  --sidebar: oklch(93.277% 0.03448 74.363); /* مقدار اصلی داشبورد */
   --sidebar-foreground: oklch(0.265 0.03 230);
   --sidebar-primary: oklch(0.52 0.115 190);
   --sidebar-primary-foreground: oklch(0.99 0.005 190);
@@ -184,4 +192,12 @@
   input[type="tel"] {
     direction: ltr;
   }
+
+  .keen-slider__slide {
+    overflow: visible !important;
+  }
+}
+
+@utility shop-section-space {
+  @apply px-5 pb-5 md:px-18;
 }
