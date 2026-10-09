@@ -2,31 +2,22 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import dynamic from "next/dynamic";
-
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import { Button } from "@/core/components/ui/button";
 
-import { type SliderInstance } from "./keen-slider-inner";
-import { ProductSliderCard, type SliderProduct } from "./product-slider-card";
-
-const KeenSliderInner = dynamic(() => import("./keen-slider-inner"), {
-  ssr: false,
-  loading: () => null,
-});
+import KeenSliderInner, {
+  type SliderProduct,
+  type SliderInstance,
+} from "./keen-slider-inner";
+import { SliderSkeleton } from "../skeletons/slider-skeleton";
 
 interface ProductSliderProps {
   products: SliderProduct[];
   title: string;
-  priority?: boolean;
 }
 
-export function ProductSlider({
-  products,
-  title,
-  priority = false,
-}: ProductSliderProps) {
+export function ProductSlider({ products, title }: ProductSliderProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const instanceRef = useRef<SliderInstance | null>(null);
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -43,7 +34,8 @@ export function ProductSlider({
           observer.disconnect();
         }
       },
-      { rootMargin: "300px" },
+      /* Bigger margin on mobile so the slider is ready before the user reaches it */
+      { rootMargin: "800px" },
     );
 
     observer.observe(el);
@@ -87,15 +79,7 @@ export function ProductSlider({
             setCurrentSlide={setCurrentSlide}
           />
         ) : (
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {products.slice(0, 4).map((product, i) => (
-              <ProductSliderCard
-                key={product.id}
-                product={product}
-                priority={priority && i < 4}
-              />
-            ))}
-          </div>
+          <SliderSkeleton />
         )}
       </div>
     </section>

@@ -1,15 +1,7 @@
 import Link from "next/link";
 
-import {
-  BadgePercent,
-  Menu,
-  Search,
-  ShoppingBag,
-  Truck,
-  User2,
-} from "lucide-react";
+import { BadgePercent, Search, ShoppingBag, Truck } from "lucide-react";
 
-import { Badge } from "@/core/components/ui/badge";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Separator } from "@/core/components/ui/separator";
@@ -19,9 +11,13 @@ import {
   type Category,
   DesktopAllCategories,
   MobileAllCategories,
-} from "./layout/AllCategories";
+} from "./AllCategories";
+import { UserActions } from "./UserActions";
 
 const categories: Category[] = [
+  {
+    title: "کل محصولات",
+  },
   {
     title: "دیجیتال",
   },
@@ -83,40 +79,6 @@ function SearchBar({ className }: { className?: string }) {
   );
 }
 
-function UserActions({ showText = true }: { showText?: boolean }) {
-  return (
-    <div className="mr-auto flex items-center gap-1 md:gap-3">
-      <Button
-        variant="ghost"
-        className="h-auto gap-1.5 px-2 py-1.5"
-        aria-label="ورود / ثبت‌نام"
-      >
-        <User2 className="h-5 w-5" />
-        {showText && (
-          <span className="hidden text-[13px] md:inline">ورود / ثبت‌نام</span>
-        )}
-      </Button>
-
-      <Button
-        variant="ghost"
-        className="h-auto gap-1.5 px-2 py-1.5"
-        aria-label="سبد خرید"
-      >
-        <ShoppingBag className="h-5 w-5" />
-        {showText && (
-          <span className="hidden text-[13px] md:inline">سبد خرید</span>
-        )}
-        <Badge
-          variant="default"
-          className="font-vazir-bold size-4.5 justify-center rounded-full px-1 text-[10px] leading-none"
-        >
-          ۲
-        </Badge>
-      </Button>
-    </div>
-  );
-}
-
 /* ─────────────────────────────────────────────
    Desktop header
    ───────────────────────────────────────────── */
@@ -141,14 +103,6 @@ function MobileHeader() {
   return (
     <header className="border-border bg-card border-b">
       <div className="shop-section-space mx-auto flex items-center gap-3 py-3">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-9 w-9"
-          aria-label="باز کردن منو"
-        >
-          <Menu className="h-5 w-5" />
-        </Button>
         <Logo showSubtitle={false} />
         <UserActions showText={false} />
       </div>

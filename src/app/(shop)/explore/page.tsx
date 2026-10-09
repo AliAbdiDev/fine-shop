@@ -1,5 +1,5 @@
-import { ProductGrid } from "@/core/features/shop/components/product-grid";
-import { ResponsiveProductFilter } from "@/core/features/shop/components/responsive-product-filter";
+// import { ProductGrid } from "@/core/features/shop/components/product-grid";
+// import { ResponsiveProductFilter } from "@/core/features/shop/components/responsive-product-filter";
 
 const products = [
   {
@@ -43,10 +43,10 @@ export default function ExplorePage() {
     <div dir="rtl" className="container mx-auto px-4 py-6">
       <div className="flex flex-col gap-6 lg:flex-row">
         <div className="lg:w-64 lg:shrink-0">
-          <ResponsiveProductFilter />
+          {/* <ResponsiveProductFilter /> */}
         </div>
         <div className="flex-1">
-          <ProductGrid products={products} />
+          {/* <ProductGrid products={products} /> */}
         </div>
       </div>
     </div>

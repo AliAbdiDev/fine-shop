@@ -108,10 +108,11 @@ export function SiteFooter() {
                   variant="ghost"
                   size="icon"
                   className="text-tertiary-foreground h-9 w-9 rounded-lg border border-white/20 hover:bg-white/10 hover:text-white"
+                  render={<a href="tel:02191001234" />}
                   nativeButton={false}
                   aria-label="شماره تماس"
                 >
-                  <Phone />
+                  <Phone className="h-4 w-4" strokeWidth={1.7} />
                 </Button>
               </div>
             </div>

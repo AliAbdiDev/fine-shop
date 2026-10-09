@@ -13,8 +13,16 @@ import { Badge } from "@/core/components/ui/badge";
 import { Button } from "@/core/components/ui/button";
 import { toPersianNum } from "@/core/utils/helpers";
 
-import type { SliderProduct } from "./product-slider-card";
-
+export interface SliderProduct {
+  id: number;
+  title: string;
+  price: number;
+  originalPrice?: number;
+  image: string;
+  category?: string;
+  rating?: number;
+  reviewCount?: number;
+}
 export type SliderInstance = KeenSliderInstance;
 export type SliderInstanceRef = React.RefObject<SliderInstance | null>;
 
@@ -34,14 +42,15 @@ export default function KeenSliderInner({
   const [ref, instance] = useKeenSlider<HTMLDivElement>({
     initial: 0,
     loop: true,
-    slides: { perView: 4, spacing: 16 },
+    slides: { perView: 1.15, spacing: 12 },
     slideChanged(slider) {
       setCurrentSlide(slider.track.details.rel);
     },
     breakpoints: {
-      "(max-width: 640px)": { slides: { perView: 1.3, spacing: 12 } },
-      "(min-width: 640px)": { slides: { perView: 3, spacing: 12 } },
-      "(min-width: 768px)": { slides: { perView: 4, spacing: 20 } },
+      "(min-width: 480px)": { slides: { perView: 2, spacing: 12 } },
+      "(min-width: 640px)": { slides: { perView: 2.3, spacing: 14 } },
+      "(min-width: 1024px)": { slides: { perView: 3, spacing: 20 } },
+      "(min-width: 1280px)": { slides: { perView: 4, spacing: 20 } },
     },
   });
 
@@ -52,7 +61,7 @@ export default function KeenSliderInner({
   return (
     <>
       <div ref={ref} className="keen-slider">
-        {products.map((product) => {
+        {products.map((product, i) => {
           const discount =
             product.originalPrice && product.originalPrice > product.price
               ? Math.round(
@@ -70,7 +79,8 @@ export default function KeenSliderInner({
                 href={`/product/${product.id}` as Route}
                 aspect="square"
                 className="h-full"
-                mediaClassName="bg-[#E9EDE3]"
+                mediaClassName="bg-secondary"
+                priority={i === 0}
                 mediaOverlay={
                   discount > 0 ? (
                     <Badge
@@ -135,7 +145,7 @@ export default function KeenSliderInner({
       </div>
 
       <div className="mt-4 flex justify-center gap-1.5">
-        {products.map((_, i) => (
+        {products.reverse().map((_, i) => (
           <button
             key={i}
             type="button"

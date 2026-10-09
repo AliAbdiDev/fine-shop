@@ -10,44 +10,37 @@ import { toPersianNum } from "@/core/utils/helpers";
 interface CategoryItem {
   title: string;
   count: number;
-  img: string;
 }
 
 const items: CategoryItem[] = [
   {
-    title: "دیجیتال",
-    count: 1200,
-    img: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=300&h=300&fit=crop",
-  },
-  {
-    title: "مد و پوشاک",
-    count: 2400,
-    img: "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=300&h=300&fit=crop",
-  },
-  {
-    title: "خانه و آشپزخانه",
-    count: 1800,
-    img: "https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=300&h=300&fit=crop",
-  },
-  {
-    title: "زیبایی و سلامت",
-    count: 900,
-    img: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300&h=300&fit=crop",
-  },
-  {
-    title: "ورزش و سفر",
-    count: 750,
-    img: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=300&h=300&fit=crop",
+    title: "کودک و اسباب‌بازی",
+    count: 600,
   },
   {
     title: "کتاب و لوازم‌تحریر",
     count: 1500,
-    img: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=300&h=300&fit=crop",
   },
   {
-    title: "کودک و اسباب‌بازی",
-    count: 600,
-    img: "https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?w=300&h=300&fit=crop",
+    title: "ورزش و سفر",
+    count: 750,
+  },
+  {
+    title: "زیبایی و سلامت",
+    count: 900,
+  },
+
+  {
+    title: "خانه و آشپزخانه",
+    count: 1800,
+  },
+  {
+    title: "مد و پوشاک",
+    count: 2400,
+  },
+  {
+    title: "دیجیتال",
+    count: 1200,
   },
 ];
 
@@ -65,7 +58,7 @@ export function CategoriesSection() {
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4 md:grid-cols-7">
-        {items.map((item) => (
+        {items.map((item, i) => (
           <Link key={item.title} href={`#/${item.title}`}>
             <Card
               className={cn(
@@ -76,9 +69,11 @@ export function CategoriesSection() {
               {/* Image */}
               <div className="relative h-20 w-20 sm:h-24 sm:w-24">
                 <Image
-                  src={item.img}
+                  src={`/images/landing/cats/cat-${i + 1}.png`}
                   alt={item.title}
                   fill
+                  quality={10}
+                  loading="lazy"
                   sizes="(max-width: 640px) 96px, 120px"
                   className="object-contain"
                 />

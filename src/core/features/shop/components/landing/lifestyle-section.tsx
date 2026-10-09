@@ -7,14 +7,6 @@ import { toPersianNum } from "@/core/utils/helpers";
 
 const cards = [
   {
-    category: "زیبایی و حال خوب",
-    title: "وقتی برای خودت",
-    description: "یک فنجان آرامش، یک کتاب و کمی رسیدگی به خود.",
-    count: 28,
-    image:
-      "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=800&h=600&fit=crop",
-  },
-  {
     category: "سفر و ماجراجویی",
     title: "سبک‌بار، راهی روزهای تازه",
     description: "همراهی‌های کاربردی برای سفر و ماجراجویی‌های تازه",
@@ -29,6 +21,14 @@ const cards = [
     count: 35,
     image:
       "https://images.unsplash.com/photo-1567016432779-094069958ea5?w=800&h=600&fit=crop",
+  },
+  {
+    category: "زیبایی و حال خوب",
+    title: "وقتی برای خودت",
+    description: "یک فنجان آرامش، یک کتاب و کمی رسیدگی به خود.",
+    count: 28,
+    image:
+      "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=800&h=600&fit=crop",
   },
 ];
 
@@ -46,10 +46,10 @@ export function LifestyleSection() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        {cards.map((card) => (
+        {cards.map((card, i) => (
           <VerticalCard
             key={card.title}
-            image={card.image}
+            image={"/images/landing/lifestyle" + (i + 1) + ".png"}
             imageAlt={card.title}
             href="#"
             aspect="4/3"

@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 
-import { CategoriesSection } from "@/core/features/shop/components/categories-section";
-import { FeaturesSection } from "@/core/features/shop/components/features-section";
-import { HeroSection } from "@/core/features/shop/components/hero-section";
-import { LifestyleSection } from "@/core/features/shop/components/lifestyle-section";
-import { NewsletterSection } from "@/core/features/shop/components/newsletter-section";
-import { ProductSlider } from "@/core/features/shop/components/product-slider";
-import { type SliderProduct } from "@/core/features/shop/components/product-slider-card";
-import { ReviewsSection } from "@/core/features/shop/components/reviews-section";
+import { CategoriesSection } from "@/core/features/shop/components/landing/categories-section";
+import { FeaturesSection } from "@/core/features/shop/components/landing/features-section";
+import { HeroSection } from "@/core/features/shop/components/landing/hero/hero-section";
+import { LifestyleSection } from "@/core/features/shop/components/landing/lifestyle-section";
+import { NewsletterSection } from "@/core/features/shop/components/landing/newsletter-section";
+import { ReviewsSection } from "@/core/features/shop/components/landing/reviews-section";
+import { type SliderProduct } from "@/core/features/shop/components/product-slider/keen-slider-inner";
+import { ProductSlider } from "@/core/features/shop/components/product-slider/product-slider";
 
 export const metadata: Metadata = {
   title: "بارزونو | فروشگاه آنلاین",
@@ -110,11 +110,7 @@ export default function LandingPage() {
       </section>
 
       <section className="shop-section-space bg-secondary py-5">
-        <ProductSlider
-          title="پیشنهادهای خوش‌قیمت"
-          products={dealProducts}
-          priority
-        />
+        <ProductSlider title="پیشنهادهای خوش‌قیمت" products={dealProducts} />
       </section>
 
       <section className="shop-section-space bg-card py-5">

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
-import { SiteFooter } from "@/core/features/shop/components/site-footer";
-import { SiteHeader } from "@/core/features/shop/components/site-header";
+import { SiteHeader } from "@/core/features/shop/components/layout/header/site-header";
+import { SiteFooter } from "@/core/features/shop/components/layout/site-footer";
 
 export const metadata: Metadata = {
   title: "فروشگاه من",
