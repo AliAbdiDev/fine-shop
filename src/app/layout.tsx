@@ -10,7 +10,7 @@ import { MswProvider } from "@/core/mocks/configs/MswProvider";
 import QueryProvider from "@/core/services/configs/query/QueryProvider";
 import { getTokenFromCookie } from "@/core/services/server/auth";
 import { getProfile } from "@/core/services/server/profile";
-import { AutInitializer } from "@/core/states/auth";
+import { AuthInitializer } from "@/core/states/auth";
 import { cn } from "@/core/utils/helpers";
 
 const vazirRegular = localFont({
@@ -94,5 +94,5 @@ export async function AuthInitializerWrapper() {
   const r = await getProfile({ token });
   const userInfo = r?.ok ? r.data : undefined;
 
-  return <AutInitializer token={token} userInfo={userInfo} />;
+  return <AuthInitializer token={token} userInfo={userInfo} />;
 }
