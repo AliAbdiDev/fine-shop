@@ -1,5 +1,6 @@
 import { Button as ButtonPrimitive } from "@base-ui/react/button";
 import { cva, type VariantProps } from "class-variance-authority";
+import { Loader2 } from "lucide-react";
 
 import { cn } from "@/core/utils/helpers";
 
@@ -38,19 +39,114 @@ const buttonVariants = cva(
   },
 );
 
-function Button({
-  className,
-  variant = "default",
-  size = "default",
-  ...props
-}: ButtonPrimitive.Props & VariantProps<typeof buttonVariants>) {
+/* ─────────────────────────────────────────────
+   Loading types
+   ───────────────────────────────────────────── */
+
+type LoadingType = "spinner" | "skeleton";
+
+interface ButtonProps
+  extends ButtonPrimitive.Props, VariantProps<typeof buttonVariants> {
+  /** Show loading state. Automatically disables the button. */
+  loading?: boolean;
+  /**
+   * Loading indicator style.
+   * - `"spinner"` (default) — replaces children with a spinner (+ optional text).
+   * - `"skeleton"` — ignores `children` and renders a fixed placeholder
+   *   sized to match the given `size`. The button never reflects the real
+   *   content while loading.
+   */
+  loadingType?: LoadingType;
+  /**
+   * Text shown next to the spinner while loading.
+   * If omitted, the original `children` stay visible.
+   * Ignored in `"skeleton"` mode.
+   */
+  loadingText?: string;
+}
+
+/* ─────────────────────────────────────────────
+   Skeleton placeholder
+   ───────────────────────────────────────────── */
+
+const SKELETON_WIDTH: Record<string, string> = {
+  xs: "w-8", // 32px
+  sm: "w-12", // 48px
+  default: "w-16", // 64px
+  lg: "w-20", // 80px
+};
+
+function SkeletonContent({ size }: { size?: string | null }) {
+  /* Icon-only buttons → a round dot matching the icon footprint */
+  if (size?.startsWith("icon")) {
+    return (
+      <span
+        aria-hidden
+        className="block size-4 animate-pulse rounded-full bg-current/30"
+      />
+    );
+  }
+
+  /* Text buttons → a bar. `block` forces the height to apply even if the
+     button's flex context is ever broken. Widths are tuned for short
+     Persian labels. */
   return (
-    <ButtonPrimitive
-      data-slot="button"
-      className={cn(buttonVariants({ variant, size, className }))}
-      {...props}
+    <span
+      aria-hidden
+      className={cn(
+        "block h-5 w-16 animate-pulse rounded-full bg-current/30",
+        SKELETON_WIDTH[size ?? "default"] ?? SKELETON_WIDTH.default,
+      )}
     />
   );
 }
 
+/* ─────────────────────────────────────────────
+   Button
+   ───────────────────────────────────────────── */
+
+function Button({
+  className,
+  variant = "default",
+  size = "default",
+  loading = false,
+  loadingType = "spinner",
+  loadingText,
+  disabled,
+  children,
+  ...props
+}: ButtonProps) {
+  const isDisabled = disabled || loading;
+  const isIconOnly = Boolean(size?.startsWith("icon"));
+  const showSkeleton = loading && loadingType === "skeleton";
+  const showSpinner = loading && loadingType === "spinner";
+
+  return (
+    <ButtonPrimitive
+      data-slot="button"
+      data-loading={loading ? loadingType : undefined}
+      disabled={isDisabled}
+      aria-busy={loading || undefined}
+      className={cn(buttonVariants({ variant, size, className }))}
+      {...props}
+    >
+      {showSkeleton ? (
+        <SkeletonContent size={size} />
+      ) : showSpinner ? (
+        isIconOnly ? (
+          <Loader2 className="animate-spin" aria-hidden />
+        ) : (
+          <>
+            <Loader2 className="animate-spin" aria-hidden />
+            <span>{loadingText ?? children}</span>
+          </>
+        )
+      ) : (
+        children
+      )}
+    </ButtonPrimitive>
+  );
+}
+
 export { Button, buttonVariants };
+export type { ButtonProps, LoadingType };
