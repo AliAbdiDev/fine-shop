@@ -32,6 +32,8 @@ export interface VerticalCardProps {
   aspect?: "square" | "4/3" | "3/4" | "16/9" | "video";
   priority?: boolean;
 
+  sizes?: string;
+
   className?: string;
   mediaClassName?: string;
   headerClassName?: string;
@@ -68,13 +70,14 @@ export function VerticalCard({
   href,
   aspect = "4/3",
   priority = false,
+  sizes = "100vw",
   className,
   mediaClassName,
   headerClassName,
   contentClassName,
   footerClassName,
   imageClassName,
-  mediaBgClassName = "bg-[#E9EDE3]",
+  mediaBgClassName = "bg-secondary",
   align = "right",
 }: VerticalCardProps) {
   const content = (
@@ -97,7 +100,7 @@ export function VerticalCard({
           src={image}
           alt={imageAlt ?? ""}
           fill
-          sizes="(max-width: 768px) 100vw, 33vw"
+          sizes={sizes}
           className={cn("object-cover", imageClassName)}
           loading={priority ? "eager" : "lazy"}
           priority={priority}
