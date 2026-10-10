@@ -72,8 +72,9 @@ export function CategoriesSection() {
                   src={`/images/landing/cats/cat-${i + 1}.png`}
                   alt={item.title}
                   fill
-                  quality={10}
+                  quality={85}
                   loading="lazy"
+                  decoding="async"
                   sizes="(max-width: 640px) 96px, 120px"
                   className="object-contain"
                 />

@@ -7,10 +7,3 @@ export interface ErrorEnvelope {
         details: { name: string[] } | null;
     };
 }
-
-export interface DrfPaginated<T> {
-    count: number;
-    next: string | null;
-    previous: string | null;
-    results: T[];
-}

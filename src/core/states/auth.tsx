@@ -86,11 +86,13 @@ const useAuthStore = createStore<AuthStore>((set, get) => ({
   },
 
   setUserInfo: (next) => {
+    console.log("🚀 ~ next:1", next);
     // undefined = "not checked yet" → don't touch the value
     if (next === undefined) {
       if (!get().userInfoIsHydrated) set({ userInfoIsHydrated: true });
       return;
     }
+    console.log("🚀 ~ next:2", next);
 
     const prev = get().userInfo;
     // shallow handles all cases: null↔null, null↔obj, obj↔obj
@@ -99,6 +101,7 @@ const useAuthStore = createStore<AuthStore>((set, get) => ({
 
     if (!needsValueUpdate && !needsHydrationFlag) return;
 
+    console.log("🚀 ~ next:3", next);
     set({
       ...(needsValueUpdate ? { userInfo: next } : null),
       ...(needsHydrationFlag ? { userInfoIsHydrated: true } : null),

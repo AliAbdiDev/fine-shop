@@ -2,6 +2,7 @@ import { createFetch } from 'ofetch';
 
 import { transformKeys } from '@/core/utils/helpers';
 
+import { contractToClient } from './fetcher/adapters';
 import { createApi } from './fetcher/fetcher';
 import { shouldTransform, isPlainData } from './fetcher/helper';
 
@@ -44,4 +45,7 @@ const clientConfig = createFetch({
     },
 });
 
-export const api = createApi({ client: clientConfig });
+export const api = createApi({
+    client: clientConfig,
+    defaultAdapter: contractToClient,
+});

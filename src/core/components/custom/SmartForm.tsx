@@ -3,7 +3,6 @@
 import { createContext, useContext, useEffect, useId } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { digitsArToEn, digitsFaToEn } from "@persian-tools/persian-tools";
 import {
   format as formatWithJalali,
   isValid as isValidDate,
@@ -40,6 +39,7 @@ import {
   FieldError,
   FieldLabel,
 } from "@/core/components/ui/field";
+import { digitsArToEn, digitsFaToEn } from "@/core/utils/helpers";
 import { cn } from "@/core/utils/helpers";
 
 import { Button } from "../ui/button";

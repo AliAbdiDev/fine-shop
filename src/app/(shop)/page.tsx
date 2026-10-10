@@ -1,103 +1,74 @@
-import type { Metadata } from "next";
+import { Suspense, type ReactNode } from "react";
 
+import { ProductCard } from "@/core/features/shop/components/card/ProductCard";
 import { CategoriesSection } from "@/core/features/shop/components/landing/categories-section";
 import { FeaturesSection } from "@/core/features/shop/components/landing/features-section";
 import { HeroSection } from "@/core/features/shop/components/landing/hero/hero-section";
 import { LifestyleSection } from "@/core/features/shop/components/landing/lifestyle-section";
 import { NewsletterSection } from "@/core/features/shop/components/landing/newsletter-section";
 import { ReviewsSection } from "@/core/features/shop/components/landing/reviews-section";
-import { type SliderProduct } from "@/core/features/shop/components/product-slider/keen-slider-inner";
-import { ProductSlider } from "@/core/features/shop/components/product-slider/product-slider";
+import { ProductSliderClient } from "@/core/features/shop/components/product-slider/product-slider";
+import { SliderSkeleton } from "@/core/features/shop/components/skeletons/slider-skeleton";
+import { productsAction } from "@/core/services/server/misc-action";
+import { cn } from "@/core/utils/helpers";
 
-export const metadata: Metadata = {
-  title: "بارزونو | فروشگاه آنلاین",
-  description:
-    "خرید آنلاین با ارسال سریع، ضمانت اصالت و بازگشت ۷ روزه. انتخاب‌های خوب برای روزهای بهتر.",
-  alternates: { canonical: "https://barzono.ir" },
-};
+interface SliderSectionProps {
+  tone?: "secondary" | "card";
+  children: ReactNode;
+}
 
-const dealProducts: SliderProduct[] = [
-  {
-    id: 1,
-    title: "کوله‌پشتی سفر چندکاره",
-    category: "ورزش و سفر",
-    price: 1_820_000,
-    originalPrice: 2_400_000,
-    rating: 4.6,
-    image:
-      "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=400&fit=crop",
-  },
-  {
-    id: 2,
-    title: "کفش روزمره مینیمال",
-    category: "مد و پوشاک",
-    price: 3_150_000,
-    originalPrice: 3_900_000,
-    rating: 4.8,
-    image:
-      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop",
-  },
-  {
-    id: 3,
-    title: "کتری برقی استیل",
-    category: "خانه و آشپزخانه",
-    price: 6_750_000,
-    rating: 4.7,
-    image:
-      "https://images.unsplash.com/photo-1517668808822-9ebb02f2a0e6?w=400&h=400&fit=crop",
-  },
-  {
-    id: 4,
-    title: "هدفون بی‌سیم نویزکنسل",
-    category: "دیجیتال",
-    price: 9_200_000,
-    originalPrice: 11_500_000,
-    rating: 4.9,
-    image:
-      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop",
-  },
-];
+function SliderSection({ tone = "secondary", children }: SliderSectionProps) {
+  return (
+    <section
+      className={cn(
+        "shop-section-space py-5",
+        tone === "secondary" ? "bg-secondary" : "bg-card",
+      )}
+    >
+      {children}
+    </section>
+  );
+}
 
-const popularProducts: SliderProduct[] = [
-  {
-    id: 5,
-    title: "شمع رایحه‌دار آرامش",
-    category: "خانه و آشپزخانه",
-    price: 1_450_000,
-    rating: 4.5,
-    image:
-      "https://images.unsplash.com/photo-1602874801006-9f4d8d3b6b93?w=400&h=400&fit=crop",
-  },
-  {
-    id: 6,
-    title: "سرم آبرسان هالورونیک",
-    category: "زیبایی و سلامت",
-    price: 790_000,
-    originalPrice: 980_000,
-    rating: 4.7,
-    image:
-      "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=400&h=400&fit=crop",
-  },
-  {
-    id: 7,
-    title: "کتاب داستان‌های کوتاه",
-    category: "کتاب و لوازم‌تحریر",
-    price: 245_000,
-    rating: 4.8,
-    image:
-      "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400&h=400&fit=crop",
-  },
-  {
-    id: 8,
-    title: "بازی فکری چوبی",
-    category: "کودک و نوزاد",
-    price: 380_000,
-    originalPrice: 460_000,
-    rating: 4.6,
-    image:
-      "https://images.unsplash.com/photo-1611996575749-79a3a250f948?w=400&h=400&fit=crop",
-  },
-];
+/* -------------------------------------------------------------------------- */
+/*                                  Sliders                                   */
+/* -------------------------------------------------------------------------- */
+
+async function EconomicalSlider() {
+  const result = await productsAction({ sort: "price_asc", pageSize: 6 });
+
+  if (!result.ok || !result.data?.length) return null;
+
+  return (
+    <SliderSection tone="secondary">
+      <ProductSliderClient title={"پیشنهادهای خوش‌قیمت"}>
+        {result.data.map((product, i) => (
+          <ProductCard key={product.id} product={product} priority={i === 0} />
+        ))}
+      </ProductSliderClient>
+    </SliderSection>
+  );
+}
+
+async function PopularSlider() {
+  const result = await productsAction({ sort: "popular", pageSize: 6 });
+
+  if (!result.ok || !result.data?.length) return null;
+
+  return (
+    <SliderSection tone="card">
+      <ProductSliderClient title={"محبوب‌های این روزها"}>
+        {result.data.map((product, i) => (
+          <ProductCard key={product.id} product={product} priority={i === 0} />
+        ))}
+      </ProductSliderClient>
+    </SliderSection>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/*                                   Page                                     */
+/* -------------------------------------------------------------------------- */
 
 export default function LandingPage() {
   return (
@@ -105,17 +76,31 @@ export default function LandingPage() {
       <section className="shop-section-space">
         <HeroSection />
       </section>
+
       <section className="shop-section-space">
         <CategoriesSection />
       </section>
 
-      <section className="shop-section-space bg-secondary py-5">
-        <ProductSlider title="پیشنهادهای خوش‌قیمت" products={dealProducts} />
-      </section>
+      <Suspense
+        fallback={
+          <SliderSection tone="secondary">
+            <SliderSkeleton />
+          </SliderSection>
+        }
+      >
+        <EconomicalSlider />
+      </Suspense>
 
-      <section className="shop-section-space bg-card py-5">
-        <ProductSlider title="محبوب‌های این روزها" products={popularProducts} />
-      </section>
+      <Suspense
+        fallback={
+          <SliderSection tone="card">
+            <SliderSkeleton />
+          </SliderSection>
+        }
+      >
+        <PopularSlider />
+      </Suspense>
+
       <section className="shop-section-space">
         <LifestyleSection />
       </section>
@@ -123,9 +108,11 @@ export default function LandingPage() {
       <section className="shop-section-space">
         <FeaturesSection />
       </section>
+
       <section className="shop-section-space">
         <ReviewsSection />
       </section>
+
       <section className="shop-section-space">
         <NewsletterSection />
       </section>

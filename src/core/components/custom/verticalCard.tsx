@@ -5,6 +5,8 @@ import { type Route } from "next";
 import Image from "next/image";
 import Link from "next/link";
 
+import { ImageIcon } from "lucide-react";
+
 import {
   Card,
   CardContent,
@@ -16,7 +18,7 @@ import {
 import { cn } from "@/core/utils/helpers";
 
 export interface VerticalCardProps {
-  image: string;
+  image?: string;
   imageAlt?: string;
 
   title?: ReactNode;
@@ -25,7 +27,6 @@ export interface VerticalCardProps {
   footer?: ReactNode;
   children?: ReactNode;
 
-  /** المانی که روی تصویر رندر می‌شه (بج تخفیف، دکمه قلب و...) */
   mediaOverlay?: ReactNode;
 
   href?: Route;
@@ -80,36 +81,45 @@ export function VerticalCard({
   mediaBgClassName = "bg-secondary",
   align = "right",
 }: VerticalCardProps) {
+  const hasImage = Boolean(image);
+
   const content = (
     <Card
       className={cn(
-        "group border-border hover:border-foreground/20 flex h-full flex-col gap-0 overflow-hidden rounded-lg border bg-white py-0 shadow-none transition-colors",
+        "border-border hover:border-foreground/20 flex h-full flex-col gap-0 overflow-hidden rounded-lg border bg-white py-0 shadow-none",
         className,
       )}
     >
-      {/* تصویر */}
       <div
         className={cn(
-          "relative w-full overflow-hidden",
+          "relative w-full overflow-hidden bg-white",
           aspectMap[aspect],
           mediaBgClassName,
           mediaClassName,
         )}
       >
-        <Image
-          src={image}
-          alt={imageAlt ?? ""}
-          fill
-          sizes={sizes}
-          className={cn("object-cover", imageClassName)}
-          loading={priority ? "eager" : "lazy"}
-          priority={priority}
-          quality={75}
-        />
+        {hasImage ? (
+          <Image
+            src={image as string}
+            alt={imageAlt ?? ""}
+            fill
+            sizes={sizes}
+            className={cn("object-cover", imageClassName)}
+            loading={priority ? "eager" : "lazy"}
+            priority={priority}
+            quality={75}
+          />
+        ) : (
+          <div
+            className="text-muted-foreground flex h-full w-full items-center justify-center"
+            aria-hidden
+          >
+            <ImageIcon className="size-14 opacity-40" />
+          </div>
+        )}
         {mediaOverlay}
       </div>
 
-      {/* هدر */}
       {(badge || title || description) && (
         <CardHeader
           className={cn(
@@ -127,7 +137,7 @@ export function VerticalCard({
           {title && (
             <CardTitle
               className={cn(
-                "line-clamp-1 text-base leading-snug font-extrabold sm:text-lg",
+                "font-vazir-bold line-clamp-1 text-base leading-snug",
                 align === "center" && "text-center",
               )}
             >
@@ -143,7 +153,6 @@ export function VerticalCard({
         </CardHeader>
       )}
 
-      {/* محتوای اضافه */}
       {children && (
         <CardContent
           className={cn(
@@ -156,7 +165,6 @@ export function VerticalCard({
         </CardContent>
       )}
 
-      {/* فوتر */}
       {footer && (
         <CardFooter
           className={cn(

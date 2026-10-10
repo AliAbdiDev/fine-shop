@@ -12,7 +12,7 @@ import { api } from "@/core/services/configs/api";
 import { type User } from "@/core/types/entities.types";
 import { deleteCookie, getCookieValue, setCookie } from "@/core/utils/cookie/serverCookie";
 
-import { cookieOptions, profileKey } from "./misc";
+import { cookieOptions, profileKey } from "./misc-utils";
 import { type ApiResult } from "../configs/fetcher/types/client.types";
 
 type LoginSuccessEnvelope = { data: { user: User }, token: string };

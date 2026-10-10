@@ -80,7 +80,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                 <AuthInitializerWrapper />
               </Suspense>
               {children}
-              <Toaster richColors />
+              <Toaster richColors position="bottom-center" />
             </QueryProvider>
           </MswProvider>
         </TooltipProvider>
@@ -91,6 +91,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
 
 export async function AuthInitializerWrapper() {
   const token = await getTokenFromCookie();
+  console.log("🚀 ~ AuthInitializerWrapper ~ token:", token);
   const r = await getProfile({ token });
   const userInfo = r?.ok ? r.data : undefined;
 

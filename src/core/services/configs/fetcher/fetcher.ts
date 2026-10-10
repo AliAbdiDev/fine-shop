@@ -8,7 +8,8 @@ import {
 import {
     type AdapterOutput,
     type ResponseAdapter,
-    identityAdapter,
+    type DefaultAdapter,
+    contractToClient,
 } from './adapters';
 import {
     type FetcherOptions,
@@ -45,43 +46,53 @@ function toError(status: number, body: unknown, raw: unknown): ApiError {
     };
 }
 
-export interface AdapterOptions<TRaw, TData> {
-    adapter?: ResponseAdapter<TRaw, TData>;
+export interface AdapterOptions<TContract, TClient> {
+    adapter?: ResponseAdapter<TContract, TClient>;
 }
 
 export interface AuthOptions {
     token?: string | null;
 }
 
-export function createApi({ client }: { client: $Fetch }) {
+export function createApi({
+    client,
+    defaultAdapter = contractToClient,
+}: {
+    client: $Fetch;
+    defaultAdapter?: DefaultAdapter;
+}) {
+    /**
+     * @typeParam TContract - Shape of the raw response coming from the backend.
+     * @typeParam TClient   - Shape the frontend consumes after the adapter runs.
+     * @typeParam TBody     - Shape of the request body.
+     */
     async function request<
-        TRaw,
-        TData = TRaw,
+        TContract,
+        TClient = TContract,
         TBody extends RequestBody = RequestBody,
     >(
         url: string,
         options: FetcherOptions<TBody> &
-            AdapterOptions<TRaw, TData> &
+            AdapterOptions<TContract, TClient> &
             AuthOptions = {},
-    ): Promise<ApiResult<TData>> {
+    ): Promise<ApiResult<TClient>> {
         const { adapter, token, ...fetchOptions } = options;
 
         if (token) {
-            console.log("🚀 ~ request ~ token:", token)
             const headers = new Headers(fetchOptions.headers);
             headers.set('Authorization', `Bearer ${token}`);
             fetchOptions.headers = headers;
         }
 
         try {
-            const response = await client.raw<TRaw>(url, fetchOptions);
-            const rawData = (response._data ?? null) as TRaw;
+            const response = await client.raw<TContract>(url, fetchOptions);
+            const rawData = (response._data ?? null) as TContract;
 
-            const adapted: AdapterOutput<TData> = adapter
+            const adapted: AdapterOutput<TClient> = adapter
                 ? adapter(rawData)
-                : identityAdapter(rawData as unknown as TData);
+                : (defaultAdapter(rawData, fetchOptions.query) as AdapterOutput<TClient>);
 
-            const res: ApiSuccess<TData> = {
+            const res: ApiSuccess<TClient> = {
                 ok: true,
                 status: response.status,
                 statusText: response.statusText,
@@ -115,38 +126,38 @@ export function createApi({ client }: { client: $Fetch }) {
         }
     }
 
-    type Options<TRaw, TData> = RequestOptions &
-        AdapterOptions<TRaw, TData> &
+    type Options<TContract, TClient> = RequestOptions &
+        AdapterOptions<TContract, TClient> &
         AuthOptions;
 
     return {
-        get: <TRaw, TData = TRaw>(
+        get: <TContract, TClient = TContract>(
             url: string,
-            options?: Options<TRaw, TData>,
-        ) => request<TRaw, TData>(url, { ...options, method: 'GET' }),
+            options?: Options<TContract, TClient>,
+        ) => request<TContract, TClient>(url, { ...options, method: 'GET' }),
 
-        post: <TRaw, TData = TRaw, TBody extends RequestBody = RequestBody>(
+        post: <TContract, TClient = TContract, TBody extends RequestBody = RequestBody>(
             url: string,
             body?: TBody,
-            options?: Options<TRaw, TData>,
-        ) => request<TRaw, TData, TBody>(url, { ...options, method: 'POST', body }),
+            options?: Options<TContract, TClient>,
+        ) => request<TContract, TClient, TBody>(url, { ...options, method: 'POST', body }),
 
-        put: <TRaw, TData = TRaw, TBody extends RequestBody = RequestBody>(
+        put: <TContract, TClient = TContract, TBody extends RequestBody = RequestBody>(
             url: string,
             body?: TBody,
-            options?: Options<TRaw, TData>,
-        ) => request<TRaw, TData, TBody>(url, { ...options, method: 'PUT', body }),
+            options?: Options<TContract, TClient>,
+        ) => request<TContract, TClient, TBody>(url, { ...options, method: 'PUT', body }),
 
-        patch: <TRaw, TData = TRaw, TBody extends RequestBody = RequestBody>(
+        patch: <TContract, TClient = TContract, TBody extends RequestBody = RequestBody>(
             url: string,
             body?: TBody,
-            options?: Options<TRaw, TData>,
-        ) => request<TRaw, TData, TBody>(url, { ...options, method: 'PATCH', body }),
+            options?: Options<TContract, TClient>,
+        ) => request<TContract, TClient, TBody>(url, { ...options, method: 'PATCH', body }),
 
-        delete: <TRaw, TData = TRaw, TBody extends RequestBody = RequestBody>(
+        delete: <TContract, TClient = TContract, TBody extends RequestBody = RequestBody>(
             url: string,
+            options?: Options<TContract, TClient>,
             body?: TBody,
-            options?: Options<TRaw, TData>,
-        ) => request<TRaw, TData, TBody>(url, { ...options, method: 'DELETE', body }),
+        ) => request<TContract, TClient, TBody>(url, { ...options, method: 'DELETE', body }),
     };
 }

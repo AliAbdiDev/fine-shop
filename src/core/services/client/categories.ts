@@ -1,11 +1,9 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 
-import { type Category, type Categorys } from "@/core/types/entities.types";
+import { type Categorys } from "@/core/types/entities.types";
 
 import { categoryKeys, type ListParams } from "./keys";
 import { api } from "../configs/api";
-import { paginatedAdapter } from "../configs/fetcher/adapters";
-import { type DrfPaginated } from "../configs/fetcher/types/contract.types";
 import { unwrap } from "../configs/fetcher/unwrap";
 
 /* -------------------- select types -------------------- */
@@ -16,7 +14,7 @@ export interface CategorySelectOption {
 }
 
 export interface CategoriesSelectResult {
-    isFetched?: boolean,
+    isFetched?: boolean;
     options: CategorySelectOption[];
     isLoading: boolean;
     isFetchingNextPage: boolean;
@@ -26,7 +24,7 @@ export interface CategoriesSelectResult {
 
 /* -------------------- hook -------------------- */
 
-type CategoryListParams = & Omit<ListParams, "page">;
+type CategoryListParams = Omit<ListParams, "page">;
 
 export function useCategoriesInfiniteSelect(
     params: CategoryListParams,
@@ -36,9 +34,9 @@ export function useCategoriesInfiniteSelect(
         initialPageParam: 1,
         queryFn: async ({ pageParam }) => {
             const full = { ...params, page: pageParam };
-            const res = await api.get<DrfPaginated<Category>, Categorys>(
+            const res = await api.get<undefined, Categorys>(
                 "/product/category/",
-                { query: full, adapter: paginatedAdapter(full) },
+                { query: full },
             );
 
             const success = unwrap(res);

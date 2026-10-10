@@ -1,4 +1,3 @@
-import { digitsArToEn, digitsFaToEn } from "@persian-tools/persian-tools";
 import { isNullOrUndefined } from "@sindresorhus/is";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -204,6 +203,24 @@ export function getDiscountInfo(
     basePrice: base,
   };
 }
+
+const PERSIAN_DIGIT_MAP: Record<string, string> = {
+  "۰": "0", "۱": "1", "۲": "2", "۳": "3", "۴": "4",
+  "۵": "5", "۶": "6", "۷": "7", "۸": "8", "۹": "9",
+};
+
+const ARABIC_DIGIT_MAP: Record<string, string> = {
+  "٠": "0", "١": "1", "٢": "2", "٣": "3", "٤": "4",
+  "٥": "5", "٦": "6", "٧": "7", "٨": "8", "٩": "9",
+};
+
+/** تبدیل ارقام فارسی (۰-۹) به انگلیسی (0-9). */
+export const digitsFaToEn = (input: string): string =>
+  input.replace(/[۰-۹]/g, (d) => PERSIAN_DIGIT_MAP[d] ?? d);
+
+/** تبدیل ارقام عربی (٠-٩) به انگلیسی (0-9). */
+export const digitsArToEn = (input: string): string =>
+  input.replace(/[٠-٩]/g, (d) => ARABIC_DIGIT_MAP[d] ?? d);
 
 // ----Phone---
 export function formatPhone(value: string | null | undefined): string {

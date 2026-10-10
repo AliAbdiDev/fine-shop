@@ -19,13 +19,16 @@ import { userSchema, type UserTypeSchema } from "@/core/validation-shema";
 
 export default function ProfilePage() {
   const defaultValues = useAuthSelector.useUserInfo();
+  const setProf = useAuthSelector.useSetUserInfo();
   const userInfoIsHydrated = useAuthSelector.useUserInfoIsHydrated();
 
   async function handleSubmit(values: UserTypeSchema) {
     const formData = toFormData(values, { fileKeys: ["avatar"] });
     const r = await updateProfile({ data: formData });
-    if (r?.ok) notify.success();
-    else notify.error(r?.error.code);
+    if (r?.ok) {
+      if (r.data) setProf(r.data);
+      notify.success();
+    } else notify.error(r?.error.code);
   }
 
   return (

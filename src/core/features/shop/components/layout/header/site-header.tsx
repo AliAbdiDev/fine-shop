@@ -1,7 +1,8 @@
 import Link from "next/link";
 
-import { BadgePercent, Search, ShoppingBag, Truck } from "lucide-react";
+import { BadgePercent, Search, Truck } from "lucide-react";
 
+import { Logo } from "@/core/components/custom/Logos";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Separator } from "@/core/components/ui/separator";
@@ -48,25 +49,6 @@ const categories: Category[] = [
    Shared components
    ───────────────────────────────────────────── */
 
-function Logo({ showSubtitle = true }: { showSubtitle?: boolean }) {
-  return (
-    <Link href="/" className="flex shrink-0 items-center gap-2">
-      <span className="bg-primary text-primary-foreground flex h-10 w-10 items-center justify-center rounded-xl">
-        <ShoppingBag className="h-5 w-5" />
-      </span>
-      <div className="flex flex-col items-start">
-        {/* extra bold */}
-        <span className="font-vazir-bold text-lg leading-tight">بارزونو</span>
-        {showSubtitle && (
-          <span className="text-muted-foreground text-[10px]">
-            انتخاب‌های خوب، هر روز
-          </span>
-        )}
-      </div>
-    </Link>
-  );
-}
-
 function SearchBar({ className }: { className?: string }) {
   return (
     <div className={cn("relative", className)}>
@@ -86,8 +68,10 @@ function SearchBar({ className }: { className?: string }) {
 function DesktopHeader() {
   return (
     <header className="border-border bg-card border-b">
-      <div className="shop-section-space mx-auto flex items-center gap-3 py-3 md:gap-6">
-        <Logo showSubtitle />
+      <div className="shop-section-space mx-auto flex items-center gap-3 pt-2 pb-0 md:gap-6">
+        <Link href="/" className="w-fit">
+          <Logo size="lg" priority type="logo" />
+        </Link>
         <SearchBar className="flex-1" />
         <UserActions showText />
       </div>
@@ -103,7 +87,9 @@ function MobileHeader() {
   return (
     <header className="border-border bg-card border-b">
       <div className="shop-section-space mx-auto flex items-center gap-3 py-3">
-        <Logo showSubtitle={false} />
+        <Link href="/">
+          <Logo size="md" priority />
+        </Link>
         <UserActions showText={false} />
       </div>
       <div className="px-5 pb-3">

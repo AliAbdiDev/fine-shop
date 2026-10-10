@@ -3,8 +3,7 @@
 import { useRouter } from "next/navigation";
 
 import { isString } from "@sindresorhus/is";
-import { useQuery } from "@tanstack/react-query";
-import { BadgeCheckIcon, ChevronsUpDownIcon, LogOutIcon } from "lucide-react";
+import { ChevronsUpDownIcon, LogOutIcon, User2 } from "lucide-react";
 
 import {
   Avatar,
@@ -28,28 +27,13 @@ import {
 } from "@/core/components/ui/sidebar";
 
 import { notify } from "./custom/notify";
-import { actionLogout, getTokenFromCookie } from "../services/server/auth";
-import { getProfile } from "../services/server/profile";
+import { actionLogout } from "../services/server/auth";
+import { useAuthSelector } from "../states/auth";
 
 export function NavUser() {
   const { isMobile } = useSidebar();
 
-  // const userInfo = useAuthSelector.useUserInfo();
-  // const avatar = userInfo?.avatar;
-  // const email = userInfo?.email;
-  // const firstName = userInfo?.firstName;
-  // const lastName = userInfo?.lastName;
-
-  const { data: token } = useQuery({
-    queryFn: getTokenFromCookie,
-    queryKey: ["token"],
-  });
-  const { data: userResponse } = useQuery({
-    queryFn: () => getProfile({ token }),
-    queryKey: ["user-profile", token],
-  });
-
-  const user = userResponse?.ok ? userResponse.data : null;
+  const user = useAuthSelector.useUserInfo();
 
   const router = useRouter();
 
@@ -109,7 +93,7 @@ export function NavUser() {
                   router.push("/admin/profile");
                 }}
               >
-                <BadgeCheckIcon />
+                <User2 />
                 حساب کاربری
               </DropdownMenuItem>
             </DropdownMenuGroup>

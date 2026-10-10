@@ -1,9 +1,11 @@
 import Link from "next/link";
 
-import { BadgeCheck, Lock, Phone, Send, ShoppingBag } from "lucide-react";
+import { BadgeCheck, Lock, Phone, Send } from "lucide-react";
 
+import { Logo } from "@/core/components/custom/Logos";
 import { Button } from "@/core/components/ui/button";
 import { Separator } from "@/core/components/ui/separator";
+import { BRAND_NAME } from "@/core/constants/misc";
 
 // Custom Instagram icon (replacement for lucide-react)
 const InstagramIcon = ({ className }: { className?: string }) => (
@@ -25,8 +27,13 @@ const InstagramIcon = ({ className }: { className?: string }) => (
 
 const columns = [
   {
-    title: "همراه بازرنو",
-    links: ["درباره ما", "تماس با ما", "مجله بازرنو", "همکاری با بازرنو"],
+    title: `همراه ${BRAND_NAME}`,
+    links: [
+      "درباره ما",
+      "تماس با ما",
+      `مجله ${BRAND_NAME}`,
+      `همکاری با ${BRAND_NAME}`,
+    ],
   },
   {
     title: "راهنمای خرید",
@@ -51,21 +58,19 @@ export function SiteFooter() {
           {/* Brand column */}
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <span className="bg-primary text-primary-foreground flex h-10 w-10 items-center justify-center rounded-xl">
-                <ShoppingBag className="h-5 w-5" />
-              </span>
+              <Logo type="logo" size={"lg"} />
               <div className="flex flex-col">
                 {/* extra bold */}
                 <span className="font-vazir-bold text-2xl leading-tight text-white">
-                  بازرنو
+                  {BRAND_NAME}{" "}
                 </span>
                 <span className="text-[10px]">انتخاب‌های خوب، هر روز</span>
               </div>
             </div>
 
             <p className="text-[13px] leading-loose">
-              بازارنو، جایی برای انتخاب‌های خوب؛ فروشگاهی برای نیازهای روزمره و
-              چیزهایی که به زندگی رنگ تازه می‌دهند.
+              {BRAND_NAME}، جایی برای انتخاب‌های خوب؛ فروشگاهی برای نیازهای
+              روزمره و چیزهایی که به زندگی رنگ تازه می‌دهند.
             </p>
 
             <div className="flex flex-col items-start gap-3 pt-1">
@@ -170,8 +175,8 @@ export function SiteFooter() {
 
         {/* Bottom section */}
         <div className="flex flex-col items-center justify-between gap-2 text-[10px] md:flex-row md:text-[11px]">
-          <p>بازرنو؛ یک فروشگاه مفهومی برای انتخاب‌های تازه</p>
-          <p>© ۱۴۰۵ بازرنو. همه حقوق محفوظ است.</p>
+          <p>{BRAND_NAME} یک فروشگاه مفهومی برای انتخاب‌های تازه</p>
+          <p>© ۱۴۰۵ {BRAND_NAME}. همه حقوق محفوظ است.</p>
         </div>
       </div>
     </footer>

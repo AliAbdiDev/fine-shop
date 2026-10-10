@@ -39,7 +39,10 @@ export function LifestyleSection() {
         <h2 className="font-vazir-bold text-lg sm:text-xl">
           انتخاب‌هایی با یک حال‌وهوا
         </h2>
-        <Link href="#" className="text-primary flex items-center gap-1 text-xs">
+        <Link
+          href="/shop"
+          className="text-primary flex items-center gap-1 text-xs"
+        >
           همه مجموعه‌ها
           <ArrowLeft className="h-3.5 w-3.5" />
         </Link>

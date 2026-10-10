@@ -47,7 +47,7 @@ export function HeroSection() {
             <Button
               size="lg"
               className="gap-2 rounded-full"
-              render={<Link href="/explore" />}
+              render={<Link href="/shop" />}
               nativeButton={false}
             >
               خرید کنید
@@ -58,7 +58,7 @@ export function HeroSection() {
               variant="outline"
               size="lg"
               className="gap-2 rounded-full bg-transparent"
-              render={<Link href="/explore" />}
+              render={<Link href="/shop" />}
               nativeButton={false}
             >
               <Sparkles className="h-4 w-4" aria-hidden />

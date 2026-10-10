@@ -11,6 +11,7 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   images: {
     formats: ['image/avif', 'image/webp'],
+    qualities: [75, 85, 100],
     remotePatterns: [{
       protocol: 'https',
       hostname: 'images.unsplash.com',

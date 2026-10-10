@@ -2,18 +2,14 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { useAuthSelector } from "@/core/states/auth";
 import {
-    type User,
     type Users,
     type EntityId,
 } from "@/core/types/entities.types";
 
 import { type ListParams, userKeys } from "./keys";
 import { api } from "../configs/api";
-import { paginatedAdapter } from "../configs/fetcher/adapters";
 import { type ApiError } from "../configs/fetcher/types/client.types";
-import { type DrfPaginated } from "../configs/fetcher/types/contract.types";
 import { unwrap } from "../configs/fetcher/unwrap";
-
 
 export function useUsers(p: ListParams) {
     const token = useAuthSelector.useToken();
@@ -22,13 +18,12 @@ export function useUsers(p: ListParams) {
         queryKey: userKeys.list(p),
         queryFn: async () =>
             unwrap(
-                await api.get<DrfPaginated<User>, Users>("/account/users/", {
+                await api.get<undefined, Users>("/account/users/", {
                     query: p,
-                    adapter: paginatedAdapter(p),
-                    token
+                    token,
                 }),
             ),
-        enabled: !!token
+        enabled: !!token,
     });
 }
 
@@ -37,14 +32,14 @@ export const useActivateUser = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (payload: { id: EntityId, isActive: boolean }) => {
+        mutationFn: async (payload: { id: EntityId; isActive: boolean }) => {
             return unwrap(
                 await api.patch<void, void, { isActive: boolean }>(
                     `/account/users/${payload.id}/`,
                     payload,
                     { token },
                 ),
-            )
+            );
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: userKeys.lists() });

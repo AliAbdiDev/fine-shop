@@ -8,7 +8,7 @@ import { isNullOrUndefined } from "@sindresorhus/is";
 import { type User } from "@/core/types/entities.types";
 
 import { api } from "../../configs/api";
-import { profileKey, type Token } from "../misc";
+import { profileKey, type Token } from "../misc-utils";
 
 export async function getProfile({ token }: { token: Token }) {
     if (isNullOrUndefined(token)) return null;
