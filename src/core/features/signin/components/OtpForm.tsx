@@ -2,8 +2,6 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { useSearchParams } from "next/navigation";
-
 import { z } from "zod";
 
 import { notify } from "@/core/components/custom/notify";
@@ -24,21 +22,19 @@ const otpSchema = z.object({
 
 type OtpType = typeof otpSchema;
 
-export function OtpForm() {
-  const searchParams = useSearchParams();
-
+export function OtpForm({ email }: { email: string }) {
   const submit = useCallback(
     async (values: z.infer<OtpType>) => {
       const result = await actionSendLoginOtpAction({
         otp: values.otp,
-        email: searchParams.get("email") ?? "",
+        email: email ?? "",
       });
 
       if (result && !result.ok) {
         notify.error(result.error);
       }
     },
-    [searchParams],
+    [email],
   );
 
   return (

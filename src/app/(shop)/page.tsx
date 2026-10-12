@@ -1,4 +1,4 @@
-import { Suspense, type ReactNode } from "react";
+import { Suspense } from "react";
 
 import { ProductCard } from "@/core/features/shop/components/card/ProductCard";
 import { CategoriesSection } from "@/core/features/shop/components/landing/categories-section";
@@ -7,28 +7,10 @@ import { HeroSection } from "@/core/features/shop/components/landing/hero/hero-s
 import { LifestyleSection } from "@/core/features/shop/components/landing/lifestyle-section";
 import { NewsletterSection } from "@/core/features/shop/components/landing/newsletter-section";
 import { ReviewsSection } from "@/core/features/shop/components/landing/reviews-section";
-import { ProductSliderClient } from "@/core/features/shop/components/product-slider/product-slider";
+import { ProductSliderClient } from "@/core/features/shop/components/product-slider";
+import { SectionSlider } from "@/core/features/shop/components/Section";
 import { SliderSkeleton } from "@/core/features/shop/components/skeletons/slider-skeleton";
 import { productsAction } from "@/core/services/server/misc-action";
-import { cn } from "@/core/utils/helpers";
-
-interface SliderSectionProps {
-  tone?: "secondary" | "card";
-  children: ReactNode;
-}
-
-function SliderSection({ tone = "secondary", children }: SliderSectionProps) {
-  return (
-    <section
-      className={cn(
-        "shop-section-space py-5",
-        tone === "secondary" ? "bg-secondary" : "bg-card",
-      )}
-    >
-      {children}
-    </section>
-  );
-}
 
 /* -------------------------------------------------------------------------- */
 /*                                  Sliders                                   */
@@ -40,13 +22,13 @@ async function EconomicalSlider() {
   if (!result.ok || !result.data?.length) return null;
 
   return (
-    <SliderSection tone="secondary">
+    <SectionSlider tone="secondary">
       <ProductSliderClient title={"پیشنهادهای خوش‌قیمت"}>
         {result.data.map((product, i) => (
-          <ProductCard key={product.id} product={product} priority={i === 0} />
+          <ProductCard key={product.id} product={product} />
         ))}
       </ProductSliderClient>
-    </SliderSection>
+    </SectionSlider>
   );
 }
 
@@ -56,13 +38,13 @@ async function PopularSlider() {
   if (!result.ok || !result.data?.length) return null;
 
   return (
-    <SliderSection tone="card">
+    <SectionSlider tone="card">
       <ProductSliderClient title={"محبوب‌های این روزها"}>
         {result.data.map((product, i) => (
-          <ProductCard key={product.id} product={product} priority={i === 0} />
+          <ProductCard key={product.id} product={product} />
         ))}
       </ProductSliderClient>
-    </SliderSection>
+    </SectionSlider>
   );
 }
 
@@ -83,9 +65,9 @@ export default function LandingPage() {
 
       <Suspense
         fallback={
-          <SliderSection tone="secondary">
+          <SectionSlider tone="secondary">
             <SliderSkeleton />
-          </SliderSection>
+          </SectionSlider>
         }
       >
         <EconomicalSlider />
@@ -93,9 +75,9 @@ export default function LandingPage() {
 
       <Suspense
         fallback={
-          <SliderSection tone="card">
+          <SectionSlider tone="card">
             <SliderSkeleton />
-          </SliderSection>
+          </SectionSlider>
         }
       >
         <PopularSlider />

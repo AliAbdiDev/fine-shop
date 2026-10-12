@@ -2,6 +2,8 @@
 
 import * as React from "react";
 
+import { type Route } from "next";
+
 import Link from "next/link";
 
 import { useVirtualizer } from "@tanstack/react-virtual";
@@ -20,10 +22,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/core/components/ui/sheet";
-
-export interface Category {
-  title: string;
-}
+import { type Categorys } from "@/core/types/entities.types";
 
 /* ─────────────────────────────────────────────
    Shared trigger
@@ -50,7 +49,7 @@ const ROW_HEIGHT_DESKTOP = 40;
 const ROW_HEIGHT_MOBILE = 48;
 
 interface VirtualizedCategoryListProps {
-  categories: Category[];
+  categories: Categorys;
   /** Height of each row in px. */
   rowHeight: number;
   /** Extra rows rendered above/below the viewport for smooth scrolling. */
@@ -61,6 +60,8 @@ interface VirtualizedCategoryListProps {
   itemClassName: string;
 }
 
+const ALL_ITEM = { slug: null, name: "کل محصولات" };
+
 function VirtualizedCategoryList({
   categories,
   rowHeight,
@@ -70,9 +71,11 @@ function VirtualizedCategoryList({
 }: VirtualizedCategoryListProps) {
   const parentRef = React.useRef<HTMLDivElement>(null);
 
+  const items = React.useMemo(() => [ALL_ITEM, ...categories], [categories]);
+
   // eslint-disable-next-line react-hooks/incompatible-library
   const virtualizer = useVirtualizer({
-    count: categories.length,
+    count: items.length,
     getScrollElement: () => parentRef.current,
     estimateSize: () => rowHeight,
     overscan,
@@ -83,11 +86,14 @@ function VirtualizedCategoryList({
       <div
         style={{
           height: `${virtualizer.getTotalSize()}px`,
+          width: "100%",
           position: "relative",
         }}
       >
         {virtualizer.getVirtualItems().map((virtualRow) => {
-          const cat = categories[virtualRow.index];
+          const item = items[virtualRow.index];
+          const href = item.slug ? `/shop/${item.slug}` : "/shop";
+
           return (
             <div
               key={virtualRow.key}
@@ -101,11 +107,12 @@ function VirtualizedCategoryList({
               }}
             >
               <Link
-                href={`#/${cat.title}`}
+                href={href as Route}
                 onClick={onSelect}
                 className={itemClassName}
+                style={{ display: "block", height: "100%" }}
               >
-                {cat.title}
+                {item.name}
               </Link>
             </div>
           );
@@ -122,7 +129,7 @@ function VirtualizedCategoryList({
 export function DesktopAllCategories({
   categories,
 }: {
-  categories: Category[];
+  categories: Categorys;
 }) {
   const [open, setOpen] = React.useState(false);
   const handleClose = () => setOpen(false);
@@ -154,11 +161,7 @@ export function DesktopAllCategories({
    Mobile: Sheet from bottom
    ───────────────────────────────────────────── */
 
-export function MobileAllCategories({
-  categories,
-}: {
-  categories: Category[];
-}) {
+export function MobileAllCategories({ categories }: { categories: Categorys }) {
   const [open, setOpen] = React.useState(false);
   const handleClose = () => setOpen(false);
 

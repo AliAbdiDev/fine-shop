@@ -26,27 +26,27 @@ export function HeroSection() {
     <div className="relative overflow-hidden">
       <div className="mx-auto grid items-center gap-8 md:grid-cols-2 md:gap-10">
         {/* ── Text column — fully server-rendered, zero JS ── */}
-        <div className="flex flex-col items-center gap-4 text-center md:items-start md:gap-5 md:text-right">
-          <div className="text-primary font-vazir-bold flex items-center justify-center text-xs">
+        <div className="flex flex-col items-start gap-4 text-right md:gap-5">
+          <div className="text-primary font-vazir-bold flex items-center justify-start text-xs">
             <span className="bg-primary ml-2 h-0.5 w-5.5" />
             کمی تازه‌تر، کمی دل‌چسب‌تر
           </div>
 
-          <h1 className="font-vazir-bold text-2xl leading-tight tracking-tight sm:text-3xl lg:text-[40px]">
+          <h1 className="font-vazir-bold text-xl leading-tight tracking-tight sm:text-2xl lg:text-[40px]">
             حال خوب، از انتخاب‌های
             <br />
             کوچک شروع می‌شود.
           </h1>
 
-          <p className="text-muted-foreground max-w-md text-sm leading-relaxed sm:text-base">
+          <p className="text-muted-foreground max-w-md text-xs leading-relaxed sm:text-sm md:text-base">
             از خانه تا محیط کار، از پوشاک تا لوازم خانگی، انتخاب‌های تازه برای
             ساختن روزهای بهتر.
           </p>
 
-          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:gap-3">
+          <div className="flex w-full gap-1 max-md:pe-1 sm:w-auto sm:gap-3">
             <Button
               size="lg"
-              className="gap-2 rounded-full"
+              className="gap-2 rounded-full max-md:w-1/2"
               render={<Link href="/shop" />}
               nativeButton={false}
             >
@@ -57,7 +57,7 @@ export function HeroSection() {
             <Button
               variant="outline"
               size="lg"
-              className="gap-2 rounded-full bg-transparent"
+              className="gap-2 rounded-full bg-transparent max-md:w-1/2"
               render={<Link href="/shop" />}
               nativeButton={false}
             >

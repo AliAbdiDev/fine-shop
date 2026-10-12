@@ -75,10 +75,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body>
         <TooltipProvider>
           <MswProvider>
+            <Suspense fallback={null}>
+              <AuthInitializerWrapper />
+            </Suspense>
             <QueryProvider>
-              <Suspense fallback={null}>
-                <AuthInitializerWrapper />
-              </Suspense>
               {children}
               <Toaster richColors position="bottom-center" />
             </QueryProvider>

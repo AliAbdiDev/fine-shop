@@ -8,7 +8,7 @@ export function NewsletterSection() {
     <div className="border-border bg-secondary grid items-center gap-6 rounded-2xl border p-6 sm:p-8 md:grid-cols-2 md:gap-10 md:p-10">
       <div className="space-y-2 text-center md:text-right">
         {/* extra bold */}
-        <h2 className="font-vazir-bold text-xl sm:text-2xl">
+        <h2 className="font-vazir-bold text-tertiary-strong text-xl sm:text-2xl">
           خبرهای خوب، زودتر برای شما
         </h2>
         <p className="text-muted-foreground text-xs sm:text-sm">

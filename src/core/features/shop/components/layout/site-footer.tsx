@@ -174,7 +174,7 @@ export function SiteFooter() {
         <Separator className="my-8 bg-white/15" />
 
         {/* Bottom section */}
-        <div className="flex flex-col items-center justify-between gap-2 text-[10px] md:flex-row md:text-[11px]">
+        <div className="md:text-2xs flex flex-col items-center justify-between gap-2 text-[10px] md:flex-row">
           <p>{BRAND_NAME} یک فروشگاه مفهومی برای انتخاب‌های تازه</p>
           <p>© ۱۴۰۵ {BRAND_NAME}. همه حقوق محفوظ است.</p>
         </div>

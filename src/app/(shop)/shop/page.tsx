@@ -1,54 +1,68 @@
-// import { ProductGrid } from "@/core/features/shop/components/product-grid";
-// import { ResponsiveProductFilter } from "@/core/features/shop/components/responsive-product-filter";
+"use client";
 
-const products = [
-  {
-    id: 1,
-    image: "/images/p1.jpg",
-    title: "هدفون بی‌سیم سونی WH-1000XM5",
-    price: 18500000,
-    originalPrice: 21000000,
-    discount: 12,
-    attributes: { color: "مشکی", warranty: "۱۸ ماه" },
-  },
-  {
-    id: 2,
-    image: "/images/p2.jpg",
-    title: "ساعت هوشمند اپل واچ سری ۹",
-    price: 24900000,
-    originalPrice: 27500000,
-    discount: 10,
-    attributes: { color: "نقره‌ای", size: "۴۵mm" },
-  },
-  {
-    id: 3,
-    image: "/images/p3.jpg",
-    title: "گوشی شیائومی ۱۳ پرو",
-    price: 32000000,
-    attributes: { color: "آبی", ram: "۱۲GB" },
-  },
-  {
-    id: 4,
-    image: "/images/p4.jpg",
-    title: "لپ‌تاپ مک‌بوک ایر M3",
-    price: 78000000,
-    originalPrice: 85000000,
-    discount: 8,
-    attributes: { ram: "۸GB", storage: "۲۵۶GB" },
-  },
+import { useState } from "react";
+
+import {
+  FilterSidebar,
+  MobileFilterTrigger,
+} from "@/core/features/shop/components/shop-explore/Filter";
+import { ProductGrid } from "@/core/features/shop/components/shop-explore/ProductGrid";
+
+const categories = [
+  { id: 1, name: "دیجیتال", slug: "digital", count: 120 },
+  { id: 2, name: "مد و پوشاک", slug: "fashion", count: 340 },
+];
+
+const brands = [
+  { id: 1, name: "سامسونگ", slug: "samsung", count: 42 },
+  { id: 2, name: "اپل", slug: "apple", count: 18 },
+];
+
+const colors = [
+  { id: 1, name: "مشکی", slug: "black", value: "#000" },
+  { id: 2, name: "سفید", slug: "white", value: "#fff" },
+];
+
+const sizes = [
+  { id: 1, name: "S", slug: "s" },
+  { id: 2, name: "M", slug: "m" },
+  { id: 3, name: "L", slug: "l" },
 ];
 
 export default function ExplorePage() {
+  const [open, setOpen] = useState(false);
+
+  const props = {
+    categories,
+    brands,
+    colors,
+    sizes,
+    maxPrice: 10_000_000,
+  };
+
   return (
     <div dir="rtl" className="container mx-auto px-4 py-6">
       <div className="flex flex-col gap-6 lg:flex-row">
-        <div className="lg:w-64 lg:shrink-0">
-          {/* <ResponsiveProductFilter /> */}
-        </div>
-        <div className="flex-1">
-          {/* <ProductGrid products={products} /> */}
+        <FilterSidebar {...props} />
+
+        <div className="flex-1 space-y-4">
+          <div className="flex items-center justify-between lg:hidden">
+            <MobileFilterTrigger onOpen={() => setOpen(true)} activeCount={0} />
+          </div>
+          <ProductGrid />
         </div>
       </div>
+      {/* 
+      <Drawer open={open} onOpenChange={setOpen}>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>فیلترها</DrawerTitle>
+          </DrawerHeader>
+          <div className="max-h-[70vh] overflow-y-auto">
+            <MobileFilterPanel {...props} />
+          </div>
+        </DrawerContent>
+      </Drawer> */}
     </div>
   );
 }

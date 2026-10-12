@@ -27,7 +27,6 @@ export interface ProductQueryParams {
 }
 
 // Constats
-
 export const cookieOptions: CookieOptions = {
     httpOnly: true,
     secure: APP_MODE.isProd(),
@@ -42,3 +41,4 @@ export function buildHash(input: string): string {
 }
 
 export const profileKey = (token: string) => `profile-${buildHash(token)}`
+export const categorieKey = "categories";

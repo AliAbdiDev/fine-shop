@@ -46,6 +46,7 @@
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-tertiary: var(--tertiary);
+  --color-tertiary-strong: var(--tertiary-strong);
   --color-tertiary-foreground: var(--tertiary-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
@@ -119,6 +120,7 @@
 
   /* سطح سوم — فوتر و نوار بالایی هدر */
   --tertiary: oklch(33.05% 0.049 156.3); /* #1F3D2B */
+  --tertiary-strong: oklch(28.229% 0.01145 145.394);
   --tertiary-foreground: oklch(90.15% 0.018 125.48); /* #D9E2D7 */
 
   --muted: oklch(96.55% 0.012 85.51); /* #F5F4EF */

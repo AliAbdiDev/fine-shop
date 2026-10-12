@@ -71,7 +71,7 @@ export function VerticalCard({
   href,
   aspect = "4/3",
   priority = false,
-  sizes = "100vw",
+  sizes = "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw",
   className,
   mediaClassName,
   headerClassName,
@@ -146,7 +146,7 @@ export function VerticalCard({
           )}
 
           {description && (
-            <CardDescription className="text-muted-foreground text-[11px] leading-relaxed sm:text-xs">
+            <CardDescription className="text-muted-foreground text-2xs leading-relaxed sm:text-xs">
               {description}
             </CardDescription>
           )}

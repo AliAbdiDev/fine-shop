@@ -12,11 +12,14 @@ const nextConfig: NextConfig = {
   images: {
     formats: ['image/avif', 'image/webp'],
     qualities: [75, 85, 100],
-    remotePatterns: [{
-      protocol: 'https',
-      hostname: 'images.unsplash.com',
-      pathname: '/**',
-    },],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 's3.us-east-005.backblazeb2.com',
+        port: '',
+        pathname: '/**',
+      },
+    ],
   },
   typedRoutes: true,
   async headers() {

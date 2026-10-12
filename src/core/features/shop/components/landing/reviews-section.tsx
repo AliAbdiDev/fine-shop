@@ -1,6 +1,6 @@
-import Link from "next/link";
+import { Star } from "lucide-react";
 
-import { ArrowLeft, Star } from "lucide-react";
+import { SectionHeader } from "../Section";
 
 const stats = [
   { value: "۴.۸ از ۵", label: "امتیاز تجربه خرید" },
@@ -32,22 +32,15 @@ const reviews = [
 export function ReviewsSection() {
   return (
     <div className="space-y-12">
-      <div className="flex items-end justify-between">
-        <h2 className="font-vazir-bold text-lg sm:text-xl">
-          از زبان همراهان بارزونو
-        </h2>
-        <Link href="#" className="text-primary flex items-center gap-1 text-xs">
-          همه دیدگاه‌ها
-          <ArrowLeft className="h-3.5 w-3.5" />
-        </Link>
-      </div>
+      <SectionHeader title="از زبان همراهان بارزونو" linkText="همه دیدگاه‌ها" />
 
       <div className="grid grid-cols-3 gap-4">
         {stats.map((s) => (
           <div key={s.label} className="text-brand-dark">
-            {/* extra bold */}
-            <p className="font-vazir-bold text-xl sm:text-3xl">{s.value}</p>
-            <p className="text-muted-foreground mt-1 text-[11px] sm:text-xs">
+            <p className="font-vazir-bold text-tertiary-strong text-xl sm:text-3xl">
+              {s.value}
+            </p>
+            <p className="text-muted-foreground text-2xs mt-1 sm:text-xs">
               {s.label}
             </p>
           </div>

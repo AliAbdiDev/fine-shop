@@ -1,3 +1,7 @@
+import { Suspense } from "react";
+
+import { type Route } from "next";
+
 import Link from "next/link";
 
 import { BadgePercent, Search, Truck } from "lucide-react";
@@ -6,49 +10,16 @@ import { Logo } from "@/core/components/custom/Logos";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Separator } from "@/core/components/ui/separator";
+import { getAllCategories } from "@/core/services/server/categorie";
+import { type Categorys } from "@/core/types/entities.types";
 import { cn } from "@/core/utils/helpers";
 
-import {
-  type Category,
-  DesktopAllCategories,
-  MobileAllCategories,
-} from "./AllCategories";
+import { DesktopAllCategories, MobileAllCategories } from "./AllCategories";
 import { UserActions } from "./UserActions";
-
-const categories: Category[] = [
-  {
-    title: "کل محصولات",
-  },
-  {
-    title: "دیجیتال",
-  },
-  {
-    title: "مد و پوشاک",
-  },
-  {
-    title: "خانه و آشپزخانه",
-  },
-  {
-    title: "زیبایی و سلامت",
-  },
-  {
-    title: "ورزش و سفر",
-  },
-  {
-    title: "کتاب و لوازم‌تحریر",
-  },
-  {
-    title: "کودک و نوزاد",
-  },
-  {
-    title: "سوپرمارکت",
-  },
-];
 
 /* ─────────────────────────────────────────────
    Shared components
    ───────────────────────────────────────────── */
-
 function SearchBar({ className }: { className?: string }) {
   return (
     <div className={cn("relative", className)}>
@@ -64,10 +35,9 @@ function SearchBar({ className }: { className?: string }) {
 /* ─────────────────────────────────────────────
    Desktop header
    ───────────────────────────────────────────── */
-
-function DesktopHeader() {
+function DesktopHeader({ className }: { className?: string }) {
   return (
-    <header className="border-border bg-card border-b">
+    <header className={cn("border-border bg-card border-b", className)}>
       <div className="shop-section-space mx-auto flex items-center gap-3 pt-2 pb-0 md:gap-6">
         <Link href="/" className="w-fit">
           <Logo size="lg" priority type="logo" />
@@ -82,10 +52,9 @@ function DesktopHeader() {
 /* ─────────────────────────────────────────────
    Mobile header
    ───────────────────────────────────────────── */
-
-function MobileHeader() {
+function MobileHeader({ className }: { className?: string }) {
   return (
-    <header className="border-border bg-card border-b">
+    <header className={cn("border-border bg-card border-b", className)}>
       <div className="shop-section-space mx-auto flex items-center gap-3 py-3">
         <Link href="/">
           <Logo size="md" priority />
@@ -102,29 +71,45 @@ function MobileHeader() {
 /* ─────────────────────────────────────────────
    Desktop navigation
    ───────────────────────────────────────────── */
-
-function DesktopNav() {
+function DesktopNav({
+  className,
+  categories,
+}: {
+  className?: string;
+  categories: Categorys;
+}) {
   return (
-    <nav className="border-border bg-card shop-section-space border-b py-4">
+    <nav
+      className={cn(
+        "border-border bg-card shop-section-space border-b py-4",
+        className,
+      )}
+    >
       <div className="flex items-center gap-4">
         <DesktopAllCategories categories={categories} />
         <Separator orientation="vertical" className="bg-border h-4 shrink-0" />
         <div className="flex w-full items-center justify-between">
-          <div className="flex items-center gap-5 overflow-x-auto">
-            {categories?.slice(0, 5).map((cat) => (
+          <div className="flex items-center gap-3 overflow-x-auto lg:gap-5">
+            <Link
+              href={`/shop`}
+              className="text-foreground hover:text-primary text-2xs shrink-0 whitespace-nowrap transition-colors lg:text-xs"
+            >
+              کل محصولات
+            </Link>
+            {categories.slice(0, 5).map((cat) => (
               <Link
-                key={cat.title}
-                href={`#/${cat.title}`}
-                className="text-foreground hover:text-primary shrink-0 text-xs whitespace-nowrap transition-colors"
+                key={cat.id}
+                href={`/shop/${cat.name}` as Route}
+                className="text-foreground hover:text-primary text-2xs shrink-0 whitespace-nowrap transition-colors lg:text-xs"
               >
-                {cat.title}
+                {cat.name}
               </Link>
             ))}
           </div>
           <Button
             variant="ghost"
             className="font-vazir-bold text-primary hover:text-primary ms-auto h-auto shrink-0 gap-1.5 px-0 text-[13px] hover:bg-transparent"
-            render={<Link href="#" />}
+            render={<Link href="/shop" />}
             nativeButton={false}
           >
             <BadgePercent />
@@ -139,17 +124,27 @@ function DesktopNav() {
 /* ─────────────────────────────────────────────
    Mobile navigation
    ───────────────────────────────────────────── */
-
-function MobileNav() {
+function MobileNav({
+  className,
+  categories,
+}: {
+  className?: string;
+  categories: Categorys;
+}) {
   return (
-    <nav className="border-border bg-card shop-section-space border-b py-4">
+    <nav
+      className={cn(
+        "border-border bg-card shop-section-space border-b py-4",
+        className,
+      )}
+    >
       <div className="flex items-center justify-between">
         <MobileAllCategories categories={categories} />
         <div className="flex items-center gap-4">
           <Button
             variant="ghost"
             className="font-vazir-bold text-primary hover:text-primary h-auto shrink-0 gap-1.5 px-0 text-[13px] hover:bg-transparent"
-            render={<Link href="#" />}
+            render={<Link href="/shop" />}
             nativeButton={false}
           >
             پیشنهادهای ویژه
@@ -157,7 +152,7 @@ function MobileNav() {
           <Button
             variant="ghost"
             className="font-vazir-bold h-auto shrink-0 gap-1.5 px-0 text-[13px] hover:bg-transparent"
-            render={<Link href="#" />}
+            render={<Link href="/shop" />}
             nativeButton={false}
           >
             پرفروش ها
@@ -169,12 +164,50 @@ function MobileNav() {
 }
 
 /* ─────────────────────────────────────────────
+   Skeleton (matches DesktopNav + MobileNav)
+   ───────────────────────────────────────────── */
+function NavSkeleton() {
+  return (
+    <>
+      {/* Desktop skeleton */}
+      <div className="border-border bg-card shop-section-space border-b py-4 max-md:hidden">
+        <div className="flex items-center gap-4">
+          <div className="bg-muted h-9 w-36 animate-pulse rounded-md" />
+          <div className="bg-border h-4 w-px shrink-0" />
+          <div className="flex w-full items-center justify-between">
+            <div className="flex items-center gap-3 lg:gap-5">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="bg-muted h-3 w-14 animate-pulse rounded"
+                />
+              ))}
+            </div>
+            <div className="bg-muted h-4 w-28 animate-pulse rounded" />
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile skeleton */}
+      <div className="border-border bg-card shop-section-space border-b py-4 md:hidden">
+        <div className="flex items-center justify-between">
+          <div className="bg-muted h-9 w-32 animate-pulse rounded-md" />
+          <div className="flex items-center gap-4">
+            <div className="bg-muted h-4 w-24 animate-pulse rounded" />
+            <div className="bg-muted h-4 w-16 animate-pulse rounded" />
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+/* ─────────────────────────────────────────────
    Announcement bar
    ───────────────────────────────────────────── */
-
 function AnnouncementBar() {
   return (
-    <div className="bg-tertiary text-tertiary-foreground py-2 text-center text-[11px]">
+    <div className="bg-tertiary text-tertiary-foreground text-2xs py-2 text-center">
       <span className="inline-flex items-center gap-1.5">
         <Truck className="h-3.5 w-3.5" />
         ارسال رایگان سفارش‌های بالای ۱ میلیون تومان
@@ -184,25 +217,35 @@ function AnnouncementBar() {
 }
 
 /* ─────────────────────────────────────────────
+   Nav — fetches and passes categories down
+   ───────────────────────────────────────────── */
+async function Nav() {
+  const r = await getAllCategories();
+
+  const categories: Categorys = r.ok ? r.data : [];
+
+  return (
+    <>
+      <DesktopNav className="max-md:hidden" categories={categories} />
+      <MobileNav className="md:hidden" categories={categories} />
+    </>
+  );
+}
+
+/* ─────────────────────────────────────────────
    Main component (Server Component)
    ───────────────────────────────────────────── */
 
-export function SiteHeader() {
+export async function SiteHeader() {
   return (
     <>
       <AnnouncementBar />
+      <DesktopHeader className="max-md:hidden" />
+      <MobileHeader className="md:hidden" />
 
-      {/* Desktop */}
-      <div className="hidden md:block">
-        <DesktopHeader />
-        <DesktopNav />
-      </div>
-
-      {/* Mobile */}
-      <div className="md:hidden">
-        <MobileHeader />
-        <MobileNav />
-      </div>
+      <Suspense fallback={<NavSkeleton />}>
+        <Nav />
+      </Suspense>
     </>
   );
 }

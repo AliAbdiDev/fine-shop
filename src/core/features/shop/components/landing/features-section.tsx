@@ -35,7 +35,7 @@ export function FeaturesSection() {
             <Icon className="text-primary h-5 w-5" />
           </div>
           <h3 className="font-vazir-bold text-xs sm:text-sm">{title}</h3>
-          <p className="text-muted-foreground text-[11px] leading-relaxed sm:text-xs">
+          <p className="text-muted-foreground text-2xs leading-relaxed sm:text-xs">
             {desc}
           </p>
         </div>
