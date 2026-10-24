@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPORT_DIR="script"
+REPORT_DIR="scripts"
 REPORT_FILE="$REPORT_DIR/git-report.txt"
 PROMPT_FILE=$(mktemp)
 
