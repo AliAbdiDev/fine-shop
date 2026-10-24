@@ -1,6 +1,239 @@
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { isNullOrUndefined } from "@sindresorhus/is";
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
 
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
+
+/* -------------------------------------------------------------------------- */
+/*                              transform keys                                */
+/* -------------------------------------------------------------------------- */
+
+export type Casing = "snake" | "camel";
+
+const toCamelCase = (str: string) =>
+  str.replace(/_+([a-z0-9])/g, (_, c: string) => c.toUpperCase());
+
+const toSnakeCase = (str: string) =>
+  str
+    .replace(/([a-z0-9])([A-Z])/g, "$1_$2")
+    .replace(/([A-Z]+)([A-Z][a-z])/g, "$1_$2")
+    .toLowerCase();
+
+const isPlainObject = (v: unknown): v is Record<string, unknown> =>
+  typeof v === "object" &&
+  v !== null &&
+  (Object.getPrototypeOf(v) === Object.prototype ||
+    Object.getPrototypeOf(v) === null);
+
+export function transformKeys<T>(input: T, mode: Casing): T {
+  const convert = mode === "snake" ? toSnakeCase : toCamelCase;
+
+  // FormData: فقط کلیدها تبدیل می‌شوند؛ مقادیر (File/Blob/string) دست‌نخورده.
+  if (input instanceof FormData) {
+    const out = new FormData();
+    for (const [k, v] of input.entries()) {
+      out.append(convert(k), v);
+    }
+    return out as unknown as T;
+  }
+
+  // URLSearchParams: برای body های x-www-form-urlencoded.
+  if (input instanceof URLSearchParams) {
+    const out = new URLSearchParams();
+    for (const [k, v] of input.entries()) {
+      out.append(convert(k), v);
+    }
+    return out as unknown as T;
+  }
+
+  const walk = (value: unknown): unknown => {
+    if (Array.isArray(value)) return value.map(walk);
+    if (!isPlainObject(value)) return value;
+
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(value)) {
+      out[convert(k)] = walk(v);
+    }
+    return out;
+  };
+
+  return walk(input) as T;
 }
+
+/* -------------------------------------------------------------------------- */
+/*                                asRecord                                    */
+/* -------------------------------------------------------------------------- */
+
+export const asRecord = (value: unknown): Record<string, unknown> | null =>
+  typeof value === "object" && value !== null && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : null;
+
+/* -------------------------------------------------------------------------- */
+/*                              toPersianNum                                  */
+/* -------------------------------------------------------------------------- */
+
+const PERSIAN_DIGITS = "۰۱۲۳۴۵۶۷۸۹";
+
+export const toPersianNum = (
+  input: string | number,
+  comma = true
+): string => {
+  const str = String(input ?? "").trim();
+  if (!str) return "";
+
+  if (/^-?0\d/.test(str)) {
+    return str.replace(/\d/g, (d) => PERSIAN_DIGITS[+d]);
+  }
+
+  const num = Number(str);
+  if (isNaN(num)) return "";
+
+  return num.toLocaleString("fa-IR", { useGrouping: comma });
+};
+/* -------------------------------------------------------------------------- */
+/*                                toFormData                                  */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * تبدیل یک آبجکت به FormData برای ارسال به بک‌اند.
+ *
+ * @param values - آبجکت ورودی
+ * @param options.fileKeys - کلیدهایی که به عنوان فایل append می‌شوند (تکرارشونده)
+ * @param options.jsonKeys - کلیدهایی که به صورت JSON stringify می‌شوند
+ *
+ * @example
+ * const fd = toFormData(values, {
+ *   fileKeys: ["images"],
+ *   jsonKeys: ["attributeList"],
+ * });
+ */
+export function toFormData(
+  values: Record<string, unknown>,
+  options?: {
+    fileKeys?: string[];
+    jsonKeys?: string[];
+  },
+): FormData {
+  const fileKeys = options?.fileKeys ?? [];
+  const jsonKeys = options?.jsonKeys ?? [];
+  const fd = new FormData();
+
+  for (const key of Object.keys(values)) {
+    const value = values[key];
+
+    if (value === undefined || value === null) {
+      continue;
+    }
+
+    // ۱) فایل‌ها
+    if (fileKeys.includes(key)) {
+      const files = Array.isArray(value) ? value : [value];
+
+      for (const f of files) {
+        if (typeof File !== "undefined" && f instanceof File) {
+          fd.append(key, f);
+        } else if (typeof Blob !== "undefined" && f instanceof Blob) {
+          fd.append(key, f);
+        }
+      }
+
+      continue;
+    }
+
+    // ۲) فیلدهای JSON
+    if (jsonKeys.includes(key)) {
+      fd.append(key, JSON.stringify(value));
+      continue;
+    }
+
+    // ۳) آرایه‌ی مقادیر ساده
+    if (Array.isArray(value)) {
+      for (const v of value) {
+        fd.append(key, String(v));
+      }
+      continue;
+    }
+
+    // ۴) مقادیر ساده
+    fd.append(key, String(value));
+  }
+
+  return fd;
+}
+
+// -----
+export interface DiscountInfo {
+  hasDiscount: boolean;
+  amount: number;
+  percent: number;
+  finalPrice: number;
+  basePrice: number;
+}
+
+/**
+ *
+ * @example
+ *   getDiscountInfo(450_000, 380_000)
+ *   // { hasDiscount: true, amount: 70000, percent: 16, finalPrice: 380000, basePrice: 450000 }
+ */
+export function getDiscountInfo(
+  basePrice: number,
+  discountedPrice?: number | null,
+): DiscountInfo {
+  const base = Number.isFinite(basePrice) && basePrice > 0 ? basePrice : 0;
+  const discounted =
+    Number.isFinite(discountedPrice) && (discountedPrice ?? 0) > 0
+      ? (discountedPrice as number)
+      : null;
+
+
+  const hasDiscount =
+    base > 0 && discounted !== null && discounted < base;
+
+  const finalPrice = hasDiscount ? discounted! : base;
+  const amount = hasDiscount ? base - finalPrice : 0;
+  const percent = hasDiscount ? Math.round((amount / base) * 100) : 0;
+
+  return {
+    hasDiscount,
+    amount,
+    percent,
+    finalPrice,
+    basePrice: base,
+  };
+}
+
+const PERSIAN_DIGIT_MAP: Record<string, string> = {
+  "۰": "0", "۱": "1", "۲": "2", "۳": "3", "۴": "4",
+  "۵": "5", "۶": "6", "۷": "7", "۸": "8", "۹": "9",
+};
+
+const ARABIC_DIGIT_MAP: Record<string, string> = {
+  "٠": "0", "١": "1", "٢": "2", "٣": "3", "٤": "4",
+  "٥": "5", "٦": "6", "٧": "7", "٨": "8", "٩": "9",
+};
+
+/** تبدیل ارقام فارسی (۰-۹) به انگلیسی (0-9). */
+export const digitsFaToEn = (input: string): string =>
+  input.replace(/[۰-۹]/g, (d) => PERSIAN_DIGIT_MAP[d] ?? d);
+
+/** تبدیل ارقام عربی (٠-٩) به انگلیسی (0-9). */
+export const digitsArToEn = (input: string): string =>
+  input.replace(/[٠-٩]/g, (d) => ARABIC_DIGIT_MAP[d] ?? d);
+
+// ----Phone---
+export function formatPhone(value: string | null | undefined): string {
+  if (isNullOrUndefined(value)) return ''
+  const en = digitsArToEn(digitsFaToEn(String(value ?? "")));
+  const digits = en.replace(/\D/g, "");
+
+  if (!digits) return "";
+  if (digits.startsWith("0")) return digits;
+  if (digits.startsWith("98")) return "0" + digits.slice(2);
+
+  return "0" + digits;
+}
+
+// ----
+export const isFile = (input: unknown): input is File => input instanceof File;

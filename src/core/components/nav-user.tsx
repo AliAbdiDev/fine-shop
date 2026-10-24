@@ -1,13 +1,9 @@
 "use client";
 
-import {
-  BadgeCheckIcon,
-  BellIcon,
-  ChevronsUpDownIcon,
-  CreditCardIcon,
-  LogOutIcon,
-  SparklesIcon,
-} from "lucide-react";
+import { useRouter } from "next/navigation";
+
+import { isString } from "@sindresorhus/is";
+import { ChevronsUpDownIcon, LogOutIcon, User2 } from "lucide-react";
 
 import {
   Avatar,
@@ -30,16 +26,17 @@ import {
   useSidebar,
 } from "@/core/components/ui/sidebar";
 
-export function NavUser({
-  user,
-}: {
-  user: {
-    name: string;
-    email: string;
-    avatar: string;
-  };
-}) {
+import { notify } from "./custom/notify";
+import { actionLogout } from "../services/server/auth";
+import { useAuthSelector } from "../states/auth";
+
+export function NavUser() {
   const { isMobile } = useSidebar();
+
+  const user = useAuthSelector.useUserInfo();
+
+  const router = useRouter();
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -50,12 +47,16 @@ export function NavUser({
             }
           >
             <Avatar>
-              <AvatarImage src={user.avatar} alt={user.name} />
-              <AvatarFallback>کار</AvatarFallback>
+              {isString(user?.avatar) && (
+                <AvatarImage src={user?.avatar} alt={user?.firstName} />
+              )}
+              <AvatarFallback>{user?.firstName?.slice(0, 2)}</AvatarFallback>
             </Avatar>
             <div className="grid flex-1 text-start text-sm leading-tight">
-              <span className="truncate font-medium">{user.name}</span>
-              <span className="truncate text-xs">{user.email}</span>
+              <span className="space-x-1 truncate font-medium">
+                {user?.firstName} {user?.lastName}
+              </span>
+              <span className="truncate text-xs">{user?.email}</span>
             </div>
             <ChevronsUpDownIcon className="ms-auto size-4" />
           </DropdownMenuTrigger>
@@ -69,40 +70,41 @@ export function NavUser({
               <DropdownMenuLabel className="p-0 font-normal">
                 <div className="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
                   <Avatar>
-                    <AvatarImage src={user.avatar} alt={user.name} />
-                    <AvatarFallback>کار</AvatarFallback>
+                    {isString(user?.avatar) && (
+                      <AvatarImage src={user?.avatar} alt={user?.firstName} />
+                    )}
+                    <AvatarFallback>
+                      {user?.firstName?.slice(0, 2)}
+                    </AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-start text-sm leading-tight">
-                    <span className="truncate font-medium">{user.name}</span>
-                    <span className="truncate text-xs">{user.email}</span>
+                    <span className="space-x-1 truncate font-medium">
+                      {user?.firstName} {user?.lastName}
+                    </span>
+                    <span className="truncate text-xs">{user?.email}</span>
                   </div>
                 </div>
               </DropdownMenuLabel>
             </DropdownMenuGroup>
-            <DropdownMenuSeparator />
+
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <SparklesIcon />
-                ارتقا حساب
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <BadgeCheckIcon />
+              <DropdownMenuItem
+                onClick={() => {
+                  router.push("/admin/profile");
+                }}
+              >
+                <User2 />
                 حساب کاربری
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCardIcon />
-                پرداخت‌ها
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <BellIcon />
-                اعلان‌ها
-              </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={async () => {
+                const r = await actionLogout();
+                if (!r?.ok) notify.error(r?.error.code);
+              }}
+              className={"hover:bg-destructive/35!"}
+            >
               <LogOutIcon />
               خروج
             </DropdownMenuItem>
