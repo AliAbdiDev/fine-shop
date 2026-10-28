@@ -171,11 +171,13 @@ function FilterSection({
   children: ReactNode;
 }) {
   return (
-    <AccordionItem value={value} className="border-b-0">
-      <AccordionTrigger className="font-vazir-bold py-3 text-sm hover:no-underline">
+    <AccordionItem value={value} className="border-b-0 bg-transparent!">
+      <AccordionTrigger className="font-vazir-bold bg-transparent py-3 text-sm hover:no-underline">
         {title}
       </AccordionTrigger>
-      <AccordionContent className="pb-4">{children}</AccordionContent>
+      <AccordionContent className="bg-transparent pb-4">
+        {children}
+      </AccordionContent>
     </AccordionItem>
   );
 }
@@ -464,11 +466,13 @@ function SwitchRow({ paramKey, label }: { paramKey: string; label: string }) {
    Header
    ───────────────────────────────────────────── */
 
-function FilterHeader() {
+function FilterHeader({ className }: { className?: string }) {
   const { activeCount, clearAll, isPending } = useFilters();
 
   return (
-    <div className="mb-2 flex items-center justify-between gap-2">
+    <div
+      className={cn("mb-2 flex items-center justify-between gap-2", className)}
+    >
       <div className="flex min-w-0 items-center gap-2">
         <h2 className="font-vazir-bold truncate text-sm">فیلترها</h2>
         {activeCount > 0 && (
@@ -509,12 +513,13 @@ function FilterContent({
   maxPrice,
 }: Omit<FilterSidebarProps, "className">) {
   return (
-    <div className="w-full min-w-0 space-y-1">
-      <FilterHeader />
+    <>
+      <FilterHeader className="pb-4" />
 
       <Accordion
         multiple
         className="border-none"
+
         defaultValue={["category", "price", "brand", "color", "size"]}
       >
         <FilterSection value="category" title="دسته‌بندی">
@@ -553,7 +558,7 @@ function FilterContent({
           </div>
         </FilterSection>
       </Accordion>
-    </div>
+    </>
   );
 }
 
@@ -565,7 +570,7 @@ export function FilterSidebar(props: FilterSidebarProps) {
   return (
     <aside
       className={cn(
-        "bg-card border-border sticky top-4 hidden h-fit w-80 shrink-0 overflow-hidden rounded-lg border lg:block",
+        "bg-card border-border sticky top-4 hidden h-fit w-85 shrink-0 overflow-hidden rounded-lg border lg:block",
         props.className,
       )}
     >
