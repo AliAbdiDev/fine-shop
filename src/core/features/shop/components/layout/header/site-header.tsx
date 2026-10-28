@@ -81,13 +81,13 @@ function DesktopNav({
   return (
     <nav
       className={cn(
-        "border-border bg-card shop-section-space border-b py-4",
+        "border-border bg-card shop-section-space border-b py-2",
         className,
       )}
     >
       <div className="flex items-center gap-4">
         <DesktopAllCategories categories={categories} />
-        <Separator orientation="vertical" className="bg-border h-4 shrink-0" />
+        <Separator orientation="vertical" className="shrink-0" />
         <div className="flex w-full items-center justify-between">
           <div className="flex items-center gap-3 overflow-x-auto lg:gap-5">
             <Link
@@ -108,7 +108,7 @@ function DesktopNav({
           </div>
           <Button
             variant="ghost"
-            className="font-vazir-bold text-primary hover:text-primary ms-auto h-auto shrink-0 gap-1.5 px-0 text-[13px] hover:bg-transparent"
+            className="font-vazir-bold text-primary hover:text-primary shrink-0 text-[13px] hover:bg-transparent"
             render={<Link href="/shop" />}
             nativeButton={false}
           >
@@ -143,7 +143,7 @@ function MobileNav({
         <div className="flex items-center gap-4">
           <Button
             variant="ghost"
-            className="font-vazir-bold text-primary hover:text-primary h-auto shrink-0 gap-1.5 px-0 text-[13px] hover:bg-transparent"
+            className="font-vazir-bold text-primary hover:text-primary text-2xs shrink-0 px-0 hover:bg-transparent"
             render={<Link href="/shop" />}
             nativeButton={false}
           >
@@ -151,7 +151,7 @@ function MobileNav({
           </Button>
           <Button
             variant="ghost"
-            className="font-vazir-bold h-auto shrink-0 gap-1.5 px-0 text-[13px] hover:bg-transparent"
+            className="font-vazir-bold text-2xs h-auto shrink-0 gap-1.5 px-0 hover:bg-transparent"
             render={<Link href="/shop" />}
             nativeButton={false}
           >

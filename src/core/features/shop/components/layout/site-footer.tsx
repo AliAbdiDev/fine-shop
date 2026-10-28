@@ -53,7 +53,7 @@ const columns = [
 export function SiteFooter() {
   return (
     <footer className="bg-tertiary text-tertiary-foreground">
-      <div className="mx-auto max-w-7xl px-6 pt-14 pb-7 md:px-16">
+      <div className=" pt-14 pb-7 shop-section-space">
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-[1.8fr_1fr_1fr_1fr_1.3fr]">
           {/* Brand column */}
           <div className="space-y-4">

@@ -7,6 +7,7 @@ import { type Route } from "next";
 import Link from "next/link";
 
 import { useVirtualizer } from "@tanstack/react-virtual";
+import { cn } from "cn";
 import { LayoutGrid } from "lucide-react";
 
 import { Button } from "@/core/components/ui/button";
@@ -32,7 +33,7 @@ function TriggerButton(props: React.ComponentProps<typeof Button>) {
   return (
     <Button
       variant="ghost"
-      className="font-vazir-bold h-auto shrink-0 gap-1.5 px-0 text-[13px] hover:bg-transparent"
+      className="font-vazir-bold shrink-0 text-[13px]"
       {...props}
     >
       <LayoutGrid className="h-4 w-4" aria-hidden />
@@ -58,6 +59,7 @@ interface VirtualizedCategoryListProps {
   onSelect: () => void;
   /** Class applied to each row's anchor. */
   itemClassName: string;
+  scrollClassName?: string;
 }
 
 const ALL_ITEM = { slug: null, name: "کل محصولات" };
@@ -68,6 +70,7 @@ function VirtualizedCategoryList({
   overscan = 6,
   onSelect,
   itemClassName,
+  scrollClassName,
 }: VirtualizedCategoryListProps) {
   const parentRef = React.useRef<HTMLDivElement>(null);
 
@@ -82,7 +85,7 @@ function VirtualizedCategoryList({
   });
 
   return (
-    <div ref={parentRef} className="overflow-y-auto">
+    <div ref={parentRef} className={cn("overflow-y-auto", scrollClassName)}>
       <div
         style={{
           height: `${virtualizer.getTotalSize()}px`,
@@ -109,8 +112,7 @@ function VirtualizedCategoryList({
               <Link
                 href={href as Route}
                 onClick={onSelect}
-                className={itemClassName}
-                style={{ display: "block", height: "100%" }}
+                className={cn("h-full", itemClassName)}
               >
                 {item.name}
               </Link>
@@ -144,14 +146,13 @@ export function DesktopAllCategories({
       >
         {/* Fixed max-height on the scroll container so the virtualizer has
             a stable viewport to measure. 8 rows × 40px + padding ≈ 320px. */}
-        <div className="max-h-80">
-          <VirtualizedCategoryList
-            categories={categories}
-            rowHeight={ROW_HEIGHT_DESKTOP}
-            onSelect={handleClose}
-            itemClassName="hover:bg-muted hover:text-primary flex h-full items-center rounded-md px-3 text-[13px] transition-colors"
-          />
-        </div>
+        <VirtualizedCategoryList
+          scrollClassName="h-70"
+          categories={categories}
+          rowHeight={ROW_HEIGHT_DESKTOP}
+          onSelect={handleClose}
+          itemClassName="hover:bg-muted hover:text-primary flex h-full items-center rounded-md px-3 text-[13px] transition-colors"
+        />
       </PopoverContent>
     </Popover>
   );
@@ -176,13 +177,23 @@ export function MobileAllCategories({ categories }: { categories: Categorys }) {
         </SheetHeader>
 
         {/* The header takes ~64px; the rest of the sheet scrolls. */}
-        <div className="max-h-[calc(85vh-64px)] px-5 pb-6">
+        <div className="px-4">
           <VirtualizedCategoryList
             categories={categories}
             rowHeight={ROW_HEIGHT_MOBILE}
             onSelect={handleClose}
-            itemClassName="hover:text-primary flex h-full items-center border-b text-sm transition-colors"
+            itemClassName="flex h-full items-center border-b text-sm"
+            scrollClassName="h-84"
           />
+          <div className="py-4">
+            <Button
+              variant={"outline"}
+              className={"w-full"}
+              onClick={() => setOpen(false)}
+            >
+              بستن
+            </Button>
+          </div>
         </div>
       </SheetContent>
     </Sheet>

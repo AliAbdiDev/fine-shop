@@ -3,15 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "pnpm run typegen && pnpm run check && next dev --turbopack",
+    "dev": "next typegen && tsc --noEmit && next dev --turbopack",
     "typegen": "next typegen && tsc --noEmit",
-    "full-check": "pnpm run ts && pnpm run lint",
+    "full-check": "tsc --noEmit && eslint",
     "check": "tsc --noEmit",
     "lint": "eslint",
-    "build": "pnpm run typegen && next build",
+    "build": "next typegen && tsc --noEmit && next build",
     "start": "next start",
     "mock-sync": "node src/core/mocks/configs/script-sync-schema.mjs",
-    "mock-init": "pnpm exec msw init public/ --save",
+    "mock-init": "msw init public/ --save",
     "r": "bash scripts/git-report.sh"
   },
   "dependencies": {
@@ -76,5 +76,8 @@
   },
   "msw": {
     "workerDirectory": ["public"]
+  },
+  "overrides": {
+    "@tanstack/query-devtools": "5.104.1"
   }
 }

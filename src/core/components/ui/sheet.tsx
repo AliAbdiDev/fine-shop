@@ -6,6 +6,7 @@ import { Dialog as SheetPrimitive } from "@base-ui/react/dialog";
 import { XIcon } from "lucide-react";
 
 import { Button } from "@/core/components/ui/button";
+import { useIsMobile } from "@/core/hooks/use-mobile";
 import { cn } from "@/core/utils/helpers";
 
 function Sheet({ ...props }: SheetPrimitive.Root.Props) {
@@ -47,6 +48,8 @@ function SheetContent({
   side?: "top" | "right" | "bottom" | "left";
   showCloseButton?: boolean;
 }) {
+  const isMobile = useIsMobile();
+
   return (
     <SheetPortal>
       <SheetOverlay />
@@ -67,7 +70,7 @@ function SheetContent({
               <Button
                 variant="ghost"
                 className="bg-secondary absolute end-4 top-4"
-                size="icon-sm"
+                size={isMobile ? "icon-lg" : "icon-sm"}
               />
             }
           >

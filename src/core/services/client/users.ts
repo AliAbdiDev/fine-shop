@@ -6,7 +6,7 @@ import {
     type EntityId,
 } from "@/core/types/entities.types";
 
-import { type ListParams, userKeys } from "./keys";
+import { type ListParams, userKeys } from "../shared/keys";
 import { api } from "../configs/api";
 import { type ApiError } from "../configs/fetcher/types/client.types";
 import { unwrap } from "../configs/fetcher/unwrap";

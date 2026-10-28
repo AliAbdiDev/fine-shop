@@ -6,11 +6,6 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Navigation, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 
-// Tree-shakable CSS — only what's needed
-import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
-
 import { Button } from "@/core/components/ui/button";
 import { cn } from "@/core/utils/helpers";
 
@@ -32,7 +27,7 @@ export function ProductSliderClient({
   const count = slides.length;
 
   return (
-    <section className="space-y-4">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="font-vazir-bold text-lg sm:text-xl">{title}</h2>
         <div className="flex items-center gap-1">
@@ -58,6 +53,9 @@ export function ProductSliderClient({
       </div>
 
       <Swiper
+        observer
+        observeSlideChildren
+        watchSlidesProgress
         modules={[Navigation, Pagination]}
         dir="rtl"
         loop
@@ -98,6 +96,6 @@ export function ProductSliderClient({
           ))}
         </div>
       )}
-    </section>
+    </div>
   );
 }

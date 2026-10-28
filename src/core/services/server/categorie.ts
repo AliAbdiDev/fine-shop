@@ -17,7 +17,7 @@ function fetchPage(page: number) {
 
 export async function getAllCategories() {
     cacheTag(categorieKey);
-    cacheLife("weeks");
+    cacheLife("max");
 
     const first = await fetchPage(1);
     if (!first.ok) return first;

@@ -51,7 +51,7 @@ function DesktopActions({ showText }: { showText: boolean }) {
         variant="ghost"
         size={isSignedIn ? "icon" : "default"}
         aria-label={isSignedIn ? "حساب کاربری" : "ورود / ثبت‌نام"}
-        render={<Link href={isSignedIn ? "/#" : "/signin"} />}
+        render={<Link href={isSignedIn ? "/#" : "/signin"} prefetch/>}
         loading={isLoading}
         loadingType="skeleton"
         nativeButton={false}
@@ -112,6 +112,7 @@ function MobileMenu() {
           <li>
             <Link
               href={isSignedIn ? "/#" : "/signin"}
+              prefetch
               className="hover:bg-muted hover:text-foreground flex items-center gap-3 rounded-md px-3 py-2.5 text-[13px] transition-colors"
             >
               <User2 className="h-4 w-4 shrink-0" aria-hidden />

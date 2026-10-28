@@ -56,7 +56,7 @@ export function HeroSlider({ slides }: HeroSliderProps) {
 
   return (
     <div
-      className="bg-muted relative mx-auto aspect-4/3 w-full overflow-hidden rounded-2xl md:max-w-md lg:max-w-lg xl:max-w-xl"
+      className="bg-muted relative mx-auto aspect-4/3 w-full overflow-hidden rounded-2xl "
       aria-roledescription="carousel"
       aria-label="محصولات منتخب"
       onFocus={() => swiperRef.current?.autoplay?.stop()}
