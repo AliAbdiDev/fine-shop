@@ -1,15 +1,16 @@
 import js from "@eslint/js";
+import nextVitals from "eslint-config-next/core-web-vitals";
+import nextTs from "eslint-config-next/typescript";
 import prettierConfig from "eslint-config-prettier";
 import eslintPluginImport from "eslint-plugin-import";
 import unusedImports from "eslint-plugin-unused-imports";
-import nextVitals from "eslint-config-next/core-web-vitals";
-import nextTs from "eslint-config-next/typescript";
 
-export default [
+const config = [
   { ignores: [".next/**", "out/**", "build/**", "next-env.d.ts"] },
   js.configs.recommended,
   ...nextVitals,
   ...nextTs,
+
   {
     plugins: {
       import: eslintPluginImport,
@@ -18,6 +19,7 @@ export default [
     settings: {
       "import/resolver": { typescript: true, node: true },
     },
+
     rules: {
       "no-unused-vars": "off",
       "@typescript-eslint/no-unused-vars": "off",
@@ -66,15 +68,11 @@ export default [
         "error",
         {
           zones: [
+            // ====================  Core ====================
             {
-              target: "./src/core/**",
+              target: "./src/core/*",
               from: "./src/core/features/**",
               message: "Core layer cannot import from features.",
-            },
-            {
-              target: "./src/core/features/*/",
-              from: "./src/core/features/*/",
-              message: "Features must be isolated.",
             },
             {
               target: "./src/core/features/*/utils/**",
@@ -86,10 +84,36 @@ export default [
               from: ["./src/core/features/**", "./src/core/**/state/**"],
               message: "Core UI cannot import from features or state.",
             },
+
+            // ====================  Features (same Core) ====================
+            {
+              target: "./src/features/*/utils/**",
+              from: [
+                "./src/features/*/components/**",
+                "./src/features/*/state/**",
+                "./src/features/*/hooks/**",
+              ],
+              message:
+                "Feature utils must be pure (cannot import from components, state, or hooks).",
+            },
+
+            {
+              target: "./src/features/*/state/**",
+              from: "./src/features/*/components/**",
+              message: "Feature state cannot import from components.",
+            },
+            {
+              target: "./src/features/*/components/**",
+              from: "./src/features/*/state/**",
+              message: "Do not import state from other features directly.",
+            },
           ],
         },
       ],
     },
   },
+
   prettierConfig,
 ];
+
+export default config;
