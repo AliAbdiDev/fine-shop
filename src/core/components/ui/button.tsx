@@ -1,3 +1,7 @@
+import { type MouseEventHandler, type ReactNode } from "react";
+
+import Link, { type LinkProps } from "next/link";
+
 import { Button as ButtonPrimitive } from "@base-ui/react/button";
 import { cva, type VariantProps } from "class-variance-authority";
 import { Loader2 } from "lucide-react";
@@ -105,6 +109,42 @@ function SkeletonContent({ size }: { size?: string | null }) {
    Button
    ───────────────────────────────────────────── */
 
+type ButtonContentProps = {
+  loading: boolean;
+  loadingType: "spinner" | "skeleton";
+  loadingText?: string;
+  size: string | null;
+  isIconOnly: boolean;
+  children: ReactNode;
+};
+
+function ButtonContent({
+  loading,
+  loadingType,
+  loadingText,
+  size,
+  isIconOnly,
+  children,
+}: ButtonContentProps) {
+  const showSkeleton = loading && loadingType === "skeleton";
+  const showSpinner = loading && loadingType === "spinner";
+
+  if (showSkeleton) return <SkeletonContent size={size} />;
+
+  if (showSpinner) {
+    return isIconOnly ? (
+      <Loader2 className="animate-spin" aria-hidden />
+    ) : (
+      <>
+        <Loader2 className="animate-spin" aria-hidden />
+        <span>{loadingText ?? children}</span>
+      </>
+    );
+  }
+
+  return <>{children}</>;
+}
+
 function Button({
   className,
   variant = "default",
@@ -118,8 +158,6 @@ function Button({
 }: ButtonProps) {
   const isDisabled = disabled || loading;
   const isIconOnly = Boolean(size?.startsWith("icon"));
-  const showSkeleton = loading && loadingType === "skeleton";
-  const showSpinner = loading && loadingType === "spinner";
 
   return (
     <ButtonPrimitive
@@ -130,23 +168,79 @@ function Button({
       className={cn(buttonVariants({ variant, size, className }))}
       {...props}
     >
-      {showSkeleton ? (
-        <SkeletonContent size={size} />
-      ) : showSpinner ? (
-        isIconOnly ? (
-          <Loader2 className="animate-spin" aria-hidden />
-        ) : (
-          <>
-            <Loader2 className="animate-spin" aria-hidden />
-            <span>{loadingText ?? children}</span>
-          </>
-        )
-      ) : (
-        children
-      )}
+      <ButtonContent
+        loading={loading}
+        loadingType={loadingType}
+        loadingText={loadingText}
+        size={size}
+        isIconOnly={isIconOnly}
+      >
+        {children}
+      </ButtonContent>
     </ButtonPrimitive>
   );
 }
 
-export { Button, buttonVariants };
+type ButtonLinkProps<T extends string> = {
+  className?: string;
+  variant?: VariantProps<typeof buttonVariants>["variant"];
+  size?: VariantProps<typeof buttonVariants>["size"];
+  loading?: boolean;
+  loadingType?: "spinner" | "skeleton";
+  loadingText?: string;
+  onClick?: MouseEventHandler<HTMLAnchorElement>;
+  children?: ReactNode;
+} & LinkProps<T>;
+
+function ButtonLink<T extends string>({
+  href,
+  className,
+  variant = "default",
+  size = "default",
+  loading = false,
+  loadingType = "skeleton",
+  loadingText,
+  onClick,
+  children,
+  ...props
+}: ButtonLinkProps<T>) {
+  const isIconOnly = Boolean(size?.startsWith("icon"));
+
+  const handleClick: MouseEventHandler<HTMLAnchorElement> = (event) => {
+    if (loading) {
+      event.preventDefault();
+      return;
+    }
+    onClick?.(event);
+  };
+
+  return (
+    <Link
+      href={href}
+      data-slot="button"
+      data-loading={loading ? loadingType : undefined}
+      aria-busy={loading || undefined}
+      aria-disabled={loading || undefined}
+      tabIndex={loading ? -1 : undefined}
+      onClick={handleClick}
+      className={cn(
+        buttonVariants({ variant, size, className }),
+        loading && "cursor-not-allowed",
+      )}
+      {...props}
+    >
+      <ButtonContent
+        loading={loading}
+        loadingType={loadingType}
+        loadingText={loadingText}
+        size={size}
+        isIconOnly={isIconOnly}
+      >
+        {children}
+      </ButtonContent>
+    </Link>
+  );
+}
+
+export { Button, buttonVariants, ButtonLink };
 export type { ButtonProps, LoadingType };

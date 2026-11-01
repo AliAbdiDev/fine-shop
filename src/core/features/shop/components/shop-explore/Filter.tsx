@@ -175,7 +175,7 @@ function FilterSection({
       <AccordionTrigger className="font-vazir-bold bg-transparent py-3 text-sm hover:no-underline">
         {title}
       </AccordionTrigger>
-      <AccordionContent className="bg-transparent pb-4">
+      <AccordionContent className="bg-transparent pt-1 pb-4">
         {children}
       </AccordionContent>
     </AccordionItem>
@@ -514,12 +514,11 @@ function FilterContent({
 }: Omit<FilterSidebarProps, "className">) {
   return (
     <>
-      <FilterHeader className="pb-4" />
+      <FilterHeader className="pb-2" />
 
       <Accordion
         multiple
         className="border-none"
-
         defaultValue={["category", "price", "brand", "color", "size"]}
       >
         <FilterSection value="category" title="دسته‌بندی">

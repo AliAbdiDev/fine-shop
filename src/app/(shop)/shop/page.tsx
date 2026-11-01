@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 
+import { useSearchParams } from "next/navigation";
+
+import { ButtonLink } from "@/core/components/ui/button";
 import {
   FilterSidebar,
   MobileFilterTrigger,
@@ -32,6 +35,8 @@ const sizes = [
 export default function ExplorePage() {
   const [open, setOpen] = useState(false);
 
+  const queryParams = useSearchParams();
+
   const props = {
     categories,
     brands,
@@ -41,13 +46,33 @@ export default function ExplorePage() {
   };
 
   return (
-    <div className="mx-auto px-4 py-6">
+    <div className="mx-auto px-4 pt-1 pb-6">
       <div className="flex flex-col gap-5 lg:flex-row">
         <FilterSidebar {...props} />
 
         <div className="flex-1 space-y-4">
           <div className="flex items-center justify-between lg:hidden">
             <MobileFilterTrigger onOpen={() => setOpen(true)} activeCount={0} />
+          </div>
+          <div className="bg-card border-border w-full rounded-lg border p-0.5">
+            <ButtonLink
+              href={{ query: { sort: "descending" } }}
+              className={
+                queryParams.get("sort") === "descending" ? "underline" : ""
+              }
+              variant={"link"}
+            >
+              خوش قیمت ترین
+            </ButtonLink>
+            <ButtonLink
+              href={{ query: { sort: "popular" } }}
+              className={
+                queryParams.get("sort") === "popular" ? "underline" : ""
+              }
+              variant={"link"}
+            >
+              محبوب ترین
+            </ButtonLink>
           </div>
           <ProductGrid />
         </div>

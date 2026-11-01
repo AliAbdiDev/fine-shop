@@ -112,11 +112,11 @@ const products: Product[] = [
 
 export function ProductGrid() {
   return (
-    <div className="grid gap-4 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3 2xl:grid-cols-4">
+    <div className="3xl:grid-cols-4 grid gap-2 sm:grid-cols-2 sm:gap-4 xl:grid-cols-3">
       {products.map((product, i) => (
         <VerticalCard
           key={i}
-          href={`/product/${product.id}` as Route}
+          href={`/shop/${product.id}` as Route}
           image={undefined}
           imageAlt={product.title}
           badge={product.badge}
