@@ -67,7 +67,10 @@ export function ProductCard({ product, priority }: ProductCardProps) {
                 </span>
               </span>
             </div>
-            <AddToCartButton disabled={product.isAvailable === false} />
+            <AddToCartButton
+              product={product}
+              disabled={product.isAvailable === false}
+            />
           </div>
         }
       />

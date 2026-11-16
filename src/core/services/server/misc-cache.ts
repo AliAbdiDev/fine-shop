@@ -8,25 +8,35 @@ import { api } from "../configs/api";
 import { cacheTagWithTags } from "../shared/tages";
 
 export const productsAsc = async () => {
-  const r = await api.get<undefined, Products>("/product/", {
-    query: { sort: "price_asc", pageSize: 6 },
-  });
+  try {
+    const r = await api.get<undefined, Products>("/product/", {
+      query: { sort: "price_asc", pageSize: 6 },
+    });
 
-  if (r.ok && r.data) {
-    cacheTagWithTags("product:price_asc");
-    cacheLife("weeks");
+    if (r.ok && r.data) {
+      cacheTagWithTags("product:price_asc");
+      cacheLife("weeks");
+      return r;
+    }
+    return { ok: false, data: [] } as const;
+  } catch {
+    return { ok: false, data: [] } as const;
   }
-  return r;
 };
 
 export const productsPopular = async () => {
-  const r = await api.get<undefined, Products>("/product/", {
-    query: { sort: "popular", pageSize: 6 },
-  });
+  try {
+    const r = await api.get<undefined, Products>("/product/", {
+      query: { sort: "popular", pageSize: 6 },
+    });
 
-  if (r.ok && r.data) {
-    cacheTagWithTags("product:popular");
-    cacheLife("weeks");
+    if (r.ok && r.data) {
+      cacheTagWithTags("product:popular");
+      cacheLife("weeks");
+      return r;
+    }
+    return { ok: false, data: [] } as const;
+  } catch {
+    return { ok: false, data: [] } as const;
   }
-  return r;
 };

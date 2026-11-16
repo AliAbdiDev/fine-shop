@@ -22,9 +22,8 @@ type LoginEmailValues = { email: string };
 type LoginOtpValues = { otp: string; email: string };
 
 export const getTokenFromCookie = async () => {
-    "use cache: private";
-    return await getCookieValue('token')
-}
+    return await getCookieValue('token');
+};
 
 export async function actionSendLoginEmail({
     email,

@@ -13,6 +13,8 @@ export function createKeys<P extends Prefix>(prefix: P) {
     all: () => [prefix] as const,
     lists: () => [prefix, "list"] as const,
     list: (params: ListParams) => [prefix, "list", params] as const,
+    infinite: (params: Omit<ListParams, "page">) =>
+      [prefix, "list", "infinite", params] as const,
     details: () => [prefix, "detail"] as const,
     detail: (id: EntityId) => [prefix, "detail", id] as const,
   };

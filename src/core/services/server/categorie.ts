@@ -16,32 +16,36 @@ function fetchPage(page: number) {
 }
 
 export async function getAllCategories() {
-    cacheTag(categorieKey);
-    cacheLife("max");
+    try {
+        cacheTag(categorieKey);
+        cacheLife("max");
 
-    const first = await fetchPage(1);
-    if (!first.ok) return first;
+        const first = await fetchPage(1);
+        if (!first.ok || !first.data) return { ok: false, data: [] } as const;
 
-    const totalPages = first.meta?.totalPages ?? 1;
+        const totalPages = first.meta?.totalPages ?? 1;
 
-    if (totalPages <= 1) return first;
+        if (totalPages <= 1) return first;
 
-    const rest = await Promise.all(
-        Array.from({ length: totalPages - 1 }, (_, i) => fetchPage(i + 2)),
-    );
+        const rest = await Promise.all(
+            Array.from({ length: totalPages - 1 }, (_, i) => fetchPage(i + 2)),
+        );
 
-    const failed = rest.find((r) => !r.ok);
-    if (failed && !failed.ok) return failed;
+        const failed = rest.find((r) => !r.ok);
+        if (failed && !failed.ok) return { ok: false, data: [] } as const;
 
-    const results = [
-        ...first.data,
-        ...rest.flatMap((r) => (r.ok ? r.data : [])),
-    ];
+        const results = [
+            ...first.data,
+            ...rest.flatMap((r) => (r.ok && r.data ? r.data : [])),
+        ];
 
-    return {
-        ok: true,
-        status: first.status,
-        statusText: first.statusText,
-        data: { ...first.data, results },
-    };
+        return {
+            ok: true,
+            status: first.status,
+            statusText: first.statusText,
+            data: results,
+        };
+    } catch {
+        return { ok: false, data: [] } as const;
+    }
 }

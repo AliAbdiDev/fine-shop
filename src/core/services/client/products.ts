@@ -1,5 +1,10 @@
 import { isNullOrUndefined, isNumber } from "@sindresorhus/is";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 
 import { useAuthSelector } from "@/core/states/auth";
 import {
@@ -12,8 +17,8 @@ import {
 import { api } from "../configs/api";
 import { type ApiError } from "../configs/fetcher/types/client.types";
 import { unwrap } from "../configs/fetcher/unwrap";
+import { revalidateTagWithTags } from "../server/actions";
 import { attributeKeys, type ListParams, productKeys } from "../shared/keys";
-import { revalidateTagWithTags } from "../shared/tages";
 
 export const useCreateProduct = () => {
   const queryClient = useQueryClient();
@@ -79,6 +84,20 @@ export function useProducts(p: ListParams) {
     queryKey: productKeys.list(p),
     queryFn: async () =>
       unwrap(await api.get<Products>("/product/", { query: p })),
+  });
+}
+
+export function useInfiniteProducts(p: Omit<ListParams, "page">) {
+  return useInfiniteQuery({
+    queryKey: productKeys.infinite(p),
+    queryFn: async ({ pageParam = 1 }) =>
+      unwrap(
+        await api.get<Products>("/product/", {
+          query: { ...p, page: pageParam },
+        }),
+      ),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => lastPage.meta?.next ?? undefined,
   });
 }
 

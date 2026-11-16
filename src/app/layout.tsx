@@ -1,5 +1,3 @@
-import { Suspense } from "react";
-
 import localFont from "next/font/local";
 
 import "./globals.css";
@@ -8,8 +6,6 @@ import { Toaster } from "sonner";
 import { TooltipProvider } from "@/core/components/ui/tooltip";
 import { MswProvider } from "@/core/mocks/configs/MswProvider";
 import QueryProvider from "@/core/services/configs/query/QueryProvider";
-import { getTokenFromCookie } from "@/core/services/server/auth";
-import { getProfile } from "@/core/services/server/profile";
 import { AuthInitializer } from "@/core/states/auth";
 import { cn } from "@/core/utils/helpers";
 
@@ -75,9 +71,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body>
         <TooltipProvider>
           <MswProvider>
-            <Suspense fallback={null}>
-              <AuthInitializerWrapper />
-            </Suspense>
+            <AuthInitializer />
             <QueryProvider>
               {children}
               <Toaster richColors position="bottom-center" />
@@ -87,13 +81,4 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       </body>
     </html>
   );
-}
-
-export async function AuthInitializerWrapper() {
-  const token = await getTokenFromCookie();
-  console.log("🚀 ~ AuthInitializerWrapper ~ token:", token);
-  const r = await getProfile({ token });
-  const userInfo = r?.ok ? r.data : undefined;
-
-  return <AuthInitializer token={token} userInfo={userInfo} />;
 }

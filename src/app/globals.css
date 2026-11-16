@@ -115,7 +115,7 @@
   --popover: oklch(100% 0 0); /* #FFFFFF */
   --popover-foreground: oklch(22.63% 0.016 145.19); /* #262B26 */
 
-  --primary: oklch(62.12% 0.143 40.07); /* #D45135 */
+  --primary: oklch(53.5% 0.145 40.07); /* Accessible primary for WCAG AA >= 4.5:1 */
   --primary-foreground: oklch(100% 0 0); /* #FFFFFF */
 
   /* L2 — سطح ثانویه (مکمل سفید: سکشن‌ها، کارت‌ها، خبرنامه) */
@@ -132,7 +132,7 @@
 
   /* سطح hover و آیتم انتخاب‌شده در منو و select */
   --accent: oklch(95.55% 0.038 30.48); /* #FBECE6 */
-  --accent-foreground: oklch(62.12% 0.143 40.07); /* #D45135 */
+  --accent-foreground: oklch(53.5% 0.145 40.07); /* #D45135 */
 
   /* Status — مقادیر معنایی واقعی */
   --success: oklch(69.6% 0.17 162.48); /* سبز موفقیت */

@@ -22,6 +22,8 @@ export const ROUTES: Record<string, Route> = {
     // shop
     HOME: '/',
     SHOP: '/shop',
+    CART: '/cart' as Route,
+    PROFILE: '/profile',
     // auth
     SIGNIN: '/signin',
     SIGNIN_VERIFY: '/signin/verify',

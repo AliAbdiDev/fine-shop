@@ -162,14 +162,14 @@ export const AuthInitializer = ({
   token,
   userInfo,
 }: {
-  token: string | null | undefined;
-  userInfo: Partial<User> | null | undefined;
-}) => {
+  token?: string | null | undefined;
+  userInfo?: Partial<User> | null | undefined;
+} = {}) => {
   const hydrate = useAuthSelector.useHydrate();
 
   useEffect(() => {
     hydrate({ token, userInfo });
   }, [hydrate, token, userInfo]);
 
-  return null;
+  return <span className="hidden" aria-hidden="true" />;
 };

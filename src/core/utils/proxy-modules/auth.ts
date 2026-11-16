@@ -3,7 +3,6 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { type Role, ROLE_HOME, ROLES, ROUTES } from '@/core/constants/misc'
 import { requestCookies } from '@/core/utils/cookie/proxyCookie'
 
-
 const GUEST_ONLY_ROUTES = [ROUTES.SIGNIN_VERIFY, ROUTES.SIGNIN]
 const ADMIN_ONLY_ROUTES = [ROUTES.ADMIN]
 const BUYER_ONLY_ROUTES = ['/temp']

@@ -2,6 +2,8 @@
 
 import { type ComponentProps } from "react";
 
+import { type Route } from "next";
+
 import Link from "next/link";
 
 import { Menu, ShoppingBag, User2 } from "lucide-react";
@@ -13,8 +15,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/core/components/ui/popover";
+import { ROUTES } from "@/core/constants/misc";
 import { useIsMobile } from "@/core/hooks/use-mobile";
 import { useAuthSelector } from "@/core/states/auth";
+import { useCart } from "@/core/states/cart";
+import { toPersianNum } from "@/core/utils/helpers";
 
 /* ─────────────────────────────────────────────
    Shared
@@ -29,12 +34,18 @@ function useAuthState() {
 }
 
 function CartBadge() {
+  const { totalItems, isHydrated } = useCart();
+
+  if (!isHydrated || totalItems <= 0) {
+    return null;
+  }
+
   return (
     <Badge
       variant="default"
       className="font-vazir-bold size-4.5 justify-center rounded-full px-1 text-[10px] leading-none"
     >
-      ۲
+      {toPersianNum(totalItems)}
     </Badge>
   );
 }
@@ -51,7 +62,12 @@ function DesktopActions({ showText }: { showText: boolean }) {
         variant="ghost"
         size={isSignedIn ? "icon" : "default"}
         aria-label={isSignedIn ? "حساب کاربری" : "ورود / ثبت‌نام"}
-        render={<Link href={isSignedIn ? "/#" : "/signin"} prefetch/>}
+        render={
+          <Link
+            href={(isSignedIn ? ROUTES.PROFILE : ROUTES.SIGNIN) as Route}
+            prefetch
+          />
+        }
         loading={isLoading}
         loadingType="skeleton"
         nativeButton={false}
@@ -72,6 +88,8 @@ function DesktopActions({ showText }: { showText: boolean }) {
         variant="ghost"
         className="h-auto gap-1.5 px-2 py-1.5"
         aria-label="سبد خرید"
+        render={<Link href={ROUTES.CART as Route} prefetch />}
+        nativeButton={false}
       >
         <ShoppingBag className="h-5 w-5" aria-hidden />
         {showText && (
@@ -111,7 +129,7 @@ function MobileMenu() {
         <ul className="flex flex-col">
           <li>
             <Link
-              href={isSignedIn ? "/#" : "/signin"}
+              href={(isSignedIn ? ROUTES.PROFILE : ROUTES.SIGNIN) as Route}
               prefetch
               className="hover:bg-muted hover:text-foreground flex items-center gap-3 rounded-md px-3 py-2.5 text-[13px] transition-colors"
             >
@@ -128,7 +146,7 @@ function MobileMenu() {
 
           <li>
             <Link
-              href="/#"
+              href={ROUTES.CART as Route}
               className="hover:bg-muted hover:text-foreground flex items-center gap-3 rounded-md px-3 py-2.5 text-[13px] transition-colors"
             >
               <ShoppingBag className="h-4 w-4 shrink-0" aria-hidden />

@@ -135,7 +135,7 @@ export function HeroSlider({ slides }: HeroSliderProps) {
       </Badge>
 
       {loop && (
-        <div className="absolute bottom-4 left-4 z-30 flex items-center gap-1.5">
+        <div className="absolute bottom-4 left-4 z-30 flex items-center gap-1">
           {Array.from({ length: count }).map((_, i) => (
             <button
               key={i}
@@ -143,13 +143,17 @@ export function HeroSlider({ slides }: HeroSliderProps) {
               onClick={() => goToSlide(i)}
               aria-label={`رفتن به اسلاید ${i + 1}`}
               aria-current={currentSlide === i}
-              className={cn(
-                "h-1.75 rounded-full transition-all duration-300",
-                currentSlide === i
-                  ? "bg-primary w-6"
-                  : "bg-muted-foreground/30 hover:bg-muted-foreground/50 w-1.75",
-              )}
-            />
+              className="flex h-7 min-w-[24px] items-center justify-center p-1"
+            >
+              <span
+                className={cn(
+                  "block h-1.75 rounded-full transition-all duration-300",
+                  currentSlide === i
+                    ? "bg-primary w-6"
+                    : "bg-muted-foreground/30 hover:bg-muted-foreground/50 w-1.75",
+                )}
+              />
+            </button>
           ))}
         </div>
       )}

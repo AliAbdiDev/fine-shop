@@ -1,15 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useSearchParams } from "next/navigation";
 
-import { ButtonLink } from "@/core/components/ui/button";
+import { ArrowUp } from "lucide-react";
+import { useInView } from "react-intersection-observer";
+
+import { Button, ButtonLink } from "@/core/components/ui/button";
 import {
   FilterSidebar,
   MobileFilterTrigger,
 } from "@/core/features/shop/components/shop-explore/Filter";
 import { ProductGrid } from "@/core/features/shop/components/shop-explore/ProductGrid";
+import { useInfiniteProducts } from "@/core/services/client/products";
 
 const categories = [
   { id: 1, name: "دیجیتال", slug: "digital", count: 120 },
@@ -34,8 +38,42 @@ const sizes = [
 
 export default function ExplorePage() {
   const [open, setOpen] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   const queryParams = useSearchParams();
+  const sort = queryParams.get("sort") || undefined;
+
+  const { data, isPending, isFetchingNextPage, hasNextPage, fetchNextPage } =
+    useInfiniteProducts({
+      pageSize: 12,
+      sort,
+    });
+
+  const { ref, inView } = useInView({
+    rootMargin: "200px",
+  });
+
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 200);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const products = data?.pages.flatMap((page) => page.data) ?? [];
 
   const props = {
     categories,
@@ -74,9 +112,44 @@ export default function ExplorePage() {
               محبوب ترین
             </ButtonLink>
           </div>
-          <ProductGrid />
+
+          <ProductGrid
+            products={products}
+            isPending={isPending}
+            isFetchingNextPage={isFetchingNextPage}
+          />
+
+          {hasNextPage && (
+            <div ref={ref} className="h-10 w-full" aria-hidden="true" />
+          )}
         </div>
       </div>
+
+      {showScrollTop && (
+        <Button
+          type="button"
+          onClick={scrollToTop}
+          size="default"
+          variant={"outline"}
+          className="border-primary/60 hover:border-primary fixed bottom-6 left-6 z-50 rounded-md border shadow-lg"
+          aria-label="رفتن به ابتدای لیست"
+        >
+          <ArrowUp className="text-primary h-5 w-5 stroke-3" />
+        </Button>
+      )}
+
+      {showScrollTop && (
+        <Button
+          type="button"
+          onClick={scrollToTop}
+          size="icon"
+          className="fixed bottom-6 left-6 z-50 rounded-md shadow-lg"
+          aria-label="رفتن به ابتدای لیست"
+        >
+          <ArrowUp className="h-5 w-5" />
+        </Button>
+      )}
+
       {/* 
       <Drawer open={open} onOpenChange={setOpen}>
         <DrawerContent>

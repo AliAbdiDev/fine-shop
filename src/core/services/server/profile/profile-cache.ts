@@ -14,8 +14,13 @@ import { profileKey, type Token } from "../misc-utils";
 export async function getProfile({ token }: { token: Token }) {
     if (isNullOrUndefined(token)) return null;
 
-    cacheTag(profileKey(token));
-    cacheLife("hours");
-    const r = await api.get<User>("/account/profile/", { token })
-    if (r.ok) return r;
+    try {
+        cacheTag(profileKey(token));
+        cacheLife("hours");
+        const r = await api.get<User>("/account/profile/", { token });
+        if (r.ok && r.data) return r;
+        return null;
+    } catch {
+        return null;
+    }
 }
