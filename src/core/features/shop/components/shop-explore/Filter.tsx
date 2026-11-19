@@ -6,7 +6,7 @@ import { type Route } from "next";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-import { Check, Search, Star, X } from "lucide-react";
+import { Check, Search, X } from "lucide-react";
 
 import {
   Accordion,
@@ -20,7 +20,6 @@ import { Checkbox } from "@/core/components/ui/checkbox";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import { ScrollArea } from "@/core/components/ui/scroll-area";
-// import { Switch } from "@/core/components/ui/switch";
 import { cn, toPersianNum } from "@/core/utils/helpers";
 
 /* ─────────────────────────────────────────────
@@ -41,17 +40,10 @@ export interface ColorOption {
   value: string;
 }
 
-export interface SizeOption {
-  id: number;
-  name: string;
-  slug: string;
-}
-
 export interface FilterSidebarProps {
   categories: FilterOption[];
-  brands: FilterOption[];
-  colors: ColorOption[];
-  sizes: SizeOption[];
+  colors?: ColorOption[];
+  materials?: FilterOption[];
   maxPrice: number;
   className?: string;
 }
@@ -83,11 +75,6 @@ function useFilters() {
       const n = Number(v);
       return Number.isFinite(n) ? n : null;
     },
-    [searchParams],
-  );
-
-  const getBool = useCallback(
-    (key: string) => searchParams.get(key) === "1",
     [searchParams],
   );
 
@@ -142,13 +129,16 @@ function useFilters() {
   }, [router, pathname]);
 
   const activeCount = Array.from(searchParams.keys()).filter(
-    (k) => k !== "sort" && k !== "page",
+    (k) =>
+      k !== "sort" &&
+      k !== "page" &&
+      k !== "page_size" &&
+      k !== "search",
   ).length;
 
   return {
     getArray,
     getNumber,
-    getBool,
     setParams,
     toggleArray,
     clearAll,
@@ -280,13 +270,27 @@ function CheckboxList({
 
 function PriceFilter({ maxPrice }: { maxPrice: number }) {
   const { getNumber, setParams } = useFilters();
-  const [min, setMin] = useState(() => getNumber("minPrice")?.toString() ?? "");
-  const [max, setMax] = useState(() => getNumber("maxPrice")?.toString() ?? "");
+  const minVal = getNumber("min_price")?.toString() ?? "";
+  const maxVal = getNumber("max_price")?.toString() ?? "";
+
+  const [min, setMin] = useState(minVal);
+  const [prevMinVal, setPrevMinVal] = useState(minVal);
+  if (minVal !== prevMinVal) {
+    setPrevMinVal(minVal);
+    setMin(minVal);
+  }
+
+  const [max, setMax] = useState(maxVal);
+  const [prevMaxVal, setPrevMaxVal] = useState(maxVal);
+  if (maxVal !== prevMaxVal) {
+    setPrevMaxVal(maxVal);
+    setMax(maxVal);
+  }
 
   const apply = () => {
     setParams({
-      minPrice: min ? Number(min) : null,
-      maxPrice: max ? Number(max) : null,
+      min_price: min ? Number(min) : null,
+      max_price: max ? Number(max) : null,
     });
   };
 
@@ -326,7 +330,7 @@ function PriceFilter({ maxPrice }: { maxPrice: number }) {
 
 function ColorFilter({ colors }: { colors: ColorOption[] }) {
   const { getArray, toggleArray } = useFilters();
-  const selected = getArray("color");
+  const selected = getArray("رنگ");
 
   return (
     <div className="flex flex-wrap gap-2">
@@ -336,7 +340,7 @@ function ColorFilter({ colors }: { colors: ColorOption[] }) {
           <button
             key={c.id}
             type="button"
-            onClick={() => toggleArray("color", c.slug)}
+            onClick={() => toggleArray("رنگ", c.slug)}
             aria-label={c.name}
             aria-pressed={checked}
             title={c.name}
@@ -355,109 +359,6 @@ function ColorFilter({ colors }: { colors: ColorOption[] }) {
           </button>
         );
       })}
-    </div>
-  );
-}
-
-/* ─────────────────────────────────────────────
-   Size
-   ───────────────────────────────────────────── */
-
-function SizeFilter({ sizes }: { sizes: SizeOption[] }) {
-  const { getArray, toggleArray } = useFilters();
-  const selected = getArray("size");
-
-  return (
-    <div className="flex flex-wrap gap-1.5">
-      {sizes.map((s) => {
-        const checked = selected.includes(s.slug);
-        return (
-          <button
-            key={s.id}
-            type="button"
-            onClick={() => toggleArray("size", s.slug)}
-            aria-pressed={checked}
-            className={cn(
-              "border-border min-w-10 shrink-0 rounded-md border px-2.5 py-1.5 text-xs transition-colors",
-              checked
-                ? "border-primary bg-primary text-primary-foreground"
-                : "hover:border-foreground/40",
-            )}
-          >
-            {s.name}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
-/* ─────────────────────────────────────────────
-   Rating
-   ───────────────────────────────────────────── */
-
-function RatingFilter() {
-  const { getNumber, setParams } = useFilters();
-  const current = getNumber("rating");
-
-  return (
-    <ul className="w-full space-y-2">
-      {[4, 3, 2, 1].map((r) => {
-        const active = current === r;
-        return (
-          <li key={r} className="w-full">
-            <button
-              type="button"
-              onClick={() => setParams({ rating: active ? null : r })}
-              aria-pressed={active}
-              className={cn(
-                "flex w-full items-center gap-2 rounded-md px-1.5 py-1 text-xs transition-colors",
-                active ? "bg-secondary" : "hover:bg-secondary/60",
-              )}
-            >
-              <span className="flex shrink-0 items-center gap-0.5">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star
-                    key={i}
-                    className={cn(
-                      "h-3.5 w-3.5",
-                      i < r
-                        ? "fill-primary text-primary"
-                        : "text-muted-foreground/40",
-                    )}
-                  />
-                ))}
-              </span>
-              <span className="text-muted-foreground truncate">و بالاتر</span>
-            </button>
-          </li>
-        );
-      })}
-    </ul>
-  );
-}
-
-/* ─────────────────────────────────────────────
-   Switch row
-   ───────────────────────────────────────────── */
-
-function SwitchRow({ paramKey, label }: { paramKey: string; label: string }) {
-  const { getBool, setParams } = useFilters();
-  const checked = getBool(paramKey);
-
-  return (
-    <div className="flex items-center justify-between gap-2">
-      <Label
-        htmlFor={paramKey}
-        className="cursor-pointer truncate text-xs font-normal sm:text-[13px]"
-      >
-        {label}
-      </Label>
-      {/* <Switch
-        id={paramKey}
-        checked={checked}
-        onCheckedChange={(v) => setParams({ [paramKey]: v })}
-      /> */}
     </div>
   );
 }
@@ -507,9 +408,8 @@ function FilterHeader({ className }: { className?: string }) {
 
 function FilterContent({
   categories,
-  brands,
   colors,
-  sizes,
+  materials,
   maxPrice,
 }: Omit<FilterSidebarProps, "className">) {
   return (
@@ -519,7 +419,7 @@ function FilterContent({
       <Accordion
         multiple
         className="border-none"
-        defaultValue={["category", "price", "brand", "color", "size"]}
+        defaultValue={["category", "price", "color", "material"]}
       >
         <FilterSection value="category" title="دسته‌بندی">
           <CheckboxList paramKey="category" options={categories} searchable />
@@ -529,33 +429,17 @@ function FilterContent({
           <PriceFilter maxPrice={maxPrice} />
         </FilterSection>
 
-        <FilterSection value="brand" title="برند">
-          <CheckboxList
-            paramKey="brand"
-            options={brands}
-            searchable
-            maxVisible={6}
-          />
-        </FilterSection>
+        {colors && colors.length > 0 && (
+          <FilterSection value="color" title="رنگ">
+            <ColorFilter colors={colors} />
+          </FilterSection>
+        )}
 
-        <FilterSection value="color" title="رنگ">
-          <ColorFilter colors={colors} />
-        </FilterSection>
-
-        <FilterSection value="size" title="سایز">
-          <SizeFilter sizes={sizes} />
-        </FilterSection>
-
-        <FilterSection value="rating" title="امتیاز">
-          <RatingFilter />
-        </FilterSection>
-
-        <FilterSection value="other" title="سایر">
-          <div className="space-y-3">
-            <SwitchRow paramKey="inStock" label="فقط کالاهای موجود" />
-            <SwitchRow paramKey="onSale" label="فقط تخفیف‌دارها" />
-          </div>
-        </FilterSection>
+        {materials && materials.length > 0 && (
+          <FilterSection value="material" title="جنس">
+            <CheckboxList paramKey="جنس" options={materials} searchable />
+          </FilterSection>
+        )}
       </Accordion>
     </>
   );

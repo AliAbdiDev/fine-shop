@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { type User, type Product, type Image } from "./types/entities.types";
+import { type User, type Product, type ImageWithFile } from "./types/entities.types";
 import { type Override } from "./types/misc";
 
 export const emailShema = z
@@ -58,7 +58,7 @@ export const productSchema = z
                     imageFile
                 ],
                 "لطفا تصویری را آپلود کنید",
-            ) satisfies z.ZodType<Image>)
+            ) satisfies z.ZodType<ImageWithFile>)
             .min(1, "لطفا تصویری را آپلود کنید")
             .max(8, "حداکثر تعداد مجاز اپلود 8 تصویر است"),
         isAvailable: z.boolean(),

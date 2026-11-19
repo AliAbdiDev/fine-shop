@@ -25,14 +25,14 @@ export default function CartPage() {
   const { items, isHydrated } = useCart();
 
   return (
-    <main className="container mx-auto max-w-7xl px-4 py-8 md:py-12">
+    <main className="container mx-auto max-w-7xl px-3 pb-8 sm:px-4 md:pb-12">
       {/* Page Header */}
-      <div className="mb-6 flex items-center gap-3">
-        <div className="bg-primary/10 text-primary flex h-10 w-10 items-center justify-center rounded-xl">
-          <ShoppingBag className="h-5 w-5" />
+      <div className="mb-5 flex items-center gap-3 sm:mb-6">
+        <div className="bg-primary/10 text-primary flex h-9 w-9 items-center justify-center rounded-xl sm:h-10 sm:w-10">
+          <ShoppingBag className="h-4.5 w-4.5 sm:h-5 sm:w-5" />
         </div>
         <div>
-          <h1 className="font-heading text-xl font-bold md:text-2xl">
+          <h1 className="font-heading text-lg font-bold sm:text-xl md:text-2xl">
             سبد خرید
           </h1>
           <p className="text-muted-foreground text-xs md:text-sm">

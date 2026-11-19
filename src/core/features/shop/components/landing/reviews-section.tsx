@@ -1,6 +1,6 @@
 import { Star } from "lucide-react";
 
-import { SectionHeader } from "../Section";
+import { SectionHeader } from "../shared/Section";
 
 const stats = [
   { value: "۴.۸ از ۵", label: "امتیاز تجربه خرید" },

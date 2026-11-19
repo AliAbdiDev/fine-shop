@@ -19,7 +19,7 @@ export function AddToCartButton({
   disabled,
   product,
   onClick,
-  showToast = false,
+  showToast = true,
 }: AddToCartButtonProps) {
   const { addItem } = useCart();
 

@@ -70,6 +70,7 @@ export function ProductCard({ product, priority }: ProductCardProps) {
             <AddToCartButton
               product={product}
               disabled={product.isAvailable === false}
+              showToast
             />
           </div>
         }

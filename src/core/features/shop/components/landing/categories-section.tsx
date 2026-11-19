@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Card } from "@/core/components/ui/card";
 import { cn, toPersianNum } from "@/core/utils/helpers";
 
-import { SectionHeader } from "../Section";
+import { SectionHeader } from "../shared/Section";
 
 interface CategoryItem {
   title: string;

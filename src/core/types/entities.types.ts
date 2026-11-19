@@ -4,9 +4,11 @@ export type Image = {
     url: string;
     alt: string;
     id?: EntityId;
-} | File;
+};
 
-export type Images = Array<Image>
+export type ImageWithFile = Image | File
+
+export type Images = Array<ImageWithFile>
 
 export type User = {
     id?: EntityId;

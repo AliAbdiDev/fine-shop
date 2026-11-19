@@ -4,8 +4,8 @@ import {
   productsPopular,
 } from "@/core/services/server/misc-cache";
 
-import { ProductSliderWrapper } from "../ProductSliderWrapper";
-import { SectionSlider } from "../Section";
+import { ProductSliderWrapper } from "../shared/ProductSliderWrapper";
+import { SectionSlider } from "../shared/Section";
 
 export async function EconomicalSlider() {
   try {

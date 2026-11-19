@@ -87,7 +87,10 @@ export function useProducts(p: ListParams) {
   });
 }
 
-export function useInfiniteProducts(p: Omit<ListParams, "page">) {
+export function useInfiniteProducts(
+  p: Omit<ListParams, "page">,
+  options?: { enabled?: boolean },
+) {
   return useInfiniteQuery({
     queryKey: productKeys.infinite(p),
     queryFn: async ({ pageParam = 1 }) =>
@@ -98,6 +101,7 @@ export function useInfiniteProducts(p: Omit<ListParams, "page">) {
       ),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => lastPage.meta?.next ?? undefined,
+    enabled: options?.enabled ?? true,
   });
 }
 

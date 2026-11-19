@@ -3,7 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import { VerticalCard } from "@/core/components/custom/verticalCard";
 import { toPersianNum } from "@/core/utils/helpers";
 
-import { SectionHeader } from "../Section";
+import { SectionHeader } from "../shared/Section";
 
 const cards = [
   {

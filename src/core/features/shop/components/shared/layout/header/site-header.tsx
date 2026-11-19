@@ -8,13 +8,13 @@ import { BadgePercent, Search, Truck } from "lucide-react";
 
 import { Logo } from "@/core/components/custom/Logos";
 import { Button } from "@/core/components/ui/button";
-import { Input } from "@/core/components/ui/input";
 import { Separator } from "@/core/components/ui/separator";
 import { getAllCategories } from "@/core/services/server/categorie";
 import { type Categorys } from "@/core/types/entities.types";
 import { cn } from "@/core/utils/helpers";
 
 import { DesktopAllCategories, MobileAllCategories } from "./AllCategories";
+import { ProductCommandDialog } from "./ProductCommandDialog";
 import { UserActions } from "./UserActions";
 
 /* ─────────────────────────────────────────────
@@ -22,13 +22,21 @@ import { UserActions } from "./UserActions";
    ───────────────────────────────────────────── */
 function SearchBar({ className }: { className?: string }) {
   return (
-    <div className={cn("relative", className)}>
-      <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
-      <Input
-        placeholder="دنبال چه چیزی می‌گردید؟"
-        className="bg-background border-border h-10 w-full rounded-lg pl-10"
-      />
-    </div>
+    <ProductCommandDialog
+      trigger={
+        <button
+          type="button"
+          aria-label="جستجوی محصولات"
+          className={cn(
+            "text-muted-foreground bg-background border-border hover:bg-accent hover:text-foreground flex h-10 w-full items-center gap-2 rounded-lg border px-3 text-sm transition-colors md:w-md",
+            className,
+          )}
+        >
+          <Search className="size-4 shrink-0" />
+          <span className="truncate text-start">دنبال چه چیزی می‌گردید؟</span>
+        </button>
+      }
+    />
   );
 }
 

@@ -9,7 +9,14 @@ import { useInView } from "react-intersection-observer";
 
 import { Button, ButtonLink } from "@/core/components/ui/button";
 import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/core/components/ui/sheet";
+import {
   FilterSidebar,
+  MobileFilterPanel,
   MobileFilterTrigger,
 } from "@/core/features/shop/components/shop-explore/Filter";
 import { ProductGrid } from "@/core/features/shop/components/shop-explore/ProductGrid";
@@ -42,6 +49,13 @@ export default function ExplorePage() {
 
   const queryParams = useSearchParams();
   const sort = queryParams.get("sort") || undefined;
+  const activeFilterCount = Array.from(queryParams.keys()).filter(
+    (k) =>
+      k !== "sort" &&
+      k !== "page" &&
+      k !== "page_size" &&
+      k !== "search",
+  ).length;
 
   const { data, isPending, isFetchingNextPage, hasNextPage, fetchNextPage } =
     useInfiniteProducts({
@@ -90,7 +104,10 @@ export default function ExplorePage() {
 
         <div className="flex-1 space-y-4">
           <div className="flex items-center justify-between lg:hidden">
-            <MobileFilterTrigger onOpen={() => setOpen(true)} activeCount={0} />
+            <MobileFilterTrigger
+              onOpen={() => setOpen(true)}
+              activeCount={activeFilterCount}
+            />
           </div>
           <div className="bg-card border-border w-full rounded-lg border p-0.5">
             <ButtonLink
@@ -150,17 +167,16 @@ export default function ExplorePage() {
         </Button>
       )}
 
-      {/* 
-      <Drawer open={open} onOpenChange={setOpen}>
-        <DrawerContent>
-          <DrawerHeader>
-            <DrawerTitle>فیلترها</DrawerTitle>
-          </DrawerHeader>
-          <div className="max-h-[70vh] overflow-y-auto">
+      <Sheet open={open} onOpenChange={setOpen}>
+        <SheetContent side="bottom" className="max-h-[85vh] rounded-t-2xl p-0">
+          <SheetHeader className="border-border border-b px-5 py-4">
+            <SheetTitle className="font-vazir-bold text-base">فیلترها</SheetTitle>
+          </SheetHeader>
+          <div className="max-h-[calc(85vh-5rem)] overflow-y-auto pt-2">
             <MobileFilterPanel {...props} />
           </div>
-        </DrawerContent>
-      </Drawer> */}
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }

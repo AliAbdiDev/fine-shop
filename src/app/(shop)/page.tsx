@@ -10,8 +10,8 @@ import { HeroSection } from "@/core/features/shop/components/landing/hero/hero-s
 import { LifestyleSection } from "@/core/features/shop/components/landing/lifestyle-section";
 import { NewsletterSection } from "@/core/features/shop/components/landing/newsletter-section";
 import { ReviewsSection } from "@/core/features/shop/components/landing/reviews-section";
-import { SectionSlider } from "@/core/features/shop/components/Section";
-import { SliderSkeleton } from "@/core/features/shop/components/skeletons/slider-skeleton";
+import { SectionSlider } from "@/core/features/shop/components/shared/Section";
+import { SliderSkeleton } from "@/core/features/shop/components/shared/skeletons/slider-skeleton";
 
 export default function LandingPage() {
   return (

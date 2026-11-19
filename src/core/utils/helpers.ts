@@ -76,9 +76,10 @@ export const asRecord = (value: unknown): Record<string, unknown> | null =>
 const PERSIAN_DIGITS = "۰۱۲۳۴۵۶۷۸۹";
 
 export const toPersianNum = (
-  input: string | number,
+  input: string | number | null | undefined,
   comma = true
 ): string => {
+  if (isNullOrUndefined(input)) return "";
   const str = String(input ?? "").trim();
   if (!str) return "";
 
